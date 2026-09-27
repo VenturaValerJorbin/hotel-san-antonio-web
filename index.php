@@ -10,8 +10,8 @@ $destacadas = array_filter($tipos, fn($t) => in_array($t->nombre, ["Simple", "Ma
 
 require "views/partes/cabecera.php";
 ?>
-<section class="sa-hero sa-hero-grande">
-    <div class="container">
+<section class="sa-hero sa-hero-grande sa-hero-foto ">
+    <div class="container ">
         <div class="etiqueta mb-3">Tu hogar en la selva amazónica</div>
         <h1>Hotel Turístico<br>San Antonio</h1>
         <p class="serif fs-5 mt-2 mb-1">Bagua, Amazonas, Perú</p>

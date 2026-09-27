@@ -63,9 +63,16 @@ a:hover { color: var(--rojo-osc); }
 .sa-hero .migas span.actual { color: #fff; }
 .sa-hero p { max-width: 34rem; opacity: .95; }
 .sa-hero-grande { padding: 3rem 0 4.5rem; }
+
+.sa-hero-foto {
+    background:
+        linear-gradient(rgba(59, 36, 26, .55), rgba(59, 36, 26, .65)),
+        url("../img/hero/hero-portada.jpg") 25% center/cover no-repeat;
+}
 .sa-hero-grande h1 { font-size: 2.4rem; }
 .sa-rasgo { display: flex; align-items: center; gap: .5rem; font-size: .85rem; }
 .sa-rasgo i { color: var(--dorado); font-size: 1.3rem; }
+
 
 /* ---------- Tarjetas ---------- */
 .sa-card { background: #fff; border: 1px solid var(--borde); border-radius: .75rem; box-shadow: 0 2px 8px rgba(79, 49, 41, .06); }
@@ -87,7 +94,6 @@ a:hover { color: var(--rojo-osc); }
 .sa-carrusel .carousel-indicators [data-bs-target] { width: 8px; height: 8px; border-radius: 50%; }
 .sa-carrusel .carousel-control-prev, .sa-carrusel .carousel-control-next { width: 12%; }
 /* ===================== FIN CAMBIO en estilo.css ============================= */
-
 
 /* Buscador de disponibilidad (Inicio): se superpone al hero */
 .sa-buscador { margin-top: -2.5rem; position: relative; z-index: 2; }
@@ -172,6 +178,7 @@ a:hover { color: var(--rojo-osc); }
     .sa-hero-grande h1 { font-size: 3.2rem; }
     .sa-card-cuerpo { padding: 1.25rem; }
     .panel-contenido { padding: 1.5rem; }
+    .sa-hero-foto { background-position: center; }
 }
 
 /* ============================================================
@@ -186,6 +193,8 @@ a:hover { color: var(--rojo-osc); }
     .panel-lado { position: sticky; top: 0; height: 100vh; }
     .panel-contenido { padding: 2rem; }
     .resumen-fijo { position: sticky; top: 1rem; }
+    /*.sa-hero-foto { background-attachment: fixed; }*/
+    .sa-hero-foto { background-attachment: scroll; }
 }
 
 @media (min-width: 1200px) {
