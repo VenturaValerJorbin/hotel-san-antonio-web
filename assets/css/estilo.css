@@ -79,6 +79,16 @@ a:hover { color: var(--rojo-osc); }
 .sa-foto { display: grid; place-items: center; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: .5rem;
     background: linear-gradient(135deg, #e7d7c0, #c9a878); color: rgba(255, 255, 255, .9); font-size: 2rem; }
 
+    /* ===================== CAMBIO (agregado) en estilo.css =====================
+   Ajustes minimos para que el carrusel de fotos se vea bien dentro de la
+   tarjeta redondeada (no se toco ninguna regla existente de arriba). */
+.sa-carrusel, .sa-carrusel .carousel-inner, .sa-carrusel .carousel-item { border-radius: .5rem; }
+.sa-carrusel .carousel-indicators { margin-bottom: .35rem; }
+.sa-carrusel .carousel-indicators [data-bs-target] { width: 8px; height: 8px; border-radius: 50%; }
+.sa-carrusel .carousel-control-prev, .sa-carrusel .carousel-control-next { width: 12%; }
+/* ===================== FIN CAMBIO en estilo.css ============================= */
+
+
 /* Buscador de disponibilidad (Inicio): se superpone al hero */
 .sa-buscador { margin-top: -2.5rem; position: relative; z-index: 2; }
 .sa-aviso { display: flex; align-items: center; gap: .5rem; font-size: .85rem; color: var(--marron); }

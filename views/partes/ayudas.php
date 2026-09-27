@@ -47,12 +47,58 @@ function fechaLarga(string $fecha): string
 }
 
 // Foto real si existe la ruta; si no, un marcador con el mismo tamano
+// ===================== CAMBIO 4 (corregido) =====================
+// Antes: src="' . e($ruta) . '"  -> fallaba en paginas dentro de publico/
+// o admin/, porque la ruta guardada en la BD (ej. "assets/img/...") es
+// relativa a la RAIZ del proyecto, no a la carpeta de la pagina actual.
+// Ahora se arma igual que todos los demas enlaces del sitio, con url().
 function foto(?string $ruta, string $alt, string $icono = "bi-image"): void
 {
     echo $ruta
-        ? '<img class="sa-foto" src="' . e($ruta) . '" alt="' . e($alt) . '" loading="lazy">'
+        ? '<img class="sa-foto" src="' . e(url($ruta)) . '" alt="' . e($alt) . '" loading="lazy">'
         : '<div class="sa-foto" role="img" aria-label="' . e($alt) . '"><i class="bi ' . e($icono) . '"></i></div>';
 }
+// ===================== FIN CAMBIO 4 ==============================
+
+// =====================================================================
+// CAMBIO 1 de 3 (agregado) - views/partes/ayudas.php
+// Carrusel de fotos (usa el componente Carousel de Bootstrap, que ya
+// se carga en pie.php). Si no hay fotos o hay solo una, no arma
+// carrusel: cae en foto() de siempre para no romper nada.
+// =====================================================================
+function carrusel(array $fotos, string $alt, string $icono = "bi-image", string $idBase = "carrusel"): void
+{
+    if (!$fotos) {
+        foto(null, $alt, $icono);
+        return;
+    }
+    if (count($fotos) === 1) {
+        foto($fotos[0], $alt, $icono);
+        return;
+    }
+    $id = $idBase . "-" . substr(md5($alt . implode("", $fotos)), 0, 8);
+    echo '<div id="' . $id . '" class="carousel slide sa-carrusel" data-bs-ride="carousel">';
+    echo '<div class="carousel-indicators">';
+    foreach ($fotos as $i => $f) {
+        echo '<button type="button" data-bs-target="#' . $id . '" data-bs-slide-to="' . $i . '"'
+            . ($i === 0 ? ' class="active" aria-current="true"' : '')
+            . ' aria-label="Foto ' . ($i + 1) . '"></button>';
+    }
+    echo '</div><div class="carousel-inner">';
+    foreach ($fotos as $i => $f) {
+        echo '<div class="carousel-item' . ($i === 0 ? ' active' : '') . '">';
+        // CAMBIO 5 (corregido): src="' . e(url($f)) . '" en vez de e($f) -> mismo motivo que CAMBIO 4
+        echo '<img class="sa-foto" src="' . e(url($f)) . '" alt="' . e($alt) . ' - foto ' . ($i + 1) . '" loading="lazy">';
+        echo '</div>';
+    }
+    echo '</div>';
+    echo '<button class="carousel-control-prev" type="button" data-bs-target="#' . $id . '" data-bs-slide="prev">'
+        . '<span class="carousel-control-prev-icon" aria-hidden="true"></span><span class="visually-hidden">Anterior</span></button>';
+    echo '<button class="carousel-control-next" type="button" data-bs-target="#' . $id . '" data-bs-slide="next">'
+        . '<span class="carousel-control-next-icon" aria-hidden="true"></span><span class="visually-hidden">Siguiente</span></button>';
+    echo '</div>';
+}
+// ===================== FIN CAMBIO 1 de 3 ==============================
 
 // Banda superior de cada pagina publica: migas de pan, titulo y texto
 function hero(string $titulo, string $texto = "", array $migas = [], string $etiqueta = ""): void
@@ -82,7 +128,10 @@ function tarjetaTipo(dto\TipoHabitacion $t, string $consulta = ""): void
     $sufijo = $consulta ? "&" . $consulta : "";
     echo '<div class="col-12 col-md-6 col-lg-4"><article class="sa-card h-100 d-flex flex-column">';
     echo '<div class="p-2 pb-0">';
-    foto($t->fotos[0] ?? null, "Habitación " . $t->nombre, "bi-house-heart");
+    // ================= CAMBIO 2 de 3 (modificado) =====================
+    // Antes: foto($t->fotos[0] ?? null, "Habitación " . $t->nombre, "bi-house-heart");
+    carrusel($t->fotos, "Habitación " . $t->nombre, "bi-house-heart", "tarjeta-" . $t->id);
+    // ===================== FIN CAMBIO 2 de 3 ===========================
     echo '</div><div class="sa-card-cuerpo d-flex flex-column flex-grow-1">';
     echo '<div class="d-flex justify-content-between align-items-start gap-2"><div>';
     echo '<h3 class="h5 mb-1">' . e($t->nombre) . '</h3>';
