@@ -1,0 +1,397 @@
+-- =====================================================================
+-- Hotel Turistico San Antonio - Aplicacion web (Desarrollo de Aplicaciones Web II)
+-- Base de datos completa para las 3 unidades del curso.
+--   Unidad I  : tipo_habitacion, habitacion, huesped, reserva, pago, puntos, contacto, carta
+--   Unidad II : rol, usuario (login y RBAC)
+--   Unidad III: pedido, comprobante (room service, reportes)
+-- Convenciones pensadas para migrar luego a un framework (ORM):
+--   id autoincremental, created_at / updated_at, borrado logico con "activo".
+-- Normalizada a 3FN: los valores calculados (noches, total, saldo, puntos) salen de vistas.
+-- =====================================================================
+
+DROP DATABASE IF EXISTS daw2_hotel_san_antonio;
+CREATE DATABASE daw2_hotel_san_antonio CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE daw2_hotel_san_antonio;
+
+-- ---------------------------------------------------------------------
+-- HABITACIONES
+-- ---------------------------------------------------------------------
+CREATE TABLE tipo_habitacion (
+    id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nombre         VARCHAR(40)   NOT NULL UNIQUE,
+    descripcion    VARCHAR(255)  NOT NULL,
+    detalle        TEXT          NULL,
+    capacidad      TINYINT UNSIGNED NOT NULL,
+    precio_noche   DECIMAL(8,2)  NOT NULL CHECK (precio_noche > 0),
+    activo         TINYINT(1)    NOT NULL DEFAULT 1,
+    created_at     TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at     TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE foto_tipo_habitacion (
+    id       INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    tipo_id  INT UNSIGNED NOT NULL,
+    ruta     VARCHAR(255) NOT NULL,
+    orden    TINYINT UNSIGNED NOT NULL DEFAULT 1,
+    CONSTRAINT fk_foto_tipo FOREIGN KEY (tipo_id) REFERENCES tipo_habitacion(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE habitacion (
+    id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    numero       VARCHAR(5)   NOT NULL UNIQUE,
+    piso         TINYINT UNSIGNED NOT NULL,
+    tipo_id      INT UNSIGNED NOT NULL,
+    estado       ENUM('disponible','ocupada','limpieza','mantenimiento') NOT NULL DEFAULT 'disponible',
+    descripcion  VARCHAR(255) NULL,
+    activo       TINYINT(1)   NOT NULL DEFAULT 1,
+    created_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_habitacion_tipo FOREIGN KEY (tipo_id) REFERENCES tipo_habitacion(id)
+) ENGINE=InnoDB;
+
+CREATE TABLE servicio (
+    id      INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nombre  VARCHAR(50) NOT NULL UNIQUE,
+    icono   VARCHAR(30) NULL
+) ENGINE=InnoDB;
+
+-- Los servicios dependen del TIPO de habitacion (ej. Ejecutiva con o sin agua caliente)
+CREATE TABLE tipo_servicio (
+    tipo_id      INT UNSIGNED NOT NULL,
+    servicio_id  INT UNSIGNED NOT NULL,
+    PRIMARY KEY (tipo_id, servicio_id),
+    CONSTRAINT fk_ts_tipo     FOREIGN KEY (tipo_id)     REFERENCES tipo_habitacion(id) ON DELETE CASCADE,
+    CONSTRAINT fk_ts_servicio FOREIGN KEY (servicio_id) REFERENCES servicio(id)        ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- USUARIOS DEL PANEL (Unidad II: login y RBAC)
+-- ---------------------------------------------------------------------
+CREATE TABLE rol (
+    id      INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nombre  VARCHAR(30) NOT NULL UNIQUE
+) ENGINE=InnoDB;
+
+CREATE TABLE usuario (
+    id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    rol_id      INT UNSIGNED NOT NULL,
+    nombres     VARCHAR(80)  NOT NULL,
+    correo      VARCHAR(100) NOT NULL UNIQUE,
+    clave       VARCHAR(255) NOT NULL,
+    activo      TINYINT(1)   NOT NULL DEFAULT 1,
+    created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_usuario_rol FOREIGN KEY (rol_id) REFERENCES rol(id)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- HUESPEDES Y PROGRAMA DE PUNTOS
+-- ---------------------------------------------------------------------
+CREATE TABLE huesped (
+    id                INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    tipo_documento    ENUM('DNI','PASAPORTE','CE') NOT NULL DEFAULT 'DNI',
+    numero_documento  VARCHAR(20)  NOT NULL,
+    nombre_completo   VARCHAR(160) NOT NULL,
+    correo            VARCHAR(100) NULL,
+    telefono          VARCHAR(20)  NOT NULL,
+    created_at        TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at        TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_huesped_documento (tipo_documento, numero_documento)
+) ENGINE=InnoDB;
+
+-- Reglas del programa de puntos editables por el administrador (no van fijas en el codigo)
+CREATE TABLE parametro (
+    clave        VARCHAR(50)  PRIMARY KEY,
+    valor        VARCHAR(50)  NOT NULL,
+    descripcion  VARCHAR(150) NOT NULL,
+    updated_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- RESTAURANTE (carta publica y room service de la Unidad III)
+-- ---------------------------------------------------------------------
+CREATE TABLE categoria_producto (
+    id      INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nombre  VARCHAR(40) NOT NULL UNIQUE
+) ENGINE=InnoDB;
+
+-- precio NULL = plato "a la carta" cuyo precio se consulta en el restaurante
+CREATE TABLE producto (
+    id            INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    categoria_id  INT UNSIGNED NOT NULL,
+    nombre        VARCHAR(80)  NOT NULL,
+    descripcion   VARCHAR(200) NULL,
+    precio        DECIMAL(7,2) NULL CHECK (precio IS NULL OR precio > 0),
+    foto          VARCHAR(255) NULL,
+    activo        TINYINT(1)   NOT NULL DEFAULT 1,
+    created_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_producto_categoria FOREIGN KEY (categoria_id) REFERENCES categoria_producto(id)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- RESERVAS Y PAGOS
+-- ---------------------------------------------------------------------
+CREATE TABLE reserva (
+    id               INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    codigo           VARCHAR(12)  NOT NULL UNIQUE,
+    huesped_id       INT UNSIGNED NOT NULL,
+    habitacion_id    INT UNSIGNED NOT NULL,
+    fecha_ingreso    DATE         NOT NULL,
+    fecha_salida     DATE         NOT NULL,
+    num_huespedes    TINYINT UNSIGNED NOT NULL DEFAULT 1,
+    precio_noche     DECIMAL(8,2) NOT NULL,             -- foto del precio al reservar
+    monto_descuento  DECIMAL(9,2) NOT NULL DEFAULT 0,   -- descuento por canje de puntos
+    monto_adelanto   DECIMAL(9,2) NOT NULL,             -- lo que se cobra online al reservar
+    modalidad_pago   ENUM('completo','fraccionado') NOT NULL DEFAULT 'completo',
+    estado           ENUM('pendiente','confirmada','checkin','checkout','cancelada','no_show') NOT NULL DEFAULT 'pendiente',
+    observaciones    VARCHAR(255) NULL,
+    usuario_id       INT UNSIGNED NULL,
+    created_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_reserva_huesped    FOREIGN KEY (huesped_id)    REFERENCES huesped(id),
+    CONSTRAINT fk_reserva_habitacion FOREIGN KEY (habitacion_id) REFERENCES habitacion(id),
+    CONSTRAINT fk_reserva_usuario    FOREIGN KEY (usuario_id)    REFERENCES usuario(id),
+    CONSTRAINT ck_reserva_fechas CHECK (fecha_salida > fecha_ingreso),
+    INDEX idx_reserva_fechas (habitacion_id, fecha_ingreso, fecha_salida)
+) ENGINE=InnoDB;
+
+-- Una reserva puede tener varios pagos: adelanto online + saldo al llegar (o un pago total)
+CREATE TABLE pago (
+    id                   INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    reserva_id           INT UNSIGNED NOT NULL,
+    tipo                 ENUM('adelanto','saldo','total') NOT NULL,
+    monto                DECIMAL(9,2) NOT NULL CHECK (monto > 0),
+    metodo               ENUM('tarjeta','yape','transferencia','efectivo') NOT NULL,
+    estado               ENUM('pendiente','aprobado','rechazado','reembolsado') NOT NULL DEFAULT 'pendiente',
+    pasarela             VARCHAR(30)  NULL,
+    codigo_transaccion   VARCHAR(80)  NULL,
+    motivo_reembolso     VARCHAR(255) NULL,
+    fecha_pago           DATETIME     NULL,
+    fecha_reembolso      DATETIME     NULL,
+    usuario_id           INT UNSIGNED NULL,
+    created_at           TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at           TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_pago_reserva FOREIGN KEY (reserva_id) REFERENCES reserva(id),
+    CONSTRAINT fk_pago_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(id)
+) ENGINE=InnoDB;
+
+-- Catalogo de recompensas del programa de puntos (editable por el administrador)
+--   pago_fraccionado : beneficio permanente, no gasta puntos (valor = % de adelanto)
+--   descuento        : canje, valor = % de descuento sobre la estadia
+--   producto         : canje, entrega un producto (ej. desayuno)
+--   noche_gratis     : canje, una noche de cortesia
+CREATE TABLE recompensa (
+    id                 INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nombre             VARCHAR(80)  NOT NULL,
+    descripcion        VARCHAR(200) NULL,
+    puntos_requeridos  INT UNSIGNED NOT NULL,
+    tipo               ENUM('pago_fraccionado','descuento','producto','noche_gratis') NOT NULL,
+    valor              DECIMAL(5,2) NULL,
+    producto_id        INT UNSIGNED NULL,
+    consume_puntos     TINYINT(1)   NOT NULL DEFAULT 1,
+    activo             TINYINT(1)   NOT NULL DEFAULT 1,
+    created_at         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_recompensa_producto FOREIGN KEY (producto_id) REFERENCES producto(id)
+) ENGINE=InnoDB;
+
+CREATE TABLE canje_recompensa (
+    id            INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    huesped_id    INT UNSIGNED NOT NULL,
+    recompensa_id INT UNSIGNED NOT NULL,
+    reserva_id    INT UNSIGNED NULL,
+    estado        ENUM('pendiente','entregado','anulado') NOT NULL DEFAULT 'pendiente',
+    created_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_canje_huesped    FOREIGN KEY (huesped_id)    REFERENCES huesped(id),
+    CONSTRAINT fk_canje_recompensa FOREIGN KEY (recompensa_id) REFERENCES recompensa(id),
+    CONSTRAINT fk_canje_reserva    FOREIGN KEY (reserva_id)    REFERENCES reserva(id)
+) ENGINE=InnoDB;
+
+-- Historial de puntos (ganado = positivo, canjeado = negativo). El saldo se calcula, no se guarda.
+CREATE TABLE movimiento_puntos (
+    id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    huesped_id   INT UNSIGNED NOT NULL,
+    reserva_id   INT UNSIGNED NULL,
+    canje_id     INT UNSIGNED NULL,
+    tipo         ENUM('ganado','canjeado','ajuste') NOT NULL,
+    puntos       INT          NOT NULL,
+    descripcion  VARCHAR(150) NULL,
+    created_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_mp_huesped FOREIGN KEY (huesped_id) REFERENCES huesped(id),
+    CONSTRAINT fk_mp_reserva FOREIGN KEY (reserva_id) REFERENCES reserva(id),
+    CONSTRAINT fk_mp_canje   FOREIGN KEY (canje_id)   REFERENCES canje_recompensa(id)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- ROOM SERVICE Y COMPROBANTES (Unidad III)
+-- ---------------------------------------------------------------------
+CREATE TABLE pedido (
+    id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    reserva_id     INT UNSIGNED NULL,
+    tipo           ENUM('room_service','restaurante') NOT NULL,
+    estado         ENUM('pendiente','preparando','entregado','cancelado') NOT NULL DEFAULT 'pendiente',
+    created_at     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_pedido_reserva FOREIGN KEY (reserva_id) REFERENCES reserva(id)
+) ENGINE=InnoDB;
+
+CREATE TABLE detalle_pedido (
+    id               INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    pedido_id        INT UNSIGNED NOT NULL,
+    producto_id      INT UNSIGNED NOT NULL,
+    cantidad         SMALLINT UNSIGNED NOT NULL,
+    precio_unitario  DECIMAL(7,2) NOT NULL,
+    CONSTRAINT fk_dp_pedido   FOREIGN KEY (pedido_id)   REFERENCES pedido(id) ON DELETE CASCADE,
+    CONSTRAINT fk_dp_producto FOREIGN KEY (producto_id) REFERENCES producto(id)
+) ENGINE=InnoDB;
+
+CREATE TABLE comprobante (
+    id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    reserva_id  INT UNSIGNED NULL,
+    pedido_id   INT UNSIGNED NULL,
+    tipo        ENUM('boleta','factura') NOT NULL DEFAULT 'boleta',
+    serie       VARCHAR(4)   NOT NULL,
+    numero      INT UNSIGNED NOT NULL,
+    monto       DECIMAL(9,2) NOT NULL,
+    emitido_en  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_comprobante (serie, numero),
+    CONSTRAINT fk_comp_reserva FOREIGN KEY (reserva_id) REFERENCES reserva(id),
+    CONSTRAINT fk_comp_pedido  FOREIGN KEY (pedido_id)  REFERENCES pedido(id)
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- RECOMENDACIONES TURISTICAS Y CONTACTO
+-- ---------------------------------------------------------------------
+CREATE TABLE lugar_turistico (
+    id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nombre       VARCHAR(80)  NOT NULL,
+    categoria    VARCHAR(30)  NOT NULL,
+    descripcion  VARCHAR(255) NOT NULL,
+    foto         VARCHAR(255) NULL,
+    activo       TINYINT(1)   NOT NULL DEFAULT 1
+) ENGINE=InnoDB;
+
+CREATE TABLE mensaje_contacto (
+    id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nombre      VARCHAR(100) NOT NULL,
+    correo      VARCHAR(100) NOT NULL,
+    telefono    VARCHAR(20)  NOT NULL,
+    asunto      ENUM('reserva','consulta','sugerencia','reclamo') NOT NULL,
+    mensaje     VARCHAR(500) NOT NULL,
+    leido       TINYINT(1)   NOT NULL DEFAULT 0,
+    created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- ---------------------------------------------------------------------
+-- VISTAS: valores calculados (asi las tablas se mantienen en 3FN)
+-- ---------------------------------------------------------------------
+CREATE VIEW vista_reserva AS
+SELECT r.*,
+       DATEDIFF(r.fecha_salida, r.fecha_ingreso)                              AS noches,
+       DATEDIFF(r.fecha_salida, r.fecha_ingreso) * r.precio_noche - r.monto_descuento AS monto_total,
+       COALESCE(p.pagado, 0)                                                  AS monto_pagado,
+       DATEDIFF(r.fecha_salida, r.fecha_ingreso) * r.precio_noche - r.monto_descuento
+           - COALESCE(p.pagado, 0)                                            AS saldo_pendiente
+FROM reserva r
+LEFT JOIN (SELECT reserva_id, SUM(monto) AS pagado
+           FROM pago WHERE estado = 'aprobado' GROUP BY reserva_id) p ON p.reserva_id = r.id;
+
+CREATE VIEW vista_puntos_huesped AS
+SELECT h.id AS huesped_id, COALESCE(SUM(m.puntos), 0) AS puntos
+FROM huesped h
+LEFT JOIN movimiento_puntos m ON m.huesped_id = h.id
+GROUP BY h.id;
+
+CREATE VIEW vista_pedido AS
+SELECT p.*, COALESCE(SUM(d.cantidad * d.precio_unitario), 0) AS total
+FROM pedido p
+LEFT JOIN detalle_pedido d ON d.pedido_id = p.id
+GROUP BY p.id;
+
+-- =====================================================================
+-- DATOS INICIALES
+-- =====================================================================
+INSERT INTO rol (nombre) VALUES ('administrador'), ('recepcionista');
+
+-- Clave de prueba de ambos usuarios: Admin123*  (guardada con password_hash)
+INSERT INTO usuario (rol_id, nombres, correo, clave) VALUES
+(1, 'Administrador San Antonio', 'admin@sanantonio.pe',
+    '$2y$10$wghTX6l0xeUQDUKKuBHiVuF6.xwUad30MKKYj7c65d2Hhg9l6Q2w6'),
+(2, 'Recepción Turno Día', 'recepcion@sanantonio.pe',
+    '$2y$10$wghTX6l0xeUQDUKKuBHiVuF6.xwUad30MKKYj7c65d2Hhg9l6Q2w6');
+
+-- Los 7 tipos de habitacion y sus tarifas, segun los mock-ups del Avance 01
+INSERT INTO tipo_habitacion (nombre, descripcion, detalle, capacidad, precio_noche) VALUES
+('Simple', 'Habitación sencilla y cómoda para una persona.',
+ 'La habitación Simple del Hotel San Antonio ofrece un ambiente tranquilo y funcional, ideal para viajeros que buscan descanso y buen precio en el corazón de Bagua.', 1, 100.00),
+('Ejecutiva sin agua caliente', 'Habitación ejecutiva con escritorio para una persona.',
+ 'Pensada para quienes viajan por trabajo: escritorio, silla y aire acondicionado en un ambiente ordenado y silencioso.', 1, 120.00),
+('Ejecutiva con agua caliente', 'Habitación ejecutiva con agua caliente para una persona.',
+ 'Igual que la Ejecutiva, con baño privado con agua caliente para un mayor confort después de la jornada.', 1, 130.00),
+('Matrimonial', 'Cama de dos plazas para dos personas.',
+ 'Habitación matrimonial amplia y acogedora, ideal para parejas que visitan Bagua por turismo o descanso.', 2, 130.00),
+('Doble', 'Dos camas para dos personas.',
+ 'Habitación con dos camas individuales, perfecta para amigos, familiares o compañeros de viaje.', 2, 150.00),
+('Suite', 'Suite con mayor espacio para dos personas.',
+ 'La Suite ofrece más espacio y comodidad, con un ambiente elegante para quienes desean una estadía especial.', 2, 150.00),
+('King', 'Amplia y cómoda, perfecta para una estadía de descanso.',
+ 'La habitación King del Hotel San Antonio ofrece un ambiente amplio, elegante y acogedor, ideal para quienes buscan comodidad y tranquilidad en el corazón de la Amazonía. Disfruta de una cama king, espacios bien iluminados y una vista privilegiada a la naturaleza de Bagua.', 2, 180.00);
+
+-- 17 habitaciones en 3 pisos (cantidad por confirmar con el hotel). Las 7 primeras coinciden con el tablero del mock-up.
+INSERT INTO habitacion (numero, piso, tipo_id) VALUES
+('101',1,1),('102',1,2),('103',1,3),('104',1,1),('105',1,2),('106',1,3),
+('201',2,4),('202',2,5),('203',2,6),('204',2,7),('205',2,4),('206',2,5),
+('301',3,1),('302',3,3),('303',3,4),('304',3,5),('305',3,6);
+
+INSERT INTO servicio (nombre, icono) VALUES
+('Baño privado','bi-droplet'),('Aire acondicionado','bi-snow'),('TV','bi-tv'),('Armario','bi-door-closed'),
+('Escritorio','bi-laptop'),('Wi-Fi gratis','bi-wifi'),('Cochera gratis','bi-car-front'),('Agua caliente','bi-thermometer-half');
+
+-- Todos los tipos: bano, aire, TV, armario, escritorio, Wi-Fi y cochera (Avance 01)
+INSERT INTO tipo_servicio (tipo_id, servicio_id)
+SELECT t.id, s.id FROM tipo_habitacion t CROSS JOIN servicio s WHERE s.nombre <> 'Agua caliente';
+-- Agua caliente: todos menos Simple y Ejecutiva sin agua caliente
+INSERT INTO tipo_servicio (tipo_id, servicio_id)
+SELECT t.id, s.id FROM tipo_habitacion t CROSS JOIN servicio s
+WHERE s.nombre = 'Agua caliente' AND t.nombre NOT IN ('Simple','Ejecutiva sin agua caliente');
+
+INSERT INTO parametro (clave, valor, descripcion) VALUES
+('soles_por_punto',   '10', 'Soles gastados por cada punto ganado'),
+('puntos_bienvenida', '0',  'Puntos otorgados al registrarse un huesped nuevo');
+
+INSERT INTO categoria_producto (nombre) VALUES ('Menú del día'),('Platos a la carta'),('Desayunos');
+
+INSERT INTO producto (categoria_id, nombre, descripcion, precio) VALUES
+(1,'Menú S/ 12','Sopa del día, segundo con guarnicion y bebida natural.',12.00),
+(1,'Menú S/ 16','Sopa del día, segundo con guarnicion, bebida natural y postre del día.',16.00),
+(2,'Cecina con patacones','Tradicional sabor amazónico, acompañada de patacones dorados.',NULL),
+(2,'Chaufa amazónico','Nuestro toque selvático del clásico chaufa, con ingredientes de la región.',NULL),
+(2,'Tilapia','Fresca y sabrosa, preparada al momento.',NULL),
+(2,'Trucha','Deliciosa trucha de la región, con el inconfundible sabor amazónico.',NULL),
+(2,'Pato','Una especialidad de la selva peruana, con sabor único y tradicional.',NULL),
+(2,'Gallina','Receta tradicional, preparada con el auténtico sabor de nuestra tierra.',NULL),
+(3,'Desayuno regional','Desayuno con productos de la región.',NULL);
+
+INSERT INTO recompensa (nombre, descripcion, puntos_requeridos, tipo, valor, producto_id, consume_puntos) VALUES
+('Pago fraccionado','Reserva pagando solo el 50 % ahora y el resto al llegar.',100,'pago_fraccionado',50,NULL,0),
+('Desayuno de cortesía','Un desayuno regional gratis durante la estadía.',150,'producto',NULL,
+    (SELECT id FROM producto WHERE nombre = 'Desayuno regional'),1),
+('10 % de descuento','Descuento sobre el costo de la estadía.',300,'descuento',10,NULL,1),
+('Noche de cortesía','Una noche gratis en habitación Simple.',500,'noche_gratis',NULL,NULL,1);
+
+INSERT INTO lugar_turistico (nombre, categoria, descripcion) VALUES
+('Pongo de Rentema','Naturaleza','Impresionante cañón del río Marañón, con paisajes únicos y gran belleza natural.'),
+('Sitio Arqueológico Las Juntas','Arqueología','Importante centro ceremonial prehispánico con historia y vistas privilegiadas.'),
+('Catarata Tsuntsuntsa','Cascada','Espectacular caída de agua rodeada de vegetación, ideal para los amantes de la naturaleza.'),
+('Catarata Nueva Esperanza (Numparket)','Cascada','Un paraíso natural de aguas cristalinas, perfecto para la aventura y el descanso.'),
+('Cataratas del Bijao','Cascada','Conjunto de hermosas caídas de agua y pozas naturales en un entorno selvático.'),
+('Plaza de Armas de Bagua','Cultura','El corazón de la ciudad, con su iglesia, áreas verdes y el encanto de la vida local.');
+
+-- Huespedes de prueba: Carlos ya tiene puntos suficientes para pagar el 50 %
+INSERT INTO huesped (tipo_documento, numero_documento, nombre_completo, correo, telefono) VALUES
+('DNI','70000001','Carlos Pérez Díaz','carlos@example.com','999111222'),
+('DNI','70000002','María López Rojas','maria@example.com','999333444');
+
+INSERT INTO movimiento_puntos (huesped_id, tipo, puntos, descripcion) VALUES
+(1, 'ajuste', 150, 'Puntos iniciales de prueba');
