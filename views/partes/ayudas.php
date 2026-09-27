@@ -100,10 +100,10 @@ function carrusel(array $fotos, string $alt, string $icono = "bi-image", string 
 }
 // ===================== FIN CAMBIO 1 de 3 ==============================
 
-// Banda superior de cada pagina publica: migas de pan, titulo y texto
-function hero(string $titulo, string $texto = "", array $migas = [], string $etiqueta = ""): void
+function hero(string $titulo, string $texto = "", array $migas = [], string $etiqueta = "", string $claseExtra = ""): void
 {
-    echo '<section class="sa-hero"><div class="container">';
+    echo '<section class="sa-hero' . ($claseExtra ? ' ' . e($claseExtra) : '') . '"><div class="container">';
+
     if ($migas) {
         echo '<div class="migas mb-2">';
         foreach ($migas as $indice => [$nombre, $url]) {

@@ -70,4 +70,14 @@ INSERT INTO foto_tipo_habitacion (tipo_id, ruta, orden) VALUES
 (7, 'assets/img/junior-suite/unior-suite6.avif', 6),
 (7, 'assets/img/junior-suite/unior-suite7.avif', 7);
 
--- tipo_id 3 = Ejecutiva con agua caliente  -> SIN FOTOS (no sobraba carpeta para asignarle)
+
+INSERT INTO foto_tipo_habitacion (tipo_id, ruta, orden) VALUES
+(3, 'assets/img/deluxe/hiabitacion_deluxe1.avif', 1),
+(3, 'assets/img/deluxe/hiabitacion_deluxe2.avif', 2),
+(3, 'assets/img/deluxe/hiabitacion_deluxe3.avif', 3),
+(3, 'assets/img/deluxe/hiabitacion_deluxe4.avif', 4),
+(3, 'assets/img/deluxe/hiabitacion_deluxe5.avif', 5),
+(3, 'assets/img/deluxe/hiabitacion_deluxe6.avif', 6),
+(3, 'assets/img/deluxe/hiabitacion_deluxe7.avif', 7),
+(3, 'assets/img/deluxe/hiabitacion_deluxe8.avif', 8),
+(3, 'assets/img/deluxe/9hiabitacion_deluxe.avif', 9);
