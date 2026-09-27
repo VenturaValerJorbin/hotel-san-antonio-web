@@ -13,7 +13,7 @@ class Contacto extends Controlador
     {
         return $accion === "enviar"
             ? $this->enviar($post)
-            : $this->resultado(false, "Accion no valida.", "contacto.php");
+            : $this->resultado(false, "Accion no valida.", "publico/contacto.php");
     }
 
     private function enviar(array $p): array
@@ -43,14 +43,14 @@ class Contacto extends Controlador
             $errores["mensaje"] = "El mensaje debe tener entre 10 y 500 caracteres.";
         }
         if ($errores) {
-            return $this->resultado(false, "Revisa los datos marcados en el formulario.", "contacto.php", $errores);
+            return $this->resultado(false, "Revisa los datos marcados en el formulario.", "publico/contacto.php", $errores);
         }
 
         return $this->ejecutar(
             fn() => (new ContactoBO())->enviar($datos),
             "Gracias por escribirnos. Te responderemos a la brevedad.",
-            "contacto.php",
-            "contacto.php"
+            "publico/contacto.php",
+            "publico/contacto.php"
         );
     }
 }

@@ -1,6 +1,6 @@
 <?php
-require "config/Autoload.php";
-require_once "views/partes/ayudas.php";
+require __DIR__ . "/../config/Autoload.php";
+require_once __DIR__ . "/../views/partes/ayudas.php";
 
 use bo\Habitacion as HabitacionBO;
 use bo\Reserva as ReservaBO;
@@ -8,7 +8,7 @@ use bo\Reserva as ReservaBO;
 $tipo = (new HabitacionBO())->tipo((int) ($_GET["id"] ?? 0));
 if (!$tipo) {
     http_response_code(404);
-    header("Location: habitaciones.php");
+    header("Location: " . url("publico/habitaciones.php"));
     exit;
 }
 
@@ -18,11 +18,11 @@ $query = http_build_query(array_filter([
     "tipo" => $tipo->id, "ingreso" => fechaGet("ingreso"), "salida" => fechaGet("salida"),
 ]));
 
-require "views/partes/cabecera.php";
+require __DIR__ . "/../views/partes/cabecera.php";
 hero(
     "Habitación " . $tipo->nombre,
     $tipo->descripcion,
-    [["Inicio", "index.php"], ["Habitaciones", "habitaciones.php"], [$tipo->nombre, null]]
+    [["Inicio", "index.php"], ["Habitaciones", "publico/habitaciones.php"], [$tipo->nombre, null]]
 );
 ?>
 <main class="container py-4 py-lg-5">
@@ -74,10 +74,10 @@ hero(
                 </div>
                 <div class="sa-caja-crema mb-3 small"><strong>Reserva sin crear cuenta.</strong> Haz tu reserva de forma rápida y sencilla.</div>
 
-                <a class="btn-sa d-block text-center text-decoration-none" href="reservar.php?<?= e($query) ?>">Reservar</a>
+                <a class="btn-sa d-block text-center text-decoration-none" href="<?= url("publico/reservar.php") ?>?<?= e($query) ?>">Reservar</a>
                 <p class="text-center small text-muted mt-2 mb-0"><i class="bi bi-calendar-heart"></i> Tu descanso te espera en Bagua.</p>
             </aside>
         </div>
     </div>
 </main>
-<?php require "views/partes/pie.php" ?>
+<?php require __DIR__ . "/../views/partes/pie.php" ?>

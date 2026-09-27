@@ -1,5 +1,5 @@
 <?php
-require "config/Autoload.php";
+require __DIR__ . "/../config/Autoload.php";
 
 use bo\Turismo as TurismoBO;
 
@@ -9,7 +9,7 @@ $lugares = (new TurismoBO())->lugares();
 // Color de la etiqueta segun la categoria del lugar
 $colores = ["Naturaleza" => "success", "Arqueología" => "secondary", "Cascada" => "primary", "Cultura" => "warning"];
 
-require "views/partes/cabecera.php";
+require __DIR__ . "/../views/partes/cabecera.php";
 hero(
     "Recomendaciones turísticas",
     "Descubre lugares imperdibles cerca de Bagua para complementar tu estadía.",
@@ -43,4 +43,4 @@ hero(
         <a class="btn-sa text-decoration-none text-center" href="https://wa.me/<?= e($hotel["whatsapp"]) ?>"><i class="bi bi-whatsapp"></i> <?= e($hotel["whatsapp_texto"]) ?></a>
     </div>
 </main>
-<?php require "views/partes/pie.php" ?>
+<?php require __DIR__ . "/../views/partes/pie.php" ?>

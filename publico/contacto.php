@@ -1,9 +1,9 @@
 <?php
-require "config/Autoload.php";
+require __DIR__ . "/../config/Autoload.php";
 
 $titulo = "Contacto";
 
-require "views/partes/cabecera.php";
+require __DIR__ . "/../views/partes/cabecera.php";
 
 $valor = fn($campo) => $antiguo[$campo] ?? "";
 $claseError = fn($campo) => isset($errores[$campo]) ? " is-invalid" : "";
@@ -22,7 +22,7 @@ hero(
                 <h2 class="h4">Formulario de contacto</h2>
                 <div class="sa-linea-dorada"></div>
                 <p class="text-muted small">Escríbenos y te responderemos a la brevedad. Estaremos encantados de ayudarte con tu reserva o cualquier consulta.</p>
-                <form action="procesar.php" method="post" novalidate>
+                <form action="<?= url("procesar.php") ?>" method="post" novalidate>
                     <input type="hidden" name="modulo" value="contacto">
                     <input type="hidden" name="accion" value="enviar">
                     <div class="mb-3">
@@ -82,4 +82,4 @@ hero(
         </div>
     </div>
 </main>
-<?php require "views/partes/pie.php" ?>
+<?php require __DIR__ . "/../views/partes/pie.php" ?>

@@ -1,12 +1,12 @@
 <?php
-require "config/Autoload.php";
+require __DIR__ . "/../config/Autoload.php";
 
 use bo\Restaurante as RestauranteBO;
 
 $titulo = "Restaurante";
 $carta = (new RestauranteBO())->carta();
 
-require "views/partes/cabecera.php";
+require __DIR__ . "/../views/partes/cabecera.php";
 hero(
     "Carta del restaurante",
     "Sabores amazónicos del corazón de Bagua. Disfruta de una experiencia única con lo mejor de nuestra tierra.",
@@ -61,4 +61,4 @@ hero(
         Te invitamos a disfrutar de la gastronomía amazónica en un ambiente acogedor y familiar.
     </div>
 </main>
-<?php require "views/partes/pie.php" ?>
+<?php require __DIR__ . "/../views/partes/pie.php" ?>

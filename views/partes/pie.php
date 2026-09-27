@@ -25,12 +25,12 @@
                 <div class="col-12 col-md-4">
                     <h6>Enlaces rápidos</h6>
                     <ul>
-                        <li><a href="index.php">Inicio</a></li>
-                        <li><a href="habitaciones.php">Habitaciones</a></li>
-                        <li><a href="restaurante.php">Restaurante</a></li>
-                        <li><a href="ubicacion.php">Ubicación</a></li>
-                        <li><a href="recomendaciones.php">Recomendaciones</a></li>
-                        <li><a href="contacto.php">Contacto</a></li>
+                        <li><a href="<?= url("index.php") ?>">Inicio</a></li>
+                        <li><a href="<?= url("publico/habitaciones.php") ?>">Habitaciones</a></li>
+                        <li><a href="<?= url("publico/restaurante.php") ?>">Restaurante</a></li>
+                        <li><a href="<?= url("publico/ubicacion.php") ?>">Ubicación</a></li>
+                        <li><a href="<?= url("publico/recomendaciones.php") ?>">Recomendaciones</a></li>
+                        <li><a href="<?= url("publico/contacto.php") ?>">Contacto</a></li>
                     </ul>
                 </div>
             </div>
@@ -41,8 +41,8 @@
         </div>
     </footer>
 
-    <script src="assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/app.js"></script>
+    <script src="<?= url("assets/vendor/bootstrap/bootstrap.bundle.min.js") ?>"></script>
+    <script src="<?= url("assets/js/app.js") ?>"></script>
 </body>
 
 </html>

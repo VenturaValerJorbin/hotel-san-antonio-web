@@ -17,8 +17,8 @@ require "views/partes/cabecera.php";
         <p class="serif fs-5 mt-2 mb-1">Bagua, Amazonas, Perú</p>
         <p class="mb-4">Hospitalidad, comodidad y la calidez de nuestra gente en un destino lleno de naturaleza y cultura.</p>
         <div class="d-grid d-sm-flex gap-2 mb-4">
-            <a class="btn-sa text-decoration-none text-center" href="reservar.php">Reservar ahora <i class="bi bi-arrow-right"></i></a>
-            <a class="btn-hero-linea text-decoration-none text-center" href="habitaciones.php">Ver habitaciones</a>
+            <a class="btn-sa text-decoration-none text-center" href="<?= url("publico/reservar.php") ?>">Reservar ahora <i class="bi bi-arrow-right"></i></a>
+            <a class="btn-hero-linea text-decoration-none text-center" href="<?= url("publico/habitaciones.php") ?>">Ver habitaciones</a>
         </div>
         <div class="row g-3">
             <div class="col-12 col-sm-4 sa-rasgo"><i class="bi bi-tree"></i> Naturaleza cerca de ti</div>
@@ -29,7 +29,7 @@ require "views/partes/cabecera.php";
 </section>
 
 <div class="container sa-buscador">
-    <form class="sa-card sa-card-cuerpo" action="habitaciones.php" method="get">
+    <form class="sa-card sa-card-cuerpo" action="<?= url("publico/habitaciones.php") ?>" method="get">
         <div class="row g-3 align-items-end">
             <div class="col-12 col-md-4 col-lg-3">
                 <label class="form-label" for="ingreso">Fecha de ingreso</label>
@@ -66,7 +66,7 @@ require "views/partes/cabecera.php";
             <div class="sa-subtitulo">Descansa en un lugar especial</div>
             <h2 class="h3 mb-0">Habitaciones destacadas</h2>
         </div>
-        <a class="small fw-bold" href="habitaciones.php">Ver todas <i class="bi bi-arrow-right"></i></a>
+        <a class="small fw-bold" href="<?= url("publico/habitaciones.php") ?>">Ver todas <i class="bi bi-arrow-right"></i></a>
     </div>
     <div class="row g-3">
         <?php foreach ($destacadas as $t) {

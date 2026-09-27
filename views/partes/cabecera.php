@@ -5,14 +5,14 @@ require_once __DIR__ . "/ayudas.php";
 $pagina = basename($_SERVER["SCRIPT_NAME"]);
 $menu = [
     "index.php" => "Inicio",
-    "habitaciones.php" => "Habitaciones",
-    "restaurante.php" => "Restaurante",
-    "ubicacion.php" => "Ubicación",
-    "recomendaciones.php" => "Recomendaciones",
-    "contacto.php" => "Contacto",
+    "publico/habitaciones.php" => "Habitaciones",
+    "publico/restaurante.php" => "Restaurante",
+    "publico/ubicacion.php" => "Ubicación",
+    "publico/recomendaciones.php" => "Recomendaciones",
+    "publico/contacto.php" => "Contacto",
 ];
 // El detalle de una habitacion pertenece a la seccion "Habitaciones"
-$activa = $pagina === "habitacion.php" ? "habitaciones.php" : $pagina;
+$activa = $pagina === "habitacion.php" ? "habitaciones.php" : $pagina;   // se compara solo el nombre del archivo
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -21,10 +21,10 @@ $activa = $pagina === "habitacion.php" ? "habitaciones.php" : $pagina;
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= e($titulo ?? "Inicio") ?> | Hotel Turístico San Antonio</title>
-    <link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
-    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
-    <link rel="icon" type="image/png" href="assets/img/logo.png">
-    <link href="assets/css/estilo.css" rel="stylesheet">
+    <link href="<?= url("assets/vendor/bootstrap/bootstrap.min.css") ?>" rel="stylesheet">
+    <link href="<?= url("assets/vendor/bootstrap-icons/bootstrap-icons.min.css") ?>" rel="stylesheet">
+    <link rel="icon" type="image/png" href="<?= url("assets/img/logo.png") ?>">
+    <link href="<?= url("assets/css/estilo.css") ?>" rel="stylesheet">
 </head>
 
 <body>
@@ -40,11 +40,11 @@ $activa = $pagina === "habitacion.php" ? "habitaciones.php" : $pagina;
                     <ul class="navbar-nav ms-auto align-items-lg-center">
                         <?php foreach ($menu as $archivo => $texto) : ?>
                             <li class="nav-item">
-                                <a class="nav-link <?= $activa === $archivo ? "active" : "" ?>" href="<?= $archivo ?>"><?= $texto ?></a>
+                                <a class="nav-link <?= $activa === basename($archivo) ? "active" : "" ?>" href="<?= url($archivo) ?>"><?= $texto ?></a>
                             </li>
                         <?php endforeach ?>
                         <li class="nav-item ms-lg-3 my-2 my-lg-0">
-                            <a class="btn-sa d-inline-block text-decoration-none" href="reservar.php"><i class="bi bi-calendar-check"></i> Reservar</a>
+                            <a class="btn-sa d-inline-block text-decoration-none" href="<?= url("publico/reservar.php") ?>"><i class="bi bi-calendar-check"></i> Reservar</a>
                         </li>
                     </ul>
                 </div>

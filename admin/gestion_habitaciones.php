@@ -1,5 +1,5 @@
 <?php
-require "config/Autoload.php";
+require __DIR__ . "/../config/Autoload.php";
 
 use bo\Habitacion as HabitacionBO;
 
@@ -12,7 +12,7 @@ $tipos = $bo->tipos();
 // Si viene ?editar=ID se carga la habitacion en el formulario (UPDATE); si no, el formulario crea (CREATE)
 $editar = isset($_GET["editar"]) ? $bo->obtener((int) $_GET["editar"]) : null;
 
-require "views/partes/panel_cabecera.php";
+require __DIR__ . "/../views/partes/panel_cabecera.php";
 
 $valor = fn($campo, $porDefecto = "") => $antiguo[$campo] ?? $porDefecto;
 $claseError = fn($campo) => isset($errores[$campo]) ? " is-invalid" : "";
@@ -23,7 +23,7 @@ $estados = ["disponible" => "Disponible", "ocupada" => "Ocupada", "limpieza" => 
 
 <section class="sa-card sa-card-cuerpo mb-4">
     <h2 class="h5"><?= $editar ? "Editar habitación " . e($editar->numero) : "Nueva habitación" ?></h2>
-    <form action="procesar.php" method="post" class="row g-3" novalidate>
+    <form action="<?= url("procesar.php") ?>" method="post" class="row g-3" novalidate>
         <input type="hidden" name="modulo" value="habitacion">
         <input type="hidden" name="accion" value="guardar">
         <input type="hidden" name="id" value="<?= $editar->id ?? 0 ?>">
@@ -66,7 +66,7 @@ $estados = ["disponible" => "Disponible", "ocupada" => "Ocupada", "limpieza" => 
         </div>
         <div class="col-12 d-flex gap-2">
             <button class="btn-sa" type="submit"><?= $editar ? "Guardar cambios" : "Registrar habitación" ?></button>
-            <?php if ($editar) : ?><a class="btn-linea text-decoration-none" href="gestion_habitaciones.php">Cancelar</a><?php endif ?>
+            <?php if ($editar) : ?><a class="btn-linea text-decoration-none" href="<?= url("admin/gestion_habitaciones.php") ?>">Cancelar</a><?php endif ?>
         </div>
     </form>
 </section>
@@ -85,8 +85,8 @@ $estados = ["disponible" => "Disponible", "ocupada" => "Ocupada", "limpieza" => 
                         <td><?= e($estados[$h->estado] ?? $h->estado) ?></td>
                         <td>
                             <div class="d-flex gap-1">
-                                <a class="btn btn-sm btn-outline-secondary" href="gestion_habitaciones.php?editar=<?= $h->id ?>">Editar</a>
-                                <form action="procesar.php" method="post" onsubmit="return confirm('¿Eliminar la habitación <?= e($h->numero) ?>?')">
+                                <a class="btn btn-sm btn-outline-secondary" href="<?= url("admin/gestion_habitaciones.php") ?>?editar=<?= $h->id ?>">Editar</a>
+                                <form action="<?= url("procesar.php") ?>" method="post" onsubmit="return confirm('¿Eliminar la habitación <?= e($h->numero) ?>?')">
                                     <input type="hidden" name="modulo" value="habitacion">
                                     <input type="hidden" name="accion" value="eliminar">
                                     <input type="hidden" name="id" value="<?= $h->id ?>">
@@ -100,4 +100,4 @@ $estados = ["disponible" => "Disponible", "ocupada" => "Ocupada", "limpieza" => 
         </table>
     </div>
 </div>
-<?php require "views/partes/panel_pie.php" ?>
+<?php require __DIR__ . "/../views/partes/panel_pie.php" ?>

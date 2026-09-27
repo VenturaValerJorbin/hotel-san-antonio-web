@@ -1,5 +1,5 @@
 <?php
-require "config/Autoload.php";
+require __DIR__ . "/../config/Autoload.php";
 
 use bo\Habitacion as HabitacionBO;
 use bo\Reserva as ReservaBO;
@@ -8,7 +8,7 @@ $titulo = "Reservar";
 $tipos = (new HabitacionBO())->tipos();
 $beneficio = (new ReservaBO())->beneficioFraccionado();
 
-require "views/partes/cabecera.php";
+require __DIR__ . "/../views/partes/cabecera.php";
 
 // Valor de un campo: lo escrito antes de un error, o el que llega por la URL, o un valor por defecto
 $valor = fn($campo, $porDefecto = "") => $antiguo[$campo] ?? $porDefecto;
@@ -24,11 +24,11 @@ $porcentaje = $beneficio ? (float) $beneficio["valor"] : 50;
 hero(
     "Reserva tu habitación",
     "Confirma tu estadía en Bagua y vive una experiencia inolvidable.",
-    [["Inicio", "index.php"], ["Habitaciones", "habitaciones.php"], ["Reserva", null]]
+    [["Inicio", "index.php"], ["Habitaciones", "publico/habitaciones.php"], ["Reserva", null]]
 );
 ?>
 <main class="container py-4 py-lg-5">
-    <form id="formReserva" action="procesar.php" method="post" novalidate data-porcentaje="<?= $porcentaje ?>">
+    <form id="formReserva" action="<?= url("procesar.php") ?>" method="post" novalidate data-porcentaje="<?= $porcentaje ?>">
         <input type="hidden" name="modulo" value="reserva">
         <input type="hidden" name="accion" value="crear">
 
@@ -160,4 +160,4 @@ hero(
         </div>
     </form>
 </main>
-<?php require "views/partes/pie.php" ?>
+<?php require __DIR__ . "/../views/partes/pie.php" ?>

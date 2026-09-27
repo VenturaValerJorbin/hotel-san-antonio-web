@@ -1,5 +1,5 @@
 <?php
-require "config/Autoload.php";
+require __DIR__ . "/../config/Autoload.php";
 
 use bo\Reserva as ReservaBO;
 
@@ -18,7 +18,7 @@ $resumen = $bo->resumen();
 
 $estados = ["pendiente" => "Pendiente", "confirmada" => "Confirmada", "checkin" => "En el hotel", "checkout" => "Finalizada", "cancelada" => "Cancelada", "no_show" => "No llegó"];
 
-require "views/partes/panel_cabecera.php";
+require __DIR__ . "/../views/partes/panel_cabecera.php";
 
 // Estado del pago de una reserva, para la columna "Pago"
 $pago = fn($r) => $r->saldoPendiente > 0
@@ -54,7 +54,7 @@ $pago = fn($r) => $r->saldoPendiente > 0
         </div>
         <div class="col-12 col-md-2 d-flex gap-2">
             <button class="btn-sa flex-grow-1" type="submit">Filtrar</button>
-            <a class="btn-linea text-decoration-none" href="reservas.php" title="Quitar filtros"><i class="bi bi-x-lg"></i></a>
+            <a class="btn-linea text-decoration-none" href="<?= url("admin/reservas.php") ?>" title="Quitar filtros"><i class="bi bi-x-lg"></i></a>
         </div>
     </div>
 </form>
@@ -63,9 +63,9 @@ $pago = fn($r) => $r->saldoPendiente > 0
 // Botones de la reserva segun su estado (los usan la tabla y las tarjetas del celular)
 $acciones = function ($r) {
     if ($r->estado === "confirmada") {
-        echo '<a class="btn btn-sm btn-danger" href="checkin.php?id=' . $r->id . '">Check-in</a>';
+        echo '<a class="btn btn-sm btn-danger" href="' . url('admin/checkin.php') . '?id=' . $r->id . '">Check-in</a>';
     } elseif ($r->estado === "checkin") {
-        echo '<form action="procesar.php" method="post" class="d-inline" onsubmit="return confirm(\'¿Registrar el check-out y cobrar el saldo?\')">'
+        echo '<form action="' . url('procesar.php') . '" method="post" class="d-inline" onsubmit="return confirm(\'¿Registrar el check-out y cobrar el saldo?\')">'
             . '<input type="hidden" name="modulo" value="reserva"><input type="hidden" name="accion" value="checkout">'
             . '<input type="hidden" name="id" value="' . $r->id . '"><button class="btn btn-sm btn-outline-danger">Check-out</button></form>';
     } else {
@@ -116,4 +116,4 @@ $acciones = function ($r) {
 <?php else : ?>
     <p class="text-muted small mt-2">Mostrando <?= count($reservas) ?> reserva(s).</p>
 <?php endif ?>
-<?php require "views/partes/panel_pie.php" ?>
+<?php require __DIR__ . "/../views/partes/panel_pie.php" ?>

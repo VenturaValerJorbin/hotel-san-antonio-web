@@ -4,10 +4,10 @@
 require_once __DIR__ . "/ayudas.php";
 
 $opciones = [
-    "reservas" => ["reservas.php", "bi-journal-text", "Reservas"],
-    "disponibilidad" => ["disponibilidad.php", "bi-calendar3", "Disponibilidad"],
-    "checkin" => ["reservas.php?estado=confirmada", "bi-person-check", "Check-in"],
-    "habitaciones" => ["gestion_habitaciones.php", "bi-door-open", "Habitaciones"],
+    "reservas" => ["admin/reservas.php", "bi-journal-text", "Reservas"],
+    "disponibilidad" => ["admin/disponibilidad.php", "bi-calendar3", "Disponibilidad"],
+    "checkin" => ["admin/reservas.php?estado=confirmada", "bi-person-check", "Check-in"],
+    "habitaciones" => ["admin/gestion_habitaciones.php", "bi-door-open", "Habitaciones"],
 ];
 ?>
 <!DOCTYPE html>
@@ -17,10 +17,10 @@ $opciones = [
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><?= e($titulo ?? "Panel") ?> | Recepción San Antonio</title>
-    <link href="assets/vendor/bootstrap/bootstrap.min.css" rel="stylesheet">
-    <link href="assets/vendor/bootstrap-icons/bootstrap-icons.min.css" rel="stylesheet">
-    <link rel="icon" type="image/png" href="assets/img/logo.png">
-    <link href="assets/css/estilo.css" rel="stylesheet">
+    <link href="<?= url("assets/vendor/bootstrap/bootstrap.min.css") ?>" rel="stylesheet">
+    <link href="<?= url("assets/vendor/bootstrap-icons/bootstrap-icons.min.css") ?>" rel="stylesheet">
+    <link rel="icon" type="image/png" href="<?= url("assets/img/logo.png") ?>">
+    <link href="<?= url("assets/css/estilo.css") ?>" rel="stylesheet">
 </head>
 
 <body>
@@ -41,11 +41,11 @@ $opciones = [
                 <div class="mb-4 d-none d-lg-block"><?php $claro = "claro"; require __DIR__ . "/logo.php" ?></div>
                 <nav class="nav flex-column gap-1 mb-auto">
                     <?php foreach ($opciones as $clave => [$url, $icono, $texto]) : ?>
-                        <a class="nav-link <?= ($activo ?? "") === $clave ? "active" : "" ?>" href="<?= $url ?>">
+                        <a class="nav-link <?= ($activo ?? "") === $clave ? "active" : "" ?>" href="<?= url($url) ?>">
                             <i class="bi <?= $icono ?>"></i> <?= $texto ?>
                         </a>
                     <?php endforeach ?>
-                    <a class="nav-link" href="index.php"><i class="bi bi-box-arrow-up-right"></i> Ver sitio público</a>
+                    <a class="nav-link" href="<?= url("index.php") ?>"><i class="bi bi-box-arrow-up-right"></i> Ver sitio público</a>
                 </nav>
                 <div class="panel-lema mt-4">Hospitalidad que deja huellas</div>
             </div>

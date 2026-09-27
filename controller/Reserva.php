@@ -20,7 +20,7 @@ class Reserva extends Controlador
             "crear" => $this->crear($post),
             "checkin" => $this->checkin($post),
             "checkout" => $this->checkout($post),
-            default => $this->resultado(false, "Accion no valida.", "reservar.php"),
+            default => $this->resultado(false, "Accion no valida.", "publico/reservar.php"),
         };
     }
 
@@ -55,7 +55,7 @@ class Reserva extends Controlador
                 );
             },
             "",
-            "reservar.php",
+            "publico/reservar.php",
             $this->volverAReservar($datos)
         );
     }
@@ -65,7 +65,7 @@ class Reserva extends Controlador
         $id = (int) ($p["id"] ?? 0);
         $habitacionId = (int) ($p["habitacion_id"] ?? 0);
         $observaciones = trim($p["observaciones"] ?? "");
-        $formulario = "checkin.php?id=$id";
+        $formulario = "admin/checkin.php?id=$id";
 
         if ($id <= 0 || $habitacionId <= 0) {
             return $this->resultado(false, "Selecciona la habitacion a asignar.", $formulario);
@@ -76,7 +76,7 @@ class Reserva extends Controlador
         return $this->ejecutar(
             fn() => $this->bo->registrarCheckin($id, $habitacionId, $observaciones),
             "Check-in registrado.",
-            "reservas.php",
+            "admin/reservas.php",
             $formulario
         );
     }
@@ -85,20 +85,20 @@ class Reserva extends Controlador
     {
         $id = (int) ($p["id"] ?? 0);
         if ($id <= 0) {
-            return $this->resultado(false, "Datos no validos.", "reservas.php");
+            return $this->resultado(false, "Datos no validos.", "admin/reservas.php");
         }
         return $this->ejecutar(
             fn() => $this->bo->registrarCheckout($id),
             "Check-out registrado, saldo cobrado y puntos sumados.",
-            "reservas.php",
-            "reservas.php"
+            "admin/reservas.php",
+            "admin/reservas.php"
         );
     }
 
     // Al fallar se vuelve al formulario conservando la habitacion y las fechas elegidas
     private function volverAReservar(array $d): string
     {
-        return "reservar.php?" . http_build_query(
+        return "publico/reservar.php?" . http_build_query(
             array_filter(["tipo" => $d["tipo_id"], "ingreso" => $d["fecha_ingreso"], "salida" => $d["fecha_salida"]])
         );
     }

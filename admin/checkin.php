@@ -1,5 +1,6 @@
 <?php
-require "config/Autoload.php";
+require __DIR__ . "/../config/Autoload.php";
+require_once __DIR__ . "/../views/partes/ayudas.php";
 
 use bo\Reserva as ReservaBO;
 
@@ -8,11 +9,11 @@ $activo = "checkin";
 
 $r = (new ReservaBO())->detalleCheckin((int) ($_GET["id"] ?? 0));
 if (!$r) {
-    header("Location: reservas.php");
+    header("Location: " . url("admin/reservas.php"));
     exit;
 }
 
-require "views/partes/panel_cabecera.php";
+require __DIR__ . "/../views/partes/panel_cabecera.php";
 
 $puedeIngresar = $r["estado"] === "confirmada";
 $asignada = (int) ($antiguo["habitacion_id"] ?? $r["habitacion_id"]);
@@ -32,7 +33,7 @@ $asignada = (int) ($antiguo["habitacion_id"] ?? $r["habitacion_id"]);
     </div>
 </section>
 
-<form action="procesar.php" method="post" novalidate>
+<form action="<?= url("procesar.php") ?>" method="post" novalidate>
     <input type="hidden" name="modulo" value="reserva">
     <input type="hidden" name="accion" value="checkin">
     <input type="hidden" name="id" value="<?= (int) $r["id"] ?>">
@@ -88,8 +89,8 @@ $asignada = (int) ($antiguo["habitacion_id"] ?? $r["habitacion_id"]);
     </div>
 
     <div class="d-flex justify-content-end gap-2 mt-3">
-        <a class="btn-linea text-decoration-none" href="reservas.php">Cancelar</a>
+        <a class="btn-linea text-decoration-none" href="<?= url("admin/reservas.php") ?>">Cancelar</a>
         <button class="btn-sa" type="submit" <?= $puedeIngresar ? "" : "disabled" ?>><i class="bi bi-person-check"></i> Registrar check-in</button>
     </div>
 </form>
-<?php require "views/partes/panel_pie.php" ?>
+<?php require __DIR__ . "/../views/partes/panel_pie.php" ?>
