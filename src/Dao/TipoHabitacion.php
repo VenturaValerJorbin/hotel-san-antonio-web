@@ -1,16 +1,9 @@
 <?php
 
-namespace dao;
+namespace App\Dao;
 
-class TipoHabitacion
+class TipoHabitacion extends Dao
 {
-    private \PDO $conn;
-
-    public function __construct(?\PDO $conn = null)
-    {
-        $this->conn = $conn ?? (new Conexion())->conectar();
-    }
-
     public function listar(): array
     {
         $stmt = $this->conn->prepare("SELECT * FROM tipo_habitacion WHERE activo = 1 ORDER BY precio_noche, id");
@@ -21,7 +14,8 @@ class TipoHabitacion
     public function obtener(int $id): ?array
     {
         $stmt = $this->conn->prepare("SELECT * FROM tipo_habitacion WHERE id = :id AND activo = 1");
-        $stmt->execute([":id" => $id]);
+        $this->enlazar($stmt, [":id" => $id]);
+        $stmt->execute();
         return $stmt->fetch() ?: null;
     }
 
@@ -33,14 +27,16 @@ class TipoHabitacion
              JOIN tipo_servicio ts ON ts.servicio_id = s.id
              WHERE ts.tipo_id = :id ORDER BY s.id"
         );
-        $stmt->execute([":id" => $tipoId]);
+        $this->enlazar($stmt, [":id" => $tipoId]);
+        $stmt->execute();
         return $stmt->fetchAll();
     }
 
     public function fotos(int $tipoId): array
     {
         $stmt = $this->conn->prepare("SELECT ruta FROM foto_tipo_habitacion WHERE tipo_id = :id ORDER BY orden");
-        $stmt->execute([":id" => $tipoId]);
+        $this->enlazar($stmt, [":id" => $tipoId]);
+        $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_COLUMN);
     }
 
@@ -57,7 +53,8 @@ class TipoHabitacion
                      AND r.fecha_ingreso < :salida AND r.fecha_salida > :ingreso)
              GROUP BY h.tipo_id"
         );
-        $stmt->execute([":ingreso" => $ingreso, ":salida" => $salida]);
+        $this->enlazar($stmt, [":ingreso" => $ingreso, ":salida" => $salida]);
+        $stmt->execute();
         return $stmt->fetchAll(\PDO::FETCH_KEY_PAIR);
     }
 }

@@ -77,7 +77,7 @@ function hero(string $titulo, string $texto = "", array $migas = [], string $eti
 }
 
 // Tarjeta de un tipo de habitacion (listado y destacadas)
-function tarjetaTipo(dto\TipoHabitacion $t, string $consulta = ""): void
+function tarjetaTipo(\App\Dto\TipoHabitacion $t, string $consulta = ""): void
 {
     $sufijo = $consulta ? "&" . $consulta : "";
     echo '<div class="col-12 col-md-6 col-lg-4"><article class="sa-card h-100 d-flex flex-column">';

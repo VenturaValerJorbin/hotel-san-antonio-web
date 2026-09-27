@@ -1,29 +1,23 @@
 <?php
 
-namespace dao;
+namespace App\Dao;
 
-class MovimientoPuntos
+class MovimientoPuntos extends Dao
 {
-    private \PDO $conn;
-
-    public function __construct(?\PDO $conn = null)
-    {
-        $this->conn = $conn ?? (new Conexion())->conectar();
-    }
-
     public function insertar(int $huespedId, ?int $reservaId, string $tipo, int $puntos, string $descripcion): int
     {
         $stmt = $this->conn->prepare(
             "INSERT INTO movimiento_puntos (huesped_id, reserva_id, tipo, puntos, descripcion)
              VALUES (:huesped_id, :reserva_id, :tipo, :puntos, :descripcion)"
         );
-        $stmt->execute([
+        $this->enlazar($stmt, [
             ":huesped_id" => $huespedId,
             ":reserva_id" => $reservaId,
             ":tipo" => $tipo,
             ":puntos" => $puntos,
             ":descripcion" => $descripcion,
         ]);
+        $stmt->execute();
         return (int) $this->conn->lastInsertId();
     }
 
@@ -31,7 +25,8 @@ class MovimientoPuntos
     public function saldo(int $huespedId): int
     {
         $stmt = $this->conn->prepare("SELECT puntos FROM vista_puntos_huesped WHERE huesped_id = :id");
-        $stmt->execute([":id" => $huespedId]);
+        $this->enlazar($stmt, [":id" => $huespedId]);
+        $stmt->execute();
         return (int) $stmt->fetchColumn();
     }
 }

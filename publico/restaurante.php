@@ -1,7 +1,7 @@
 <?php
 require __DIR__ . "/../config/Autoload.php";
 
-use bo\Restaurante as RestauranteBO;
+use App\Bo\Restaurante as RestauranteBO;
 
 $titulo = "Restaurante";
 $carta = (new RestauranteBO())->carta();

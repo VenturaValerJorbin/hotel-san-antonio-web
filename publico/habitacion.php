@@ -2,8 +2,8 @@
 require __DIR__ . "/../config/Autoload.php";
 require_once __DIR__ . "/../views/partes/ayudas.php";
 
-use bo\Habitacion as HabitacionBO;
-use bo\Reserva as ReservaBO;
+use App\Bo\Habitacion as HabitacionBO;
+use App\Bo\Reserva as ReservaBO;
 
 $tipo = (new HabitacionBO())->tipo((int) ($_GET["id"] ?? 0));
 if (!$tipo) {

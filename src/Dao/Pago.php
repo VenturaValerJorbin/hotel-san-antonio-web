@@ -1,23 +1,16 @@
 <?php
 
-namespace dao;
+namespace App\Dao;
 
-class Pago
+class Pago extends Dao
 {
-    private \PDO $conn;
-
-    public function __construct(?\PDO $conn = null)
-    {
-        $this->conn = $conn ?? (new Conexion())->conectar();
-    }
-
     public function insertar(array $d): int
     {
         $stmt = $this->conn->prepare(
             "INSERT INTO pago (reserva_id, tipo, monto, metodo, estado, pasarela, codigo_transaccion, fecha_pago)
              VALUES (:reserva_id, :tipo, :monto, :metodo, :estado, :pasarela, :codigo_transaccion, :fecha_pago)"
         );
-        $stmt->execute([
+        $this->enlazar($stmt, [
             ":reserva_id" => $d["reserva_id"],
             ":tipo" => $d["tipo"],
             ":monto" => $d["monto"],
@@ -27,6 +20,7 @@ class Pago
             ":codigo_transaccion" => $d["codigo_transaccion"] ?? null,
             ":fecha_pago" => $d["fecha_pago"] ?? null,
         ]);
+        $stmt->execute();
         return (int) $this->conn->lastInsertId();
     }
 }

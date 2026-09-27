@@ -1,8 +1,8 @@
 <?php
 
-namespace bo;
+namespace App\Bo;
 
-use dao\Producto as ProductoDAO;
+use App\Dao\Producto as ProductoDAO;
 
 // BO de la carta: agrupa los productos por categoria para mostrarlos en la pagina publica.
 class Restaurante

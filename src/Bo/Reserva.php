@@ -1,17 +1,17 @@
 <?php
 
-namespace bo;
+namespace App\Bo;
 
-use dao\Conexion;
-use dao\Habitacion as HabitacionDAO;
-use dao\Huesped as HuespedDAO;
-use dao\MovimientoPuntos as MovimientoPuntosDAO;
-use dao\Pago as PagoDAO;
-use dao\Parametro as ParametroDAO;
-use dao\Recompensa as RecompensaDAO;
-use dao\Reserva as ReservaDAO;
-use dao\TipoHabitacion as TipoHabitacionDAO;
-use dto\Reserva as ReservaDTO;
+use App\Dao\Conexion;
+use App\Dao\Habitacion as HabitacionDAO;
+use App\Dao\Huesped as HuespedDAO;
+use App\Dao\MovimientoPuntos as MovimientoPuntosDAO;
+use App\Dao\Pago as PagoDAO;
+use App\Dao\Parametro as ParametroDAO;
+use App\Dao\Recompensa as RecompensaDAO;
+use App\Dao\Reserva as ReservaDAO;
+use App\Dao\TipoHabitacion as TipoHabitacionDAO;
+use App\Dto\Reserva as ReservaDTO;
 
 // BO de reservas: reglas del hotel (disponibilidad, puntos, pago 100 % o 50 %)
 // y transacciones. Todos los DAO comparten UNA conexion para que el commit/rollBack sea conjunto.

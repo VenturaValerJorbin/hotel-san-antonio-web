@@ -1,7 +1,7 @@
 <?php
 require __DIR__ . "/../config/Autoload.php";
 
-use bo\Habitacion as HabitacionBO;
+use App\Bo\Habitacion as HabitacionBO;
 
 $titulo = "Gestión de habitaciones";
 $activo = "habitaciones";

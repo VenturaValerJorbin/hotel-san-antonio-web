@@ -1,7 +1,7 @@
 <?php
 require __DIR__ . "/../config/Autoload.php";
 
-use bo\Turismo as TurismoBO;
+use App\Bo\Turismo as TurismoBO;
 
 $titulo = "Recomendaciones";
 $lugares = (new TurismoBO())->lugares();

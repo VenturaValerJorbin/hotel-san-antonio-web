@@ -10,9 +10,9 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 
 // Lista blanca: solo estos modulos pueden ser invocados desde un formulario
 $controladores = [
-    "habitacion" => \controller\Habitacion::class,
-    "reserva" => \controller\Reserva::class,
-    "contacto" => \controller\Contacto::class,
+    "habitacion" => \App\Controller\Habitacion::class,
+    "reserva" => \App\Controller\Reserva::class,
+    "contacto" => \App\Controller\Contacto::class,
 ];
 
 $clase = $controladores[$_POST["modulo"] ?? ""] ?? null;

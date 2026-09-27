@@ -1,8 +1,8 @@
 <?php
 
-namespace bo;
+namespace App\Bo;
 
-use dao\LugarTuristico as LugarTuristicoDAO;
+use App\Dao\LugarTuristico as LugarTuristicoDAO;
 
 class Turismo
 {

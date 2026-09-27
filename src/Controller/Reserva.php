@@ -1,8 +1,8 @@
 <?php
 
-namespace controller;
+namespace App\Controller;
 
-use bo\Reserva as ReservaBO;
+use App\Bo\Reserva as ReservaBO;
 
 // Controlador de reservas: valida el formulario y delega la reserva, el check-in y el check-out al BO.
 class Reserva extends Controlador

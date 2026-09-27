@@ -2,7 +2,7 @@
 require __DIR__ . "/../config/Autoload.php";
 require_once __DIR__ . "/../views/partes/ayudas.php";
 
-use bo\Habitacion as HabitacionBO;
+use App\Bo\Habitacion as HabitacionBO;
 
 $titulo = "Habitaciones";
 

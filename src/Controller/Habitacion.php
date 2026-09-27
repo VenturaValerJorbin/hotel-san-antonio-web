@@ -1,8 +1,8 @@
 <?php
 
-namespace controller;
+namespace App\Controller;
 
-use bo\Habitacion as HabitacionBO;
+use App\Bo\Habitacion as HabitacionBO;
 
 // Controlador de habitaciones: recibe el POST, valida en el servidor y llama al BO.
 class Habitacion extends Controlador

@@ -1,16 +1,9 @@
 <?php
 
-namespace dao;
+namespace App\Dao;
 
-class Reserva
+class Reserva extends Dao
 {
-    private \PDO $conn;
-
-    public function __construct(?\PDO $conn = null)
-    {
-        $this->conn = $conn ?? (new Conexion())->conectar();
-    }
-
     // Busca una habitacion del tipo pedido sin cruce de fechas con otras reservas activas.
     // FOR UPDATE bloquea la fila dentro de la transaccion: evita reservar la misma habitacion dos veces.
     public function habitacionLibre(int $tipoId, string $ingreso, string $salida): ?int
@@ -25,7 +18,8 @@ class Reserva
                      AND r.fecha_ingreso < :salida AND r.fecha_salida > :ingreso)
              ORDER BY h.numero LIMIT 1 FOR UPDATE"
         );
-        $stmt->execute([":tipo" => $tipoId, ":ingreso" => $ingreso, ":salida" => $salida]);
+        $this->enlazar($stmt, [":tipo" => $tipoId, ":ingreso" => $ingreso, ":salida" => $salida]);
+        $stmt->execute();
         $id = $stmt->fetchColumn();
         return $id === false ? null : (int) $id;
     }
@@ -43,7 +37,8 @@ class Reserva
                      AND r.fecha_ingreso < :salida AND r.fecha_salida > :ingreso)
              ORDER BY h.numero"
         );
-        $stmt->execute([":tipo" => $tipoId, ":excluir" => $excluirReservaId, ":ingreso" => $ingreso, ":salida" => $salida]);
+        $this->enlazar($stmt, [":tipo" => $tipoId, ":excluir" => $excluirReservaId, ":ingreso" => $ingreso, ":salida" => $salida]);
+        $stmt->execute();
         return $stmt->fetchAll();
     }
 
@@ -55,7 +50,7 @@ class Reserva
              VALUES (:codigo, :huesped_id, :habitacion_id, :fecha_ingreso, :fecha_salida,
                      :num_huespedes, :precio_noche, :monto_adelanto, :modalidad_pago, :estado)"
         );
-        $stmt->execute([
+        $this->enlazar($stmt, [
             ":codigo" => $d["codigo"],
             ":huesped_id" => $d["huesped_id"],
             ":habitacion_id" => $d["habitacion_id"],
@@ -67,6 +62,7 @@ class Reserva
             ":modalidad_pago" => $d["modalidad_pago"],
             ":estado" => $d["estado"],
         ]);
+        $stmt->execute();
         return (int) $this->conn->lastInsertId();
     }
 
@@ -75,18 +71,18 @@ class Reserva
     public function listar(array $filtros = []): array
     {
         $donde = [];
-        $param = [];
+        $valores = [];
         if (($filtros["buscar"] ?? "") !== "") {
             $donde[] = "(hu.nombre_completo LIKE :nombre OR hu.numero_documento LIKE :documento)";
-            $param[":nombre"] = $param[":documento"] = "%" . $filtros["buscar"] . "%";
+            $valores[":nombre"] = $valores[":documento"] = "%" . $filtros["buscar"] . "%";
         }
         if (($filtros["ingreso"] ?? "") !== "") {
             $donde[] = "v.fecha_ingreso = :ingreso";
-            $param[":ingreso"] = $filtros["ingreso"];
+            $valores[":ingreso"] = $filtros["ingreso"];
         }
         if (($filtros["estado"] ?? "") !== "") {
             $donde[] = "v.estado = :estado";
-            $param[":estado"] = $filtros["estado"];
+            $valores[":estado"] = $filtros["estado"];
         }
 
         $stmt = $this->conn->prepare(
@@ -100,7 +96,8 @@ class Reserva
             . ($donde ? " WHERE " . implode(" AND ", $donde) : "") .
             " ORDER BY v.fecha_ingreso DESC, v.id DESC"
         );
-        $stmt->execute($param);
+        $this->enlazar($stmt, $valores);
+        $stmt->execute();
         return $stmt->fetchAll();
     }
 
@@ -125,14 +122,16 @@ class Reserva
              WHERE estado IN ('pendiente','confirmada','checkin')
                AND fecha_ingreso <= :hasta AND fecha_salida > :desde"
         );
-        $stmt->execute([":desde" => $desde, ":hasta" => $hasta]);
+        $this->enlazar($stmt, [":desde" => $desde, ":hasta" => $hasta]);
+        $stmt->execute();
         return $stmt->fetchAll();
     }
 
     public function obtener(int $id): ?array
     {
         $stmt = $this->conn->prepare("SELECT * FROM vista_reserva WHERE id = :id");
-        $stmt->execute([":id" => $id]);
+        $this->enlazar($stmt, [":id" => $id]);
+        $stmt->execute();
         return $stmt->fetch() ?: null;
     }
 
@@ -148,7 +147,8 @@ class Reserva
              JOIN tipo_habitacion t ON t.id = hab.tipo_id
              WHERE v.id = :id"
         );
-        $stmt->execute([":id" => $id]);
+        $this->enlazar($stmt, [":id" => $id]);
+        $stmt->execute();
         return $stmt->fetch() ?: null;
     }
 
@@ -157,12 +157,14 @@ class Reserva
         $stmt = $this->conn->prepare(
             "UPDATE reserva SET habitacion_id = :habitacion, observaciones = :obs WHERE id = :id"
         );
-        return $stmt->execute([":habitacion" => $habitacionId, ":obs" => $observaciones ?: null, ":id" => $id]);
+        $this->enlazar($stmt, [":habitacion" => $habitacionId, ":obs" => $observaciones ?: null, ":id" => $id]);
+        return $stmt->execute();
     }
 
     public function cambiarEstado(int $id, string $estado): bool
     {
         $stmt = $this->conn->prepare("UPDATE reserva SET estado = :estado WHERE id = :id");
-        return $stmt->execute([":estado" => $estado, ":id" => $id]);
+        $this->enlazar($stmt, [":estado" => $estado, ":id" => $id]);
+        return $stmt->execute();
     }
 }

@@ -1,16 +1,9 @@
 <?php
 
-namespace dao;
+namespace App\Dao;
 
-class Producto
+class Producto extends Dao
 {
-    private \PDO $conn;
-
-    public function __construct(?\PDO $conn = null)
-    {
-        $this->conn = $conn ?? (new Conexion())->conectar();
-    }
-
     // Carta publica: productos activos con el nombre de su categoria
     public function listarCarta(): array
     {

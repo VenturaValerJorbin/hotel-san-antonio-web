@@ -1,8 +1,8 @@
 <?php
 require __DIR__ . "/../config/Autoload.php";
 
-use bo\Habitacion as HabitacionBO;
-use bo\Reserva as ReservaBO;
+use App\Bo\Habitacion as HabitacionBO;
+use App\Bo\Reserva as ReservaBO;
 
 $titulo = "Reservar";
 $tipos = (new HabitacionBO())->tipos();

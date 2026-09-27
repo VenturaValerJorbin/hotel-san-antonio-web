@@ -1,11 +1,11 @@
 <?php
 
-namespace bo;
+namespace App\Bo;
 
-use dao\Habitacion as HabitacionDAO;
-use dao\TipoHabitacion as TipoHabitacionDAO;
-use dto\Habitacion as HabitacionDTO;
-use dto\TipoHabitacion as TipoHabitacionDTO;
+use App\Dao\Habitacion as HabitacionDAO;
+use App\Dao\TipoHabitacion as TipoHabitacionDAO;
+use App\Dto\Habitacion as HabitacionDTO;
+use App\Dto\TipoHabitacion as TipoHabitacionDTO;
 
 // BO: reglas de negocio y conversion de los arreglos del DAO a objetos DTO.
 class Habitacion

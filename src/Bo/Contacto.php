@@ -1,8 +1,8 @@
 <?php
 
-namespace bo;
+namespace App\Bo;
 
-use dao\MensajeContacto as MensajeContactoDAO;
+use App\Dao\MensajeContacto as MensajeContactoDAO;
 
 class Contacto
 {

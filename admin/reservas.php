@@ -1,7 +1,7 @@
 <?php
 require __DIR__ . "/../config/Autoload.php";
 
-use bo\Reserva as ReservaBO;
+use App\Bo\Reserva as ReservaBO;
 
 $titulo = "Gestión de reservas";
 $activo = "reservas";

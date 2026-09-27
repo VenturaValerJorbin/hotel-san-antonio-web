@@ -1,7 +1,7 @@
 <?php
 require "config/Autoload.php";
 
-use bo\Habitacion as HabitacionBO;
+use App\Bo\Habitacion as HabitacionBO;
 
 $titulo = "Inicio";
 $tipos = (new HabitacionBO())->tipos();

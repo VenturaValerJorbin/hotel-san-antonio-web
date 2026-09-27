@@ -1,6 +1,6 @@
 <?php
 
-namespace controller;
+namespace App\Controller;
 
 // Base comun de los controladores: todos responden con el mismo formato.
 abstract class Controlador

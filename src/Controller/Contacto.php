@@ -1,8 +1,8 @@
 <?php
 
-namespace controller;
+namespace App\Controller;
 
-use bo\Contacto as ContactoBO;
+use App\Bo\Contacto as ContactoBO;
 
 // Controlador del formulario de contacto.
 class Contacto extends Controlador

@@ -2,7 +2,7 @@
 require __DIR__ . "/../config/Autoload.php";
 require_once __DIR__ . "/../views/partes/ayudas.php";
 
-use bo\Reserva as ReservaBO;
+use App\Bo\Reserva as ReservaBO;
 
 $titulo = "Registro de check-in";
 $activo = "checkin";
