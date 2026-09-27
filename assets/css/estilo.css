@@ -1,0 +1,187 @@
+/* Fuentes locales (Playfair Display para titulos, Lato para texto): el sitio no depende de internet */
+@font-face { font-family: "Playfair Display"; font-weight: 600; font-style: normal; font-display: swap; src: url("../fonts/playfair-display-600.woff2") format("woff2"); }
+@font-face { font-family: "Playfair Display"; font-weight: 700; font-style: normal; font-display: swap; src: url("../fonts/playfair-display-700.woff2") format("woff2"); }
+@font-face { font-family: "Lato"; font-weight: 400; font-style: normal; font-display: swap; src: url("../fonts/lato-400.woff2") format("woff2"); }
+@font-face { font-family: "Lato"; font-weight: 700; font-style: normal; font-display: swap; src: url("../fonts/lato-700.woff2") format("woff2"); }
+
+/* ============================================================
+   Hotel Turístico San Antonio - estilos (mobile-first)
+   Los estilos base son los del celular; tablet (768px) y
+   escritorio (992px / 1200px) se agregan con min-width.
+   Paleta tomada de los mock-ups del Avance 01.
+   ============================================================ */
+:root {
+    --rojo: #B51725;
+    --rojo-osc: #9E1C28;
+    --marron: #4F3129;
+    --marron-osc: #3E2A23;
+    --dorado: #B18C54;
+    --hueso: #FAF6F5;
+    --tinta: #2B1D18;
+    --gris: #6f625c;
+    --borde: #EADFD8;
+    --crema: #F4ECE3;
+    --rosado: #FDEBE9;
+}
+
+body { font-family: "Lato", system-ui, sans-serif; background: var(--hueso); color: var(--tinta); }
+h1, h2, h3, h4, .serif { font-family: "Playfair Display", Georgia, serif; font-weight: 700; }
+a { color: var(--rojo); }
+a:hover { color: var(--rojo-osc); }
+
+/* ---------- Botones ---------- */
+.btn-sa { background: var(--rojo); color: #fff; border: 0; border-radius: .5rem; font-weight: 700; padding: .7rem 1.25rem; }
+.btn-sa:hover, .btn-sa:focus { background: var(--rojo-osc); color: #fff; }
+.btn-linea { background: #fff; color: var(--marron); border: 1px solid var(--dorado); border-radius: .5rem; font-weight: 700; padding: .55rem 1rem; }
+.btn-linea:hover { background: var(--crema); color: var(--marron); }
+.btn-hero-linea { color: #fff; border: 1px solid rgba(255, 255, 255, .7); border-radius: .5rem; font-weight: 700; padding: .7rem 1.25rem; }
+.btn-hero-linea:hover { background: rgba(255, 255, 255, .15); color: #fff; }
+
+/* ---------- Logo ---------- */
+.sa-logo { display: inline-block; line-height: 0; }
+.sa-logo img { height: 3.4rem; width: auto; }
+/* El logo tiene fondo blanco: sobre fondos oscuros va en una placa blanca */
+.sa-logo.claro img { background: #fff; border-radius: .5rem; padding: .25rem .6rem; height: 3.6rem; }
+
+/* ---------- Cabecera y navegacion ---------- */
+.sa-header { background: var(--hueso); border-bottom: 1px solid var(--borde); }
+.sa-header .nav-link { color: var(--tinta); font-weight: 700; font-size: .95rem; padding: .6rem 0; }
+.sa-header .nav-link.active { color: var(--rojo); }
+.sa-header .navbar-toggler { border-color: var(--borde); }
+
+/* ---------- Hero ---------- */
+.sa-hero {
+    background:
+        radial-gradient(circle at 85% 15%, rgba(177, 140, 84, .55), transparent 55%),
+        linear-gradient(135deg, var(--marron-osc), var(--marron) 60%, #6b4433);
+    color: #fff; padding: 2.25rem 0;
+}
+.sa-hero h1 { font-size: 2rem; line-height: 1.1; }
+.sa-hero .etiqueta { color: var(--dorado); letter-spacing: .25em; font-size: .7rem; font-weight: 700; text-transform: uppercase; }
+.sa-hero .migas { font-size: .85rem; color: var(--dorado); }
+.sa-hero .migas a { color: var(--dorado); text-decoration: none; }
+.sa-hero .migas span.actual { color: #fff; }
+.sa-hero p { max-width: 34rem; opacity: .95; }
+.sa-hero-grande { padding: 3rem 0 4.5rem; }
+.sa-hero-grande h1 { font-size: 2.4rem; }
+.sa-rasgo { display: flex; align-items: center; gap: .5rem; font-size: .85rem; }
+.sa-rasgo i { color: var(--dorado); font-size: 1.3rem; }
+
+/* ---------- Tarjetas ---------- */
+.sa-card { background: #fff; border: 1px solid var(--borde); border-radius: .75rem; box-shadow: 0 2px 8px rgba(79, 49, 41, .06); }
+.sa-card-cuerpo { padding: 1rem; }
+.sa-precio { color: var(--rojo); font-family: "Playfair Display", serif; font-weight: 700; font-size: 1.35rem; white-space: nowrap; }
+.sa-precio small { display: block; color: var(--gris); font-family: "Lato", sans-serif; font-size: .7rem; font-weight: 400; text-align: right; }
+.sa-subtitulo { color: var(--dorado); letter-spacing: .2em; font-size: .7rem; font-weight: 700; text-transform: uppercase; }
+.sa-linea-dorada { width: 2.5rem; height: 2px; background: var(--dorado); margin: .5rem 0 1rem; }
+
+/* Marcador de foto: se reemplaza por <img> cuando el hotel suba sus fotos */
+.sa-foto { display: grid; place-items: center; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: .5rem;
+    background: linear-gradient(135deg, #e7d7c0, #c9a878); color: rgba(255, 255, 255, .9); font-size: 2rem; }
+
+/* Buscador de disponibilidad (Inicio): se superpone al hero */
+.sa-buscador { margin-top: -2.5rem; position: relative; z-index: 2; }
+.sa-aviso { display: flex; align-items: center; gap: .5rem; font-size: .85rem; color: var(--marron); }
+.sa-aviso i { color: var(--dorado); font-size: 1.1rem; }
+
+.sa-servicio { display: inline-flex; align-items: center; gap: .35rem; font-size: .8rem; color: var(--gris); margin-right: .75rem; }
+.sa-servicio i { color: var(--marron); }
+
+/* Pastillas de estado */
+.pill { display: inline-block; padding: .2rem .6rem; border-radius: 1rem; font-size: .75rem; font-weight: 700; }
+.pill-confirmada { background: #DDF3E4; color: #1E6B3A; }
+.pill-pendiente { background: #FBEFC9; color: #8A6A12; }
+.pill-checkin { background: #F8D9D9; color: var(--rojo-osc); }
+.pill-checkout, .pill-cancelada, .pill-no_show { background: #E9E4E1; color: #5c524c; }
+.pill-pagado { background: #DDF3E4; color: #1E6B3A; }
+.pill-saldo { background: #FBEFC9; color: #8A6A12; }
+
+/* Caja destacada de pago */
+.sa-caja-pago { background: var(--rosado); border-radius: .5rem; padding: .75rem 1rem; }
+.sa-caja-pago strong { color: var(--rojo); }
+.sa-caja-crema { background: var(--crema); border-radius: .5rem; padding: .75rem 1rem; }
+
+/* Metodo de pago */
+.sa-metodo { display: block; cursor: pointer; }
+.sa-metodo input { position: absolute; opacity: 0; }
+.sa-metodo span { display: flex; align-items: center; gap: .6rem; border: 1px solid var(--borde); border-radius: .5rem; padding: .7rem .9rem; background: #fff; }
+.sa-metodo input:checked + span { border-color: var(--rojo); background: var(--rosado); }
+.sa-metodo input:focus-visible + span { outline: 2px solid var(--dorado); }
+
+/* Banner y pie de pagina */
+.sa-banner { background: linear-gradient(90deg, rgba(250, 246, 245, .95), rgba(250, 246, 245, .6)), linear-gradient(135deg, #b9c9a8, #7a9a72); padding: 2rem 0; }
+.sa-pie { background: var(--marron); color: #f1e6de; padding: 2rem 0 1rem; font-size: .9rem; }
+.sa-pie h6 { color: #fff; letter-spacing: .12em; font-size: .75rem; text-transform: uppercase; }
+.sa-pie a { color: #f1e6de; text-decoration: none; }
+.sa-pie a:hover { color: #fff; text-decoration: underline; }
+.sa-pie ul { list-style: none; padding: 0; margin: 0; }
+.sa-pie li { margin-bottom: .35rem; }
+.sa-pie .copy { border-top: 1px solid rgba(255, 255, 255, .15); margin-top: 1.5rem; padding-top: 1rem; font-size: .8rem; opacity: .85; }
+
+/* Formularios */
+.form-label { font-weight: 700; font-size: .9rem; color: var(--marron); }
+.form-control:focus, .form-select:focus, .form-check-input:focus { border-color: var(--dorado); box-shadow: 0 0 0 .2rem rgba(177, 140, 84, .25); }
+.form-check-input:checked { background-color: var(--rojo); border-color: var(--rojo); }
+.requerido::after { content: " *"; color: var(--rojo); }
+
+/* Carta del restaurante */
+.sa-precio-menu { background: var(--rojo); color: #fff; border-radius: .4rem; padding: .25rem .8rem; font-weight: 700; }
+
+/* ============================================================
+   PANEL DEL PERSONAL (recepción / administración)
+   ============================================================ */
+.panel-barra { background: var(--rojo); color: #fff; }
+/* !important: Bootstrap deja transparente el offcanvas-lg en escritorio */
+.panel-lado { background: var(--marron-osc) !important; color: #fff; }
+.panel-lado .nav-link { color: #eadfd8; border-radius: .5rem; padding: .7rem 1rem; display: flex; gap: .6rem; align-items: center; }
+.panel-lado .nav-link:hover { background: rgba(255, 255, 255, .08); color: #fff; }
+.panel-lado .nav-link.active { background: var(--rojo); color: #fff; }
+.panel-lema { color: var(--dorado); font-size: .7rem; letter-spacing: .2em; text-transform: uppercase; }
+.panel-contenido { padding: 1rem; }
+.sa-stat { display: flex; align-items: center; gap: .75rem; padding: .9rem 1rem; }
+.sa-stat .num { font-family: "Playfair Display", serif; font-size: 1.8rem; font-weight: 700; line-height: 1; }
+.sa-stat i { font-size: 1.6rem; color: var(--dorado); }
+
+/* Tablero de disponibilidad */
+.tablero { border-collapse: separate; border-spacing: 3px; font-size: .75rem; min-width: 32rem; }
+.tablero th { text-align: center; color: var(--gris); font-weight: 700; }
+.tablero td.hab { font-weight: 700; white-space: nowrap; padding-right: .5rem; }
+.tablero td.celda { text-align: center; padding: .5rem .2rem; border-radius: .35rem; font-weight: 700; }
+.celda-disponible { background: #DDF3E4; color: #1E6B3A; }
+.celda-reservada { background: #FBEFC9; color: #8A6A12; }
+.celda-ocupada { background: #F8D9D9; color: var(--rojo-osc); }
+.celda-mantenimiento { background: #E4E0DD; color: #5c524c; }
+.punto { display: inline-block; width: .7rem; height: .7rem; border-radius: 50%; margin-right: .3rem; }
+
+/* ============================================================
+   TABLET (>= 768px)
+   ============================================================ */
+@media (min-width: 768px) {
+    .sa-hero { padding: 3rem 0; }
+    .sa-hero h1 { font-size: 2.75rem; }
+    .sa-hero-grande h1 { font-size: 3.2rem; }
+    .sa-card-cuerpo { padding: 1.25rem; }
+    .panel-contenido { padding: 1.5rem; }
+}
+
+/* ============================================================
+   ESCRITORIO (>= 992px)
+   ============================================================ */
+@media (min-width: 992px) {
+    .sa-header .nav-link { padding: .5rem .9rem; }
+    .sa-hero { padding: 3.5rem 0; }
+    .sa-hero-grande { padding: 5rem 0 6rem; }
+    .sa-hero-grande h1 { font-size: 3.8rem; }
+    .panel { display: grid; grid-template-columns: 250px 1fr; min-height: 100vh; }
+    .panel-lado { position: sticky; top: 0; height: 100vh; }
+    .panel-contenido { padding: 2rem; }
+    .resumen-fijo { position: sticky; top: 1rem; }
+}
+
+@media (min-width: 1200px) {
+    .sa-hero h1 { font-size: 3.2rem; }
+}
+
+@media (min-width: 992px) {
+    .sa-logo img { height: 4rem; }
+}
