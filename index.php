@@ -67,6 +67,15 @@ require "views/partes/cabecera.php";
 </div>
 
 <main class="container py-5">
+    <!-- Aviso del programa de puntos: entre el buscador y las habitaciones, a la vista al abrir la web -->
+    <section class="sa-caja-crema d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 p-4 mb-5">
+        <div>
+            <h2 class="h4 mb-1"><i class="bi bi-gift text-danger"></i> Programa de puntos</h2>
+            <p class="mb-0">Acumula puntos en cada estadía y accede a pago fraccionado, cortesías y descuentos.</p>
+        </div>
+        <a class="btn-linea text-decoration-none text-center" href="<?= url("publico/puntos.php") ?>">Conocer beneficios</a>
+    </section>
+
     <div class="d-flex justify-content-between align-items-end mb-3">
         <div>
             <div class="sa-subtitulo">Descansa en un lugar especial</div>
@@ -97,14 +106,5 @@ require "views/partes/cabecera.php";
             <?php endforeach ?>
         </div>
     </div>
-
-    <!-- Aviso del programa de puntos -->
-    <section class="sa-caja-crema d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 p-4 mt-5">
-        <div>
-            <h2 class="h4 mb-1"><i class="bi bi-gift text-danger"></i> Programa de puntos</h2>
-            <p class="mb-0">Acumula puntos en cada estadía y accede a pago fraccionado, cortesías y descuentos.</p>
-        </div>
-        <a class="btn-linea text-decoration-none text-center" href="<?= url("publico/puntos.php") ?>">Conocer beneficios</a>
-    </section>
 </main>
 <?php require "views/partes/pie.php" ?>
