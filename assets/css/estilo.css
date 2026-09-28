@@ -45,10 +45,11 @@ a:hover { color: var(--rojo-osc); }
 
 /* ---------- Cabecera y navegacion ---------- */
 /* Menu fijo: se queda arriba al hacer scroll. z-index sobre carruseles y tarjetas (Bootstrap usa 1030 para sticky-top). */
-.sa-header { background: var(--hueso); border-bottom: 1px solid var(--borde); position: sticky; top: 0; z-index: 1030; box-shadow: 0 2px 8px rgba(79, 49, 41, .08); }
+/* Fondo crema (un tono mas oscuro que el de la pagina) para que el menu se distinga al hacer scroll. */
+.sa-header { background: var(--crema); border-bottom: 1px solid #E0D0BC; position: sticky; top: 0; z-index: 1030; box-shadow: 0 2px 10px rgba(79, 49, 41, .12); }
 .sa-header .nav-link { color: var(--tinta); font-weight: 700; font-size: .95rem; padding: .6rem 0; }
 .sa-header .nav-link.active { color: var(--rojo); }
-.sa-header .navbar-toggler { border-color: var(--borde); }
+.sa-header .navbar-toggler { border-color: #D3C1AB; }
 /* Como el menu es fijo, si se abre en una pantalla baja debe poder desplazarse en vez de quedar cortado */
 @media (max-width: 1199.98px) {
     .sa-header .navbar-collapse { max-height: calc(100vh - 6rem); overflow-y: auto; }
