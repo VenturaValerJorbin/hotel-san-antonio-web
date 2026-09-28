@@ -19,7 +19,7 @@ if ($filtroTipo > 0) {
 $consulta = $rangoValido ? http_build_query(["ingreso" => $ingreso, "salida" => $salida]) : "";
 
 require __DIR__ . "/../views/partes/cabecera.php";
-hero("Nuestras habitaciones", "Comodidad, tranquilidad y una experiencia única en el corazón de la Amazonía.", [], "Descansa en Bagua");
+hero("Nuestras habitaciones", "Comodidad, tranquilidad y una experiencia única en el corazón de la Amazonía.", [], "Descansa en Bagua", "sa-hero-foto-habitaciones");
 ?>
 <main class="container py-5">
     <div class="sa-subtitulo"><?= count($tipos) === 1 ? "Una opción" : count($tipos) . " opciones" ?> para tu estadía</div>

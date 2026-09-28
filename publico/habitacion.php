@@ -29,14 +29,13 @@ hero(
     <div class="row g-4">
         <div class="col-12 col-lg-7">
             <div class="sa-card p-2">
-                <?php foto($tipo->fotos[0] ?? null, "Habitación " . $tipo->nombre, "bi-house-heart") ?>
-                <?php if (count($tipo->fotos) > 1) : ?>
-                    <div class="row g-2 mt-1">
-                        <?php foreach (array_slice($tipo->fotos, 0, 4) as $f) : ?>
-                            <div class="col-3"><?php foto($f, "Foto de la habitación " . $tipo->nombre) ?></div>
-                        <?php endforeach ?>
-                    </div>
-                <?php endif ?>
+                <?php
+                // ================= CAMBIO 3 de 3 (modificado) =====================
+                // Antes: foto() de la primera imagen + fila de hasta 4 miniaturas debajo.
+                // Ahora: un solo carrusel con TODAS las fotos de la habitacion.
+                carrusel($tipo->fotos, "Habitación " . $tipo->nombre, "bi-house-heart", "detalle-" . $tipo->id);
+                // ===================== FIN CAMBIO 3 de 3 ===========================
+                ?>
             </div>
 
             <h2 class="h4 mt-4">Descripción</h2>
