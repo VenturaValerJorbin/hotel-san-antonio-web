@@ -138,9 +138,6 @@ hero(
                         <?php endforeach ?>
                     </div>
                     <?= $mensaje("metodo_pago") ?>
-                    <div class="alert alert-info small mt-3 mb-0">
-                        <i class="bi bi-info-circle"></i> Modo de prueba: el cobro se simula. La pasarela de pago real se conectará en la siguiente etapa del proyecto.
-                    </div>
 
                     <div class="form-check mt-4">
                         <input class="form-check-input<?= $claseError("acepta") ?>" type="checkbox" id="acepta" name="acepta" required>
