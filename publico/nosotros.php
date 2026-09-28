@@ -75,7 +75,7 @@ hero(
         <div class="col-12 col-md-4">
             <article class="sa-card sa-card-cuerpo h-100">
                 <h3 class="h5"><i class="bi bi-house-heart text-danger"></i> Alojamiento</h3>
-                <p class="small text-muted mb-0">Siete tipos de habitación, todas con baño privado, televisor y aire acondicionado. Wi-Fi y cochera sin costo para nuestros huéspedes.</p>
+                <p class="small text-muted mb-0">Seis tipos de habitación, todas con baño privado, televisor y aire acondicionado. Wi-Fi y cochera sin costo para nuestros huéspedes.</p>
             </article>
         </div>
         <div class="col-12 col-md-4">

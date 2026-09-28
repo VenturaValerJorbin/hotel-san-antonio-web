@@ -55,7 +55,7 @@ CREATE TABLE servicio (
     icono   VARCHAR(30) NULL
 ) ENGINE=InnoDB;
 
--- Los servicios dependen del TIPO de habitacion (ej. Ejecutiva con o sin agua caliente)
+-- Los servicios dependen del TIPO de habitacion (ej. la Simple no incluye agua caliente)
 CREATE TABLE tipo_servicio (
     tipo_id      INT UNSIGNED NOT NULL,
     servicio_id  INT UNSIGNED NOT NULL,
@@ -321,14 +321,12 @@ INSERT INTO usuario (rol_id, nombres, correo, clave) VALUES
 (2, 'Recepción Turno Día', 'recepcion@sanantonio.pe',
     '$2y$10$wghTX6l0xeUQDUKKuBHiVuF6.xwUad30MKKYj7c65d2Hhg9l6Q2w6');
 
--- Los 7 tipos de habitacion y sus tarifas, segun los mock-ups del Avance 01
+-- Los 6 tipos de habitacion y sus tarifas. Solo la Simple no incluye agua caliente.
 INSERT INTO tipo_habitacion (nombre, descripcion, detalle, capacidad, precio_noche) VALUES
 ('Simple', 'Habitación sencilla y cómoda para una persona.',
  'La habitación Simple del Hotel San Antonio ofrece un ambiente tranquilo y funcional, ideal para viajeros que buscan descanso y buen precio en el corazón de Bagua.', 1, 100.00),
-('Ejecutiva sin agua caliente', 'Habitación ejecutiva con escritorio para una persona.',
- 'Pensada para quienes viajan por trabajo: escritorio, silla y aire acondicionado en un ambiente ordenado y silencioso.', 1, 120.00),
-('Ejecutiva con agua caliente', 'Habitación ejecutiva con agua caliente para una persona.',
- 'Igual que la Ejecutiva, con baño privado con agua caliente para un mayor confort después de la jornada.', 1, 130.00),
+('Ejecutiva', 'Habitación ejecutiva con escritorio y agua caliente para una persona.',
+ 'Pensada para quienes viajan por trabajo: escritorio, silla y aire acondicionado en un ambiente ordenado y silencioso, con baño privado con agua caliente para un mayor confort después de la jornada.', 1, 130.00),
 ('Matrimonial', 'Cama de dos plazas para dos personas.',
  'Habitación matrimonial amplia y acogedora, ideal para parejas que visitan Bagua por turismo o descanso.', 2, 130.00),
 ('Doble', 'Dos camas para dos personas.',
@@ -338,11 +336,20 @@ INSERT INTO tipo_habitacion (nombre, descripcion, detalle, capacidad, precio_noc
 ('King', 'Amplia y cómoda, perfecta para una estadía de descanso.',
  'La habitación King del Hotel San Antonio ofrece un ambiente amplio, elegante y acogedor, ideal para quienes buscan comodidad y tranquilidad en el corazón de la Amazonía. Disfruta de una cama king, espacios bien iluminados y una vista privilegiada a la naturaleza de Bagua.', 2, 180.00);
 
--- 17 habitaciones en 3 pisos (cantidad por confirmar con el hotel). Las 7 primeras coinciden con el tablero del mock-up.
-INSERT INTO habitacion (numero, piso, tipo_id) VALUES
-('101',1,1),('102',1,2),('103',1,3),('104',1,1),('105',1,2),('106',1,3),
-('201',2,4),('202',2,5),('203',2,6),('204',2,7),('205',2,4),('206',2,5),
-('301',3,1),('302',3,3),('303',3,4),('304',3,5),('305',3,6);
+-- 17 habitaciones en 3 pisos (cantidad por confirmar con el hotel).
+-- El tipo se indica por su nombre, asi el orden de los tipos no afecta a las habitaciones.
+INSERT INTO habitacion (numero, piso, tipo_id)
+SELECT h.numero, h.piso, t.id
+FROM (
+    SELECT '101' AS numero, 1 AS piso, 'Simple' AS tipo UNION ALL SELECT '102', 1, 'Ejecutiva' UNION ALL SELECT '103', 1, 'Ejecutiva'
+    UNION ALL SELECT '104', 1, 'Simple' UNION ALL SELECT '105', 1, 'Ejecutiva' UNION ALL SELECT '106', 1, 'Ejecutiva'
+    UNION ALL SELECT '201', 2, 'Matrimonial' UNION ALL SELECT '202', 2, 'Doble' UNION ALL SELECT '203', 2, 'Suite'
+    UNION ALL SELECT '204', 2, 'King' UNION ALL SELECT '205', 2, 'Matrimonial' UNION ALL SELECT '206', 2, 'Doble'
+    UNION ALL SELECT '301', 3, 'Simple' UNION ALL SELECT '302', 3, 'Ejecutiva' UNION ALL SELECT '303', 3, 'Matrimonial'
+    UNION ALL SELECT '304', 3, 'Doble' UNION ALL SELECT '305', 3, 'Suite'
+) h
+JOIN tipo_habitacion t ON t.nombre = h.tipo
+ORDER BY h.numero;
 
 INSERT INTO servicio (nombre, icono) VALUES
 ('Baño privado','bi-droplet'),('Aire acondicionado','bi-snow'),('TV','bi-tv'),('Armario','bi-door-closed'),
@@ -351,10 +358,10 @@ INSERT INTO servicio (nombre, icono) VALUES
 -- Todos los tipos: bano, aire, TV, armario, escritorio, Wi-Fi y cochera (Avance 01)
 INSERT INTO tipo_servicio (tipo_id, servicio_id)
 SELECT t.id, s.id FROM tipo_habitacion t CROSS JOIN servicio s WHERE s.nombre <> 'Agua caliente';
--- Agua caliente: todos menos Simple y Ejecutiva sin agua caliente
+-- Agua caliente: todos los tipos menos la Simple
 INSERT INTO tipo_servicio (tipo_id, servicio_id)
 SELECT t.id, s.id FROM tipo_habitacion t CROSS JOIN servicio s
-WHERE s.nombre = 'Agua caliente' AND t.nombre NOT IN ('Simple','Ejecutiva sin agua caliente');
+WHERE s.nombre = 'Agua caliente' AND t.nombre <> 'Simple';
 
 -- Fotos de cada tipo de habitacion. Las imagenes estan en assets/img/ y aqui solo se guarda su ruta
 -- (relativa a la raiz del proyecto) y el orden en que aparecen en el carrusel.
@@ -366,7 +373,7 @@ INSERT INTO foto_tipo_habitacion (tipo_id, ruta, orden) VALUES
 (1, 'assets/img/economic-room/economic-room4.avif', 4),
 (1, 'assets/img/economic-room/economic-room5.avif', 5);
 
--- tipo_id 2 = Ejecutiva sin agua caliente
+-- tipo_id 2 = Ejecutiva
 INSERT INTO foto_tipo_habitacion (tipo_id, ruta, orden) VALUES
 (2, 'assets/img/deluxe/hiabitacion_deluxe1.avif', 1),
 (2, 'assets/img/deluxe/hiabitacion_deluxe2.avif', 2),
@@ -378,53 +385,49 @@ INSERT INTO foto_tipo_habitacion (tipo_id, ruta, orden) VALUES
 (2, 'assets/img/deluxe/hiabitacion_deluxe8.avif', 8),
 (2, 'assets/img/deluxe/9hiabitacion_deluxe.avif', 9);
 
--- tipo_id 3 = Ejecutiva con agua caliente: es la misma habitacion que la anterior, comparte sus fotos
-INSERT INTO foto_tipo_habitacion (tipo_id, ruta, orden)
-SELECT 3, ruta, orden FROM foto_tipo_habitacion WHERE tipo_id = 2;
-
--- tipo_id 4 = Matrimonial
+-- tipo_id 3 = Matrimonial
 INSERT INTO foto_tipo_habitacion (tipo_id, ruta, orden) VALUES
-(4, 'assets/img/deluxe-queen/habitacion_queen1.avif', 1),
-(4, 'assets/img/deluxe-queen/habitacion_queen2.avif', 2),
-(4, 'assets/img/deluxe-queen/habitacion_queen3.avif', 3),
-(4, 'assets/img/deluxe-queen/habitacion_queen4.avif', 4);
+(3, 'assets/img/deluxe-queen/habitacion_queen1.avif', 1),
+(3, 'assets/img/deluxe-queen/habitacion_queen2.avif', 2),
+(3, 'assets/img/deluxe-queen/habitacion_queen3.avif', 3),
+(3, 'assets/img/deluxe-queen/habitacion_queen4.avif', 4);
 
--- tipo_id 5 = Doble
+-- tipo_id 4 = Doble
 INSERT INTO foto_tipo_habitacion (tipo_id, ruta, orden) VALUES
-(5, 'assets/img/doble/habitacion-doble1.avif', 1),
-(5, 'assets/img/doble/habitacion-doble2.avif', 2),
-(5, 'assets/img/doble/habitacion-doble3.avif', 3),
-(5, 'assets/img/doble/habitacion-doble4.avif', 4),
-(5, 'assets/img/doble/habitacion-doble5.avif', 5),
-(5, 'assets/img/doble/habitacion-doble6.avif', 6),
-(5, 'assets/img/doble/habitacion-doble7.avif', 7),
-(5, 'assets/img/doble/habitacion-doble8.avif', 8),
-(5, 'assets/img/doble/habitacion-doble9.avif', 9),
-(5, 'assets/img/doble/habitacion-doble10.avif', 10),
-(5, 'assets/img/doble/habitacion-doble11.avif', 11),
-(5, 'assets/img/doble/habitacion-doble12.avif', 12),
-(5, 'assets/img/doble/habitacion-doble13.avif', 13),
-(5, 'assets/img/doble/habitacion-doble14.avif', 14),
-(5, 'assets/img/doble/habitacion-doble15.avif', 15),
-(5, 'assets/img/doble/habitacion-doble16.avif', 16),
-(5, 'assets/img/doble/habitacion-doble17.avif', 17),
-(5, 'assets/img/doble/habitacion-doble18.avif', 18);
+(4, 'assets/img/doble/habitacion-doble1.avif', 1),
+(4, 'assets/img/doble/habitacion-doble2.avif', 2),
+(4, 'assets/img/doble/habitacion-doble3.avif', 3),
+(4, 'assets/img/doble/habitacion-doble4.avif', 4),
+(4, 'assets/img/doble/habitacion-doble5.avif', 5),
+(4, 'assets/img/doble/habitacion-doble6.avif', 6),
+(4, 'assets/img/doble/habitacion-doble7.avif', 7),
+(4, 'assets/img/doble/habitacion-doble8.avif', 8),
+(4, 'assets/img/doble/habitacion-doble9.avif', 9),
+(4, 'assets/img/doble/habitacion-doble10.avif', 10),
+(4, 'assets/img/doble/habitacion-doble11.avif', 11),
+(4, 'assets/img/doble/habitacion-doble12.avif', 12),
+(4, 'assets/img/doble/habitacion-doble13.avif', 13),
+(4, 'assets/img/doble/habitacion-doble14.avif', 14),
+(4, 'assets/img/doble/habitacion-doble15.avif', 15),
+(4, 'assets/img/doble/habitacion-doble16.avif', 16),
+(4, 'assets/img/doble/habitacion-doble17.avif', 17),
+(4, 'assets/img/doble/habitacion-doble18.avif', 18);
 
--- tipo_id 6 = Suite
+-- tipo_id 5 = Suite
 INSERT INTO foto_tipo_habitacion (tipo_id, ruta, orden) VALUES
-(6, 'assets/img/deluxe-suite/1deluxe-suite.avif', 1),
-(6, 'assets/img/deluxe-suite/2deluxe-suite.avif', 2),
-(6, 'assets/img/deluxe-suite/3deluxe-suite.avif', 3);
+(5, 'assets/img/deluxe-suite/1deluxe-suite.avif', 1),
+(5, 'assets/img/deluxe-suite/2deluxe-suite.avif', 2),
+(5, 'assets/img/deluxe-suite/3deluxe-suite.avif', 3);
 
--- tipo_id 7 = King
+-- tipo_id 6 = King
 INSERT INTO foto_tipo_habitacion (tipo_id, ruta, orden) VALUES
-(7, 'assets/img/junior-suite/unior-suite1.avif', 1),
-(7, 'assets/img/junior-suite/unior-suite2.avif', 2),
-(7, 'assets/img/junior-suite/unior-suite3.avif', 3),
-(7, 'assets/img/junior-suite/unior-suite4.avif', 4),
-(7, 'assets/img/junior-suite/unior-suite5.avif', 5),
-(7, 'assets/img/junior-suite/unior-suite6.avif', 6),
-(7, 'assets/img/junior-suite/unior-suite7.avif', 7);
+(6, 'assets/img/junior-suite/unior-suite1.avif', 1),
+(6, 'assets/img/junior-suite/unior-suite2.avif', 2),
+(6, 'assets/img/junior-suite/unior-suite3.avif', 3),
+(6, 'assets/img/junior-suite/unior-suite4.avif', 4),
+(6, 'assets/img/junior-suite/unior-suite5.avif', 5),
+(6, 'assets/img/junior-suite/unior-suite6.avif', 6),
+(6, 'assets/img/junior-suite/unior-suite7.avif', 7);
 
 INSERT INTO parametro (clave, valor, descripcion) VALUES
 ('soles_por_punto',   '10', 'Soles gastados por cada punto ganado'),
