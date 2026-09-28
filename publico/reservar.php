@@ -126,7 +126,8 @@ hero(
                     <div class="form-check mt-4">
                         <input class="form-check-input<?= $claseError("acepta") ?>" type="checkbox" id="acepta" name="acepta" required>
                         <label class="form-check-label" for="acepta">
-                            Acepto los términos y condiciones: el pago no es reembolsable, salvo que la habitación no corresponda a lo publicado en esta web.
+                            Acepto los <a href="<?= url("publico/terminos.php") ?>" target="_blank" rel="noopener">términos y condiciones</a> y la
+                            <a href="<?= url("publico/privacidad.php") ?>" target="_blank" rel="noopener">política de privacidad</a>: el pago no es reembolsable, salvo que la habitación no corresponda a lo publicado en esta web.
                         </label>
                         <?= $mensaje("acepta") ?>
                     </div>

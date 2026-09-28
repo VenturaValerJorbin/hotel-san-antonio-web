@@ -9,6 +9,7 @@ $menu = [
     "publico/restaurante.php" => "Restaurante",
     "publico/ubicacion.php" => "Ubicación",
     "publico/recomendaciones.php" => "Recomendaciones",
+    "publico/nosotros.php" => "Nosotros",
     "publico/contacto.php" => "Contacto",
 ];
 // El detalle de una habitacion pertenece a la seccion "Habitaciones"
@@ -29,7 +30,8 @@ $activa = $pagina === "habitacion.php" ? "habitaciones.php" : $pagina;   // se c
 
 <body>
     <header class="sa-header">
-        <nav class="navbar navbar-expand-lg">
+        <!-- El menu se despliega en escritorio ancho (xl): con 7 enlaces no cabe en pantallas medianas -->
+        <nav class="navbar navbar-expand-xl">
             <div class="container">
                 <?php require __DIR__ . "/logo.php" ?>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPublico"
@@ -37,13 +39,13 @@ $activa = $pagina === "habitacion.php" ? "habitaciones.php" : $pagina;   // se c
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="menuPublico">
-                    <ul class="navbar-nav ms-auto align-items-lg-center">
+                    <ul class="navbar-nav ms-auto align-items-xl-center">
                         <?php foreach ($menu as $archivo => $texto) : ?>
                             <li class="nav-item">
                                 <a class="nav-link <?= $activa === basename($archivo) ? "active" : "" ?>" href="<?= url($archivo) ?>"><?= $texto ?></a>
                             </li>
                         <?php endforeach ?>
-                        <li class="nav-item ms-lg-3 my-2 my-lg-0">
+                        <li class="nav-item ms-xl-3 my-2 my-xl-0">
                             <a class="btn-sa d-inline-block text-decoration-none" href="<?= url("publico/reservar.php") ?>"><i class="bi bi-calendar-check"></i> Reservar</a>
                         </li>
                     </ul>
