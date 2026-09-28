@@ -7,6 +7,12 @@ $titulo = "Inicio";
 $tipos = (new HabitacionBO())->tipos();
 // En la portada se destacan tres tipos
 $destacadas = array_filter($tipos, fn($t) => in_array($t->nombre, ["Simple", "Matrimonial", "King"], true));
+$servicios = [
+    ["bi-car-front", "Cochera gratuita", "Estacionamiento sin costo para nuestros huéspedes."],
+    ["bi-wifi", "Wi-Fi gratis", "Internet sin costo durante tu estadía."],
+    ["bi-clock", "Recepción 24 horas", "Atención a cualquier hora del día."],
+    ["bi-cup-hot", "Restaurante", "Comida regional, menú del día y servicio a la habitación."],
+];
 
 require "views/partes/cabecera.php";
 ?>
@@ -73,5 +79,32 @@ require "views/partes/cabecera.php";
             tarjetaTipo($t);
         } ?>
     </div>
+
+    <!-- Servicios del hotel (datos del Avance 01) -->
+    <div class="mt-5">
+        <div class="sa-subtitulo">Pensado para tu comodidad</div>
+        <h2 class="h3">Servicios del hotel</h2>
+        <div class="sa-linea-dorada"></div>
+        <div class="row g-3">
+            <?php foreach ($servicios as [$icono, $nombre, $texto]) : ?>
+                <div class="col-6 col-lg-3">
+                    <article class="sa-card sa-card-cuerpo h-100 text-center">
+                        <i class="bi <?= $icono ?> fs-2 text-danger"></i>
+                        <h3 class="h6 mt-2"><?= e($nombre) ?></h3>
+                        <p class="small text-muted mb-0"><?= e($texto) ?></p>
+                    </article>
+                </div>
+            <?php endforeach ?>
+        </div>
+    </div>
+
+    <!-- Aviso del programa de puntos -->
+    <section class="sa-caja-crema d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 p-4 mt-5">
+        <div>
+            <h2 class="h4 mb-1"><i class="bi bi-gift text-danger"></i> Programa de puntos</h2>
+            <p class="mb-0">Acumula puntos en cada estadía y accede a pago fraccionado, cortesías y descuentos.</p>
+        </div>
+        <a class="btn-linea text-decoration-none text-center" href="<?= url("publico/puntos.php") ?>">Conocer beneficios</a>
+    </section>
 </main>
 <?php require "views/partes/pie.php" ?>

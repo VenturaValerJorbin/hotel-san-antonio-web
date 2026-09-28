@@ -105,7 +105,7 @@ hero(
                             </label>
                         </div>
                         <?= $mensaje("modalidad_pago") ?>
-                        <div class="form-text">Acumulas puntos en cada estadía. Se valida con tu DNI o pasaporte al confirmar.</div>
+                        <div class="form-text">Acumulas puntos en cada estadía. Se valida con tu DNI o pasaporte al confirmar. <a href="<?= url("publico/puntos.php") ?>">Conoce el programa de puntos</a>.</div>
                     </div>
 
                     <div class="row g-2 mb-1">

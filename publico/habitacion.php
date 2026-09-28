@@ -70,6 +70,7 @@ hero(
                 <div class="sa-caja-pago mb-2 small">
                     <strong>Pago de la reserva en línea.</strong>
                     Pagas el 100 % al reservar<?= $beneficio ? ", o solo el " . (float) $beneficio["valor"] . " % si eres huésped frecuente (" . $beneficio["puntos_requeridos"] . " puntos)" : "" ?>.
+                    <a href="<?= url("publico/puntos.php") ?>">Conoce el programa de puntos</a>.
                 </div>
                 <div class="sa-caja-crema mb-3 small"><strong>Reserva sin crear cuenta.</strong> Haz tu reserva de forma rápida y sencilla.</div>
 

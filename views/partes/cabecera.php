@@ -9,6 +9,7 @@ $menu = [
     "publico/restaurante.php" => "Restaurante",
     "publico/ubicacion.php" => "Ubicación",
     "publico/recomendaciones.php" => "Recomendaciones",
+    "publico/puntos.php" => "Puntos",
     "publico/nosotros.php" => "Nosotros",
     "publico/contacto.php" => "Contacto",
 ];

@@ -11,4 +11,12 @@ class Recompensa extends Dao
         $stmt->execute();
         return $stmt->fetch() ?: null;
     }
+
+    // Recompensas vigentes de menos a mas puntos (pagina publica del programa de puntos)
+    public function listarActivas(): array
+    {
+        $stmt = $this->conn->prepare("SELECT * FROM recompensa WHERE activo = 1 ORDER BY puntos_requeridos, id");
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
 }
