@@ -89,6 +89,16 @@ a:hover { color: var(--rojo-osc); }
 }
 .sa-hero-foto-habitaciones > .container { width: 100%; }
 
+/*imagenes de restaurante*/
+.sa-hero-foto-restaurante {
+    background:
+        linear-gradient(rgba(59, 36, 26, .60), rgba(59, 36, 26, .70)),
+        url("../img/restaurante/restaurante.jpg") center 40%/cover no-repeat;
+    display: flex; align-items: center; min-height: 18rem;
+     
+}
+.sa-hero-foto-restaurante > .container { width: 100%; }
+
 /* ---------- Tarjetas ---------- */
 .sa-card { background: #fff; border: 1px solid var(--borde); border-radius: .75rem; box-shadow: 0 2px 8px rgba(79, 49, 41, .06); }
 .sa-card-cuerpo { padding: 1rem; }
@@ -227,6 +237,7 @@ a:hover { color: var(--rojo-osc); }
     .resumen-fijo { position: sticky; top: 6rem; }   /* por debajo del menu fijo */
     /*.sa-hero-foto { background-attachment: fixed; }*/
     .sa-hero-foto { background-attachment: scroll; }
+   /* .sa-hero-foto-restaurante{ background-attachment: fixed; }*/
 }
 
 @media (min-width: 1200px) {

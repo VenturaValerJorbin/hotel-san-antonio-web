@@ -11,7 +11,9 @@ return [
     "recepcion" => "Recepción las 24 horas",
     // Foto de la pagina "Nosotros": poner aqui la ruta de la imagen (ej. "assets/img/nosotros/hotel.jpg").
     // Mientras este en null se muestra un marcador.
-    "foto_nosotros" => null,
+
+    //imagen de nosotros
+"foto_nosotros" => "assets/img/hero/recepcion.jpg",
     // Redes sociales: completar con la direccion real de cada una (https://...).
     // Las que queden vacias no se muestran en el pie de pagina.
     "redes" => [

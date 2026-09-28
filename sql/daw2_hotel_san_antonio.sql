@@ -468,3 +468,10 @@ INSERT INTO huesped (tipo_documento, numero_documento, nombre_completo, correo, 
 
 INSERT INTO movimiento_puntos (huesped_id, tipo, puntos, descripcion) VALUES
 (1, 'ajuste', 150, 'Puntos iniciales de prueba');
+
+UPDATE producto SET foto = 'assets/img/restaurante/secina con patacones.jpg' WHERE nombre = 'Cecina con patacones';
+UPDATE producto SET foto = 'assets/img/restaurante/Chaufa amazónico.jpg'     WHERE nombre = 'Chaufa amazónico';
+UPDATE producto SET foto = 'assets/img/restaurante/Tilapia.jpg'              WHERE nombre = 'Tilapia';
+UPDATE producto SET foto = 'assets/img/restaurante/Trucha.jpg'               WHERE nombre = 'Trucha';
+UPDATE producto SET foto = 'assets/img/restaurante/Pato.jpg'                 WHERE nombre = 'Pato';
+UPDATE producto SET foto = 'assets/img/restaurante/Gallina.jpg'              WHERE nombre = 'Gallina';
