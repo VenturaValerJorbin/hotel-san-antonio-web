@@ -44,6 +44,9 @@ hero(
             <h2 class="h4 mt-4">Comodidades destacadas</h2>
             <div class="d-flex flex-wrap gap-3">
                 <span class="sa-servicio"><i class="bi bi-people"></i> <?= $tipo->capacidad ?> <?= $tipo->capacidad === 1 ? "persona" : "personas" ?></span>
+                <?php if ($tipo->pisos) : ?>
+                    <span class="sa-servicio"><i class="bi bi-building"></i> <?= textoPisos($tipo->pisos) ?></span>
+                <?php endif ?>
                 <?php foreach ($tipo->servicios as $s) : ?>
                     <span class="sa-servicio"><i class="bi <?= e($s["icono"]) ?>"></i> <?= e($s["nombre"]) ?></span>
                 <?php endforeach ?>
@@ -66,6 +69,9 @@ hero(
                         <div class="col-6 small"><i class="bi <?= e($s["icono"]) ?> me-1"></i> <?= e($s["nombre"]) ?></div>
                     <?php endforeach ?>
                 </div>
+                <?php if ($tipo->pisos) : ?>
+                    <p class="small mb-3"><i class="bi bi-building me-1"></i> <strong>Ubicación:</strong> <?= textoPisos($tipo->pisos) ?>. Al reservar puedes elegir tu piso.</p>
+                <?php endif ?>
 
                 <div class="sa-caja-pago mb-2 small">
                     <strong>Pago de la reserva en línea.</strong>

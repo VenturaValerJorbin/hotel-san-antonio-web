@@ -16,7 +16,7 @@ hero(
         <div class="col-12 col-lg-9">
             <h2 class="h5">1. Reservas</h2>
             <p>Puedes reservar sin crear una cuenta, indicando tu nombre completo, tu número de DNI o pasaporte y tu celular. Al confirmar la reserva recibes un código con el que puedes identificarla.</p>
-            <p>El hotel asigna una habitación disponible del tipo que elegiste para las fechas indicadas. La habitación definitiva se confirma en el registro de llegada (check-in).</p>
+            <p>Al reservar se te asigna una habitación libre del tipo que elegiste y puedes indicar el piso en el que prefieres alojarte. Al confirmar verás el número y el piso de tu habitación. Por causas operativas, como mantenimiento, el hotel podría cambiarla por otra del mismo tipo.</p>
 
             <h2 class="h5 mt-4">2. Pagos</h2>
             <p>El pago se realiza en línea. Como regla general, se paga el 100 % del monto de la estadía al reservar.</p>

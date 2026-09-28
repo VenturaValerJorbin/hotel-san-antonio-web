@@ -22,6 +22,14 @@ function url(string $ruta): string
     return $base . $ruta;
 }
 
+// Enlace a un CSS/JS propio con la fecha de su ultima modificacion (?v=...): cuando el archivo cambia,
+// el navegador descarga la version nueva en vez de usar la que tiene guardada.
+function recurso(string $ruta): string
+{
+    $archivo = dirname(__DIR__, 2) . "/" . $ruta;
+    return url($ruta) . (is_file($archivo) ? "?v=" . filemtime($archivo) : "");
+}
+
 // Escapa texto antes de imprimirlo en HTML (evita XSS)
 function e($valor): string
 {
@@ -31,6 +39,16 @@ function e($valor): string
 function soles($valor): string
 {
     return "S/ " . number_format((float) $valor, 2);
+}
+
+// Escribe una lista de pisos: [1] -> "Piso 1", [1, 3] -> "Pisos 1 y 3", [1, 2, 3] -> "Pisos 1, 2 y 3"
+function textoPisos(array $pisos): string
+{
+    if (count($pisos) <= 1) {
+        return $pisos ? "Piso " . $pisos[0] : "";
+    }
+    $ultimo = array_pop($pisos);
+    return "Pisos " . implode(", ", $pisos) . " y " . $ultimo;
 }
 
 // Lee una fecha valida (Y-m-d) de la URL; si no es valida devuelve ""

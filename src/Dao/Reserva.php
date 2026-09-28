@@ -4,13 +4,15 @@ namespace App\Dao;
 
 class Reserva extends Dao
 {
-    // Busca una habitacion del tipo pedido sin cruce de fechas con otras reservas activas.
+    // Busca una habitacion del tipo pedido (y del piso pedido, si $piso > 0) sin cruce de fechas con otras reservas activas.
+    // Devuelve id, numero y piso, o null si no hay. Es la primera libre por numero.
     // FOR UPDATE bloquea la fila dentro de la transaccion: evita reservar la misma habitacion dos veces.
-    public function habitacionLibre(int $tipoId, string $ingreso, string $salida): ?int
+    public function habitacionLibre(int $tipoId, string $ingreso, string $salida, int $piso = 0): ?array
     {
+        $filtroPiso = $piso > 0 ? "AND h.piso = :piso" : "";   // fragmento fijo: el valor del piso viaja como parametro
         $stmt = $this->conn->prepare(
-            "SELECT h.id FROM habitacion h
-             WHERE h.tipo_id = :tipo AND h.activo = 1 AND h.estado <> 'mantenimiento'
+            "SELECT h.id, h.numero, h.piso FROM habitacion h
+             WHERE h.tipo_id = :tipo AND h.activo = 1 AND h.estado <> 'mantenimiento' $filtroPiso
                AND NOT EXISTS (
                    SELECT 1 FROM reserva r
                    WHERE r.habitacion_id = h.id
@@ -18,17 +20,20 @@ class Reserva extends Dao
                      AND r.fecha_ingreso < :salida AND r.fecha_salida > :ingreso)
              ORDER BY h.numero LIMIT 1 FOR UPDATE"
         );
-        $this->enlazar($stmt, [":tipo" => $tipoId, ":ingreso" => $ingreso, ":salida" => $salida]);
+        $valores = [":tipo" => $tipoId, ":ingreso" => $ingreso, ":salida" => $salida];
+        if ($piso > 0) {
+            $valores[":piso"] = $piso;
+        }
+        $this->enlazar($stmt, $valores);
         $stmt->execute();
-        $id = $stmt->fetchColumn();
-        return $id === false ? null : (int) $id;
+        return $stmt->fetch() ?: null;
     }
 
     // Habitaciones del tipo libres en las fechas de una reserva, sin contar la propia reserva (para asignar en el check-in)
     public function habitacionesLibres(int $tipoId, string $ingreso, string $salida, int $excluirReservaId): array
     {
         $stmt = $this->conn->prepare(
-            "SELECT h.id, h.numero FROM habitacion h
+            "SELECT h.id, h.numero, h.piso FROM habitacion h
              WHERE h.tipo_id = :tipo AND h.activo = 1 AND h.estado <> 'mantenimiento'
                AND NOT EXISTS (
                    SELECT 1 FROM reserva r

@@ -94,8 +94,14 @@ class Reserva
                 throw new \DomainException("La habitacion {$tipo['nombre']} admite hasta {$tipo['capacidad']} persona(s).");
             }
 
-            $habitacionId = (new ReservaDAO($conn))->habitacionLibre($tipo["id"], $d["fecha_ingreso"], $d["fecha_salida"])
-                ?? throw new \DomainException("No hay habitaciones {$tipo['nombre']} disponibles en esas fechas.");
+            // Piso de preferencia (0 = sin preferencia). Si se pide un piso y no hay libre, se avisa en vez de asignar otro.
+            $piso = (int) ($d["piso"] ?? 0);
+            $habitacion = (new ReservaDAO($conn))->habitacionLibre($tipo["id"], $d["fecha_ingreso"], $d["fecha_salida"], $piso)
+                ?? throw new \DomainException(
+                    $piso > 0
+                        ? "No hay habitaciones {$tipo['nombre']} libres en el piso $piso en esas fechas. Elige otro piso o \"Sin preferencia\"."
+                        : "No hay habitaciones {$tipo['nombre']} disponibles en esas fechas."
+                );
 
             $huespedDao = new HuespedDAO($conn);
             $huesped = $huespedDao->buscarPorDocumento($d["tipo_documento"], $d["numero_documento"]);
@@ -117,7 +123,7 @@ class Reserva
             $reservaId = $reservaDao->insertar([
                 "codigo" => $codigo,
                 "huesped_id" => $huespedId,
-                "habitacion_id" => $habitacionId,
+                "habitacion_id" => $habitacion["id"],
                 "fecha_ingreso" => $d["fecha_ingreso"],
                 "fecha_salida" => $d["fecha_salida"],
                 "num_huespedes" => $d["num_huespedes"],
@@ -140,7 +146,10 @@ class Reserva
             ]);
 
             $conn->commit();
-            return ["codigo" => $codigo, "total" => $total, "pagado" => $adelanto, "saldo" => round($total - $adelanto, 2)];
+            return [
+                "codigo" => $codigo, "total" => $total, "pagado" => $adelanto, "saldo" => round($total - $adelanto, 2),
+                "habitacion" => $habitacion["numero"], "piso" => (int) $habitacion["piso"],
+            ];
         } catch (\Throwable $e) {
             if ($conn->inTransaction()) {
                 $conn->rollBack();

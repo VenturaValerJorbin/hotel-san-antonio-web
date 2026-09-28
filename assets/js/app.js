@@ -24,6 +24,7 @@
             const ahora = fraccionado ? Math.round(total * porcentaje) / 100 : total;
 
             $("r_habitacion").textContent = opcion?.value ? opcion.dataset.nombre : "—";
+            $("r_piso").textContent = $("piso").value !== "0" ? "Piso " + $("piso").value : "Sin preferencia";
             $("r_ingreso").textContent = $("fecha_ingreso").value || "—";
             $("r_salida").textContent = $("fecha_salida").value || "—";
             $("r_noches").textContent = n ? n + (n === 1 ? " noche" : " noches") : "—";
@@ -42,6 +43,16 @@
             minimo.setDate(minimo.getDate() + 1);
             $("fecha_salida").min = minimo.toISOString().slice(0, 10);
         };
+
+        // Al cambiar de habitacion, el selector de piso ofrece solo los pisos donde existe ese tipo
+        // (los pisos vienen del servidor en data-pisos de cada opcion, ej. "1,3")
+        $("tipo_id").addEventListener("change", () => {
+            const pisos = ($("tipo_id").selectedOptions[0]?.dataset.pisos || "").split(",").filter(Boolean);
+            const actual = $("piso").value;
+            $("piso").innerHTML = '<option value="0">Sin preferencia</option>'
+                + pisos.map((p) => '<option value="' + p + '">Piso ' + p + "</option>").join("");
+            $("piso").value = pisos.includes(actual) ? actual : "0";
+        });
 
         form.addEventListener("input", () => { limitarSalida(); actualizar(); });
         form.addEventListener("change", actualizar);

@@ -13,7 +13,8 @@ class TipoHabitacion
         public float $precioNoche = 0,
         public array $servicios = [],
         public array $fotos = [],
-        public ?int $libres = null   // habitaciones libres en las fechas buscadas (null si no se buscaron)
+        public ?int $libres = null,  // habitaciones libres en las fechas buscadas (null si no se buscaron)
+        public array $pisos = []     // pisos donde hay habitaciones de este tipo
     ) {
     }
 }

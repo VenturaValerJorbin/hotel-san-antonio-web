@@ -32,6 +32,7 @@ class Reserva extends Controlador
             "fecha_ingreso" => $p["fecha_ingreso"] ?? "",
             "fecha_salida" => $p["fecha_salida"] ?? "",
             "num_huespedes" => 1,
+            "piso" => (int) ($p["piso"] ?? 0),   // 0 = sin preferencia
             // Un solo campo "DNI / Pasaporte": 8 digitos es DNI, cualquier otro formato valido es pasaporte
             "tipo_documento" => preg_match('/^\d{8}$/', $documento) ? "DNI" : "PASAPORTE",
             "numero_documento" => $documento,
@@ -50,8 +51,8 @@ class Reserva extends Controlador
             function () use ($datos) {
                 $r = $this->bo->reservar($datos);
                 return sprintf(
-                    "Reserva %s confirmada. Total S/ %.2f, pagado S/ %.2f, saldo a pagar al llegar S/ %.2f.",
-                    $r["codigo"], $r["total"], $r["pagado"], $r["saldo"]
+                    "Reserva %s confirmada. Habitación N.° %s (piso %d). Total S/ %.2f, pagado S/ %.2f, saldo a pagar al llegar S/ %.2f.",
+                    $r["codigo"], $r["habitacion"], $r["piso"], $r["total"], $r["pagado"], $r["saldo"]
                 );
             },
             "",
@@ -110,6 +111,9 @@ class Reserva extends Controlador
 
         if ($d["tipo_id"] <= 0) {
             $e["tipo_id"] = "Selecciona una habitacion.";
+        }
+        if ($d["piso"] < 0 || $d["piso"] > 9) {
+            $e["piso"] = "Elige un piso valido.";
         }
         if (!$this->fechaValida($d["fecha_ingreso"]) || $d["fecha_ingreso"] < $hoy) {
             $e["fecha_ingreso"] = "Ingresa una fecha de llegada valida (hoy o posterior).";

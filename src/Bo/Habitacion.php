@@ -81,7 +81,7 @@ class Habitacion
     {
         return new TipoHabitacionDTO(
             $t["id"], $t["nombre"], $t["descripcion"], $t["detalle"] ?? "", $t["capacidad"], $t["precio_noche"],
-            $dao->servicios($t["id"]), $dao->fotos($t["id"]), $libres
+            $dao->servicios($t["id"]), $dao->fotos($t["id"]), $libres, $dao->pisos($t["id"])
         );
     }
 }

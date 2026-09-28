@@ -61,7 +61,7 @@ $asignada = (int) ($antiguo["habitacion_id"] ?? $r["habitacion_id"]);
                     <label class="form-label requerido" for="habitacion_id">Habitación asignada</label>
                     <select class="form-select" id="habitacion_id" name="habitacion_id" <?= $puedeIngresar ? "" : "disabled" ?> required>
                         <?php foreach ($r["libres"] as $h) : ?>
-                            <option value="<?= (int) $h["id"] ?>" <?= $asignada === (int) $h["id"] ? "selected" : "" ?>>Habitación <?= e($h["numero"]) ?></option>
+                            <option value="<?= (int) $h["id"] ?>" <?= $asignada === (int) $h["id"] ? "selected" : "" ?>>Habitación <?= e($h["numero"]) ?> · piso <?= (int) $h["piso"] ?></option>
                         <?php endforeach ?>
                     </select>
                 </div>

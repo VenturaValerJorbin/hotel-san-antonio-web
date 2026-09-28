@@ -26,7 +26,7 @@ $activa = $pagina === "habitacion.php" ? "habitaciones.php" : $pagina;   // se c
     <link href="<?= url("assets/vendor/bootstrap/bootstrap.min.css") ?>" rel="stylesheet">
     <link href="<?= url("assets/vendor/bootstrap-icons/bootstrap-icons.min.css") ?>" rel="stylesheet">
     <link rel="icon" type="image/png" href="<?= url("assets/img/logo.png") ?>">
-    <link href="<?= url("assets/css/estilo.css") ?>" rel="stylesheet">
+    <link href="<?= recurso("assets/css/estilo.css") ?>" rel="stylesheet">
 </head>
 
 <body>

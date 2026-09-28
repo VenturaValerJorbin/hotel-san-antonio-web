@@ -19,6 +19,14 @@ $tipoElegido = (string) ($antiguo["tipo_id"] ?? $_GET["tipo"] ?? "");
 $ingreso = $antiguo["fecha_ingreso"] ?? fechaGet("ingreso");
 $salida = $antiguo["fecha_salida"] ?? fechaGet("salida");
 $modalidad = $valor("modalidad_pago", "completo");
+// Piso de preferencia: solo se ofrecen los pisos donde existe la habitacion elegida (0 = sin preferencia)
+$pisoElegido = (int) $valor("piso", 0);
+$pisosDelTipo = [];
+foreach ($tipos as $t) {
+    if ($tipoElegido === (string) $t->id) {
+        $pisosDelTipo = $t->pisos;
+    }
+}
 $porcentaje = $beneficio ? (float) $beneficio["valor"] : 50;
 
 hero(
@@ -47,12 +55,23 @@ hero(
                                 <option value="" data-precio="0">Selecciona una habitación...</option>
                                 <?php foreach ($tipos as $t) : ?>
                                     <option value="<?= $t->id ?>" data-precio="<?= $t->precioNoche ?>" data-nombre="<?= e($t->nombre) ?>"
-                                        <?= $tipoElegido === (string) $t->id ? "selected" : "" ?>>
+                                        data-pisos="<?= e(implode(",", $t->pisos)) ?>" <?= $tipoElegido === (string) $t->id ? "selected" : "" ?>>
                                         <?= e($t->nombre) ?> · <?= $t->capacidad ?> <?= $t->capacidad === 1 ? "persona" : "personas" ?> · <?= soles($t->precioNoche) ?> por noche
                                     </option>
                                 <?php endforeach ?>
                             </select>
                             <?= $mensaje("tipo_id") ?>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label" for="piso">Piso de preferencia</label>
+                            <select class="form-select<?= $claseError("piso") ?>" id="piso" name="piso">
+                                <option value="0">Sin preferencia</option>
+                                <?php foreach ($pisosDelTipo as $p) : ?>
+                                    <option value="<?= $p ?>" <?= $pisoElegido === $p ? "selected" : "" ?>>Piso <?= $p ?></option>
+                                <?php endforeach ?>
+                            </select>
+                            <?= $mensaje("piso") ?>
+                            <div class="form-text"><i class="bi bi-building"></i> Elige en qué piso quieres alojarte, por ejemplo si te cuesta subir escaleras. Al confirmar verás el número y el piso de tu habitación.</div>
                         </div>
                         <div class="col-12 col-sm-6">
                             <label class="form-label requerido" for="fecha_ingreso">Fecha de ingreso</label>
@@ -140,6 +159,7 @@ hero(
                     <p class="text-muted small">Revisa los detalles de tu estadía.</p>
                     <dl class="row mb-0">
                         <dt class="col-6 fw-normal text-muted">Habitación</dt><dd class="col-6 text-end" id="r_habitacion">—</dd>
+                        <dt class="col-6 fw-normal text-muted">Piso</dt><dd class="col-6 text-end" id="r_piso">Sin preferencia</dd>
                         <dt class="col-6 fw-normal text-muted">Ingreso</dt><dd class="col-6 text-end" id="r_ingreso">—</dd>
                         <dt class="col-6 fw-normal text-muted">Salida</dt><dd class="col-6 text-end" id="r_salida">—</dd>
                         <dt class="col-6 fw-normal text-muted">Estadía</dt><dd class="col-6 text-end" id="r_noches">—</dd>

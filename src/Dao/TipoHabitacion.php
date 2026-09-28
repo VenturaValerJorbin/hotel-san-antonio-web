@@ -32,6 +32,15 @@ class TipoHabitacion extends Dao
         return $stmt->fetchAll();
     }
 
+    // Pisos donde hay habitaciones activas de este tipo (para que el cliente elija en cual hospedarse)
+    public function pisos(int $tipoId): array
+    {
+        $stmt = $this->conn->prepare("SELECT DISTINCT piso FROM habitacion WHERE tipo_id = :id AND activo = 1 ORDER BY piso");
+        $this->enlazar($stmt, [":id" => $tipoId]);
+        $stmt->execute();
+        return array_map("intval", $stmt->fetchAll(\PDO::FETCH_COLUMN));
+    }
+
     public function fotos(int $tipoId): array
     {
         $stmt = $this->conn->prepare("SELECT ruta FROM foto_tipo_habitacion WHERE tipo_id = :id ORDER BY orden");
