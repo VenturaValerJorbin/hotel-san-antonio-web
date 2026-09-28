@@ -9,6 +9,9 @@ $tipos = (new HabitacionBO())->tipos();
 $beneficio = (new ReservaBO())->beneficioFraccionado();
 
 require __DIR__ . "/../views/partes/cabecera.php";
+/** @var array $hotel Datos del hotel (los crea views/partes/ayudas.php) */
+/** @var array $errores Errores del formulario (los crea views/partes/ayudas.php) */
+/** @var array $antiguo Datos escritos antes de un error (los crea views/partes/ayudas.php) */
 
 // Valor de un campo: lo escrito antes de un error, o el que llega por la URL, o un valor por defecto
 $valor = fn($campo, $porDefecto = "") => $antiguo[$campo] ?? $porDefecto;

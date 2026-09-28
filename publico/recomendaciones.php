@@ -10,6 +10,7 @@ $lugares = (new TurismoBO())->lugares();
 $colores = ["Naturaleza" => "success", "Arqueología" => "secondary", "Cascada" => "primary", "Cultura" => "warning"];
 
 require __DIR__ . "/../views/partes/cabecera.php";
+/** @var array $hotel Datos del hotel (los crea views/partes/ayudas.php) */
 hero(
     "Recomendaciones turísticas",
     "Descubre lugares imperdibles cerca de Bagua para complementar tu estadía.",

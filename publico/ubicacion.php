@@ -4,6 +4,7 @@ require __DIR__ . "/../config/Autoload.php";
 $titulo = "Ubicación";
 
 require __DIR__ . "/../views/partes/cabecera.php";
+/** @var array $hotel Datos del hotel (los crea views/partes/ayudas.php) */
 
 $busqueda = urlencode("Hotel Turístico San Antonio, Jr. Amazonas 456, Bagua, Amazonas, Perú");
 hero(

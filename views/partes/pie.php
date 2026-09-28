@@ -1,3 +1,4 @@
+<?php /** @var array $hotel Datos del hotel (los crea views/partes/ayudas.php) */ ?>
     <section class="sa-banner">
         <div class="container">
             <h2 class="h3 mb-1">Más que un hotel,</h2>

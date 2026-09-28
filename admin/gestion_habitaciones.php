@@ -13,6 +13,8 @@ $tipos = $bo->tipos();
 $editar = isset($_GET["editar"]) ? $bo->obtener((int) $_GET["editar"]) : null;
 
 require __DIR__ . "/../views/partes/panel_cabecera.php";
+/** @var array $errores Errores del formulario (los crea views/partes/ayudas.php) */
+/** @var array $antiguo Datos escritos antes de un error (los crea views/partes/ayudas.php) */
 
 $valor = fn($campo, $porDefecto = "") => $antiguo[$campo] ?? $porDefecto;
 $claseError = fn($campo) => isset($errores[$campo]) ? " is-invalid" : "";

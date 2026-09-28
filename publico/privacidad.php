@@ -4,6 +4,7 @@ require __DIR__ . "/../config/Autoload.php";
 $titulo = "Política de privacidad";
 
 require __DIR__ . "/../views/partes/cabecera.php";
+/** @var array $hotel Datos del hotel (los crea views/partes/ayudas.php) */
 
 hero(
     "Política de privacidad",

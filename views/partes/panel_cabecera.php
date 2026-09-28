@@ -2,6 +2,7 @@
 // Diseno del panel del personal: barra superior en el celular y menu lateral fijo en escritorio.
 // Cada pagina define $titulo y $activo ("reservas", "disponibilidad" o "habitaciones") antes de incluirla.
 require_once __DIR__ . "/ayudas.php";
+/** @var array|null $flash Mensaje de la pagina anterior (lo crea views/partes/ayudas.php) */
 
 $opciones = [
     "reservas" => ["admin/reservas.php", "bi-journal-text", "Reservas"],

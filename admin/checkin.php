@@ -14,6 +14,7 @@ if (!$r) {
 }
 
 require __DIR__ . "/../views/partes/panel_cabecera.php";
+/** @var array $antiguo Datos escritos antes de un error (los crea views/partes/ayudas.php) */
 
 $puedeIngresar = $r["estado"] === "confirmada";
 $asignada = (int) ($antiguo["habitacion_id"] ?? $r["habitacion_id"]);

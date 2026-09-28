@@ -4,6 +4,7 @@ require __DIR__ . "/../config/Autoload.php";
 $titulo = "Libro de Reclamaciones";
 
 require __DIR__ . "/../views/partes/cabecera.php";
+/** @var array $hotel Datos del hotel (los crea views/partes/ayudas.php) */
 
 hero(
     "Libro de Reclamaciones",

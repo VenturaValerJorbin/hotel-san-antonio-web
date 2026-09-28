@@ -1,6 +1,7 @@
 <?php
 // Diseno de las paginas publicas: cabecera con menu. Cada pagina define $titulo antes de incluirla.
 require_once __DIR__ . "/ayudas.php";
+/** @var array|null $flash Mensaje de la pagina anterior (lo crea views/partes/ayudas.php) */
 
 $pagina = basename($_SERVER["SCRIPT_NAME"]);
 $menu = [

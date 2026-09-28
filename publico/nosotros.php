@@ -4,6 +4,7 @@ require __DIR__ . "/../config/Autoload.php";
 $titulo = "Nosotros";
 
 require __DIR__ . "/../views/partes/cabecera.php";
+/** @var array $hotel Datos del hotel (los crea views/partes/ayudas.php) */
 
 // Los valores salen de los mock-ups del Avance 01 (naturaleza, atencion personalizada, comodidad, hospitalidad)
 $valores = [

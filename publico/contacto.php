@@ -4,6 +4,9 @@ require __DIR__ . "/../config/Autoload.php";
 $titulo = "Contacto";
 
 require __DIR__ . "/../views/partes/cabecera.php";
+/** @var array $hotel Datos del hotel (los crea views/partes/ayudas.php) */
+/** @var array $errores Errores del formulario (los crea views/partes/ayudas.php) */
+/** @var array $antiguo Datos escritos antes de un error (los crea views/partes/ayudas.php) */
 
 $valor = fn($campo) => $antiguo[$campo] ?? "";
 $claseError = fn($campo) => isset($errores[$campo]) ? " is-invalid" : "";
