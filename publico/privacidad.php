@@ -34,8 +34,6 @@ hero(
 
             <h2 class="h5 mt-4">6. Tus derechos</h2>
             <p>Puedes ejercer tus derechos de acceso, rectificación, cancelación y oposición sobre tus datos personales escribiendo a <?= e($hotel["correo"]) ?> e indicando tu nombre completo y tu número de documento.</p>
-
-            <p class="small text-muted border-top pt-3 mt-4">Texto de referencia elaborado para el proyecto académico. El hotel debe revisarlo y ajustarlo antes de su uso oficial.</p>
         </div>
     </div>
 </main>

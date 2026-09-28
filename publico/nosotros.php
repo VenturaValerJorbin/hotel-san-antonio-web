@@ -20,7 +20,7 @@ hero(
 );
 ?>
 <main class="container py-4 py-lg-5">
-    <!-- Historia y foto. La foto se configura en config/hotel.php (foto_nosotros); mientras no haya, se ve un marcador -->
+    <?php // Historia y foto. La foto se configura en config/hotel.php (foto_nosotros); mientras no haya, se ve un marcador ?>
     <div class="row g-4 align-items-center mb-5">
         <div class="col-12 col-lg-6 order-lg-2">
             <?php foto($hotel["foto_nosotros"], "Hotel Turístico San Antonio", "bi-building") ?>

@@ -31,7 +31,7 @@ $activa = $pagina === "habitacion.php" ? "habitaciones.php" : $pagina;   // se c
 
 <body>
     <header class="sa-header">
-        <!-- El menu se despliega en escritorio ancho (xl): con 7 enlaces no cabe en pantallas medianas -->
+        <?php // El menu se despliega en escritorio ancho (xl): con tantos enlaces no cabe en pantallas medianas ?>
         <nav class="navbar navbar-expand-xl">
             <div class="container">
                 <?php require __DIR__ . "/logo.php" ?>

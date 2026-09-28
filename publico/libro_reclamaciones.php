@@ -27,7 +27,7 @@ hero(
             <p>De acuerdo con la normativa de protección al consumidor, el proveedor debe responder los reclamos en un plazo máximo de 15 días hábiles.</p>
             <p>Presentar un reclamo no impide acudir a otras vías de solución de controversias, ni es requisito previo para interponer una denuncia ante el Indecopi.</p>
 
-            <p class="small text-muted border-top pt-3 mt-4">En cumplimiento del Código de Protección y Defensa del Consumidor (Ley N.° 29571) y su reglamento del Libro de Reclamaciones (D. S. N.° 011-2011-PCM). Este canal usa el formulario de contacto del proyecto académico; para su operación real, el hotel debe adoptar el formato oficial del Libro de Reclamaciones virtual del Indecopi.</p>
+            <p class="small text-muted border-top pt-3 mt-4">Conforme al Código de Protección y Defensa del Consumidor (Ley N.° 29571) y al Reglamento del Libro de Reclamaciones (D. S. N.° 011-2011-PCM).</p>
         </div>
 
         <div class="col-12 col-lg-4">

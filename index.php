@@ -89,7 +89,7 @@ require "views/partes/cabecera.php";
         } ?>
     </div>
 
-    <!-- Servicios del hotel (datos del Avance 01) -->
+    <!-- Servicios del hotel -->
     <div class="mt-5">
         <div class="sa-subtitulo">Pensado para tu comodidad</div>
         <h2 class="h3">Servicios del hotel</h2>

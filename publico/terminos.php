@@ -38,8 +38,6 @@ hero(
             <h2 class="h5 mt-4">7. Consultas y reclamos</h2>
             <p>Puedes escribirnos por WhatsApp al <?= e($hotel["whatsapp_texto"]) ?> o al correo <?= e($hotel["correo"]) ?>. También puedes presentar un reclamo o una queja en nuestro <a href="<?= url("publico/libro_reclamaciones.php") ?>">Libro de Reclamaciones</a>.</p>
             <p>Estos términos se rigen por las leyes de la República del Perú.</p>
-
-            <p class="small text-muted border-top pt-3 mt-4">Texto de referencia elaborado para el proyecto académico. El hotel debe revisarlo y ajustarlo antes de su uso oficial.</p>
         </div>
     </div>
 </main>
