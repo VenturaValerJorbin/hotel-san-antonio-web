@@ -1,3 +1,4 @@
+
 <?php
 require __DIR__ . "/../config/Autoload.php";
 
@@ -7,10 +8,14 @@ $titulo = "Restaurante";
 $carta = (new RestauranteBO())->carta();
 
 require __DIR__ . "/../views/partes/cabecera.php";
+
+//imagen restaurante cabesera
 hero(
     "Carta del restaurante",
     "Sabores amazónicos del corazón de Bagua. Disfruta de una experiencia única con lo mejor de nuestra tierra.",
-    [["Inicio", "index.php"], ["Restaurante", null]]
+    [["Inicio", "index.php"], ["Restaurante", null]],
+    "",                          // <- NUEVO (sin etiqueta)
+    "sa-hero-foto-restaurante"   // <- NUEVO (clase de la foto)
 );
 ?>
 <main class="container py-4 py-lg-5">
