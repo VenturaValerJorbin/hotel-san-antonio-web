@@ -453,13 +453,14 @@ INSERT INTO recompensa (nombre, descripcion, puntos_requeridos, tipo, valor, pro
 ('10 % de descuento','Descuento sobre el costo de la estadía.',300,'descuento',10,NULL,1),
 ('Noche de cortesía','Una noche gratis en habitación Simple.',500,'noche_gratis',NULL,NULL,1);
 
-INSERT INTO lugar_turistico (nombre, categoria, descripcion) VALUES
-('Pongo de Rentema','Naturaleza','Impresionante cañón del río Marañón, con paisajes únicos y gran belleza natural.'),
-('Sitio Arqueológico Las Juntas','Arqueología','Importante centro ceremonial prehispánico con historia y vistas privilegiadas.'),
-('Catarata Tsuntsuntsa','Cascada','Espectacular caída de agua rodeada de vegetación, ideal para los amantes de la naturaleza.'),
-('Catarata Nueva Esperanza (Numparket)','Cascada','Un paraíso natural de aguas cristalinas, perfecto para la aventura y el descanso.'),
-('Cataratas del Bijao','Cascada','Conjunto de hermosas caídas de agua y pozas naturales en un entorno selvático.'),
-('Plaza de Armas de Bagua','Cultura','El corazón de la ciudad, con su iglesia, áreas verdes y el encanto de la vida local.');
+-- La columna foto guarda la ruta de la imagen (relativa a la raiz del proyecto)
+INSERT INTO lugar_turistico (nombre, categoria, descripcion, foto) VALUES
+('Pongo de Rentema','Naturaleza','Impresionante cañón del río Marañón, con paisajes únicos y gran belleza natural.','assets/img/recomendaciones/pongo-rentema.avif'),
+('Sitio Arqueológico Las Juntas','Arqueología','Importante centro ceremonial prehispánico con historia y vistas privilegiadas.','assets/img/recomendaciones/las-juntas.avif'),
+('Catarata Tsuntsuntsa','Cascada','Espectacular caída de agua rodeada de vegetación, ideal para los amantes de la naturaleza.','assets/img/recomendaciones/tsuntsuntsa.avif'),
+('Catarata Nueva Esperanza (Numparket)','Cascada','Un paraíso natural de aguas cristalinas, perfecto para la aventura y el descanso.','assets/img/recomendaciones/nueva-esperanza.avif'),
+('Cataratas del Bijao','Cascada','Conjunto de hermosas caídas de agua y pozas naturales en un entorno selvático.','assets/img/recomendaciones/bijao.avif'),
+('Plaza de Armas de Bagua','Cultura','El corazón de la ciudad, con su iglesia, áreas verdes y el encanto de la vida local.','assets/img/recomendaciones/plaza-armas-bagua.avif');
 
 -- Huespedes de prueba: Carlos ya tiene puntos suficientes para pagar el 50 %
 INSERT INTO huesped (tipo_documento, numero_documento, nombre_completo, correo, telefono) VALUES
@@ -469,6 +470,7 @@ INSERT INTO huesped (tipo_documento, numero_documento, nombre_completo, correo, 
 INSERT INTO movimiento_puntos (huesped_id, tipo, puntos, descripcion) VALUES
 (1, 'ajuste', 150, 'Puntos iniciales de prueba');
 
+-- Fotos de los platos de la carta (los platos ya existen mas arriba; aqui solo se les asigna la imagen)
 UPDATE producto SET foto = 'assets/img/restaurante/secina con patacones.jpg' WHERE nombre = 'Cecina con patacones';
 UPDATE producto SET foto = 'assets/img/restaurante/Chaufa amazónico.jpg'     WHERE nombre = 'Chaufa amazónico';
 UPDATE producto SET foto = 'assets/img/restaurante/Tilapia.jpg'              WHERE nombre = 'Tilapia';
