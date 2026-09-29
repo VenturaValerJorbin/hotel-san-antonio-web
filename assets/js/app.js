@@ -35,13 +35,19 @@
             $("r_saldo").textContent = soles(total - ahora);
         };
 
-        // La salida debe ser al menos un dia despues de la llegada
+        // La salida debe ser al menos un dia despues de la llegada. Si esta vacia o quedo
+        // invalida con la nueva llegada, se autocompleta a "un dia despues"; el huesped puede
+        // cambiarla despues para quedarse mas noches.
         const limitarSalida = () => {
             const ingreso = $("fecha_ingreso").value;
             if (!ingreso) return;
             const minimo = new Date(ingreso);
             minimo.setDate(minimo.getDate() + 1);
-            $("fecha_salida").min = minimo.toISOString().slice(0, 10);
+            const minimoTexto = minimo.toISOString().slice(0, 10);
+            $("fecha_salida").min = minimoTexto;
+            if (!$("fecha_salida").value || $("fecha_salida").value < minimoTexto) {
+                $("fecha_salida").value = minimoTexto;
+            }
         };
 
         // Al cambiar de habitacion, el selector de piso ofrece solo los pisos donde existe ese tipo
