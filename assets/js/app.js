@@ -15,6 +15,20 @@
             return dias > 0 ? dias : 0;
         };
 
+        // Suma lo marcado en "Tus beneficios de huesped frecuente": los de soles fijos se suman
+        // entre si, pero de los de porcentaje solo cuenta el mas alto marcado (igual que en el
+        // servidor, ver Bo\Reserva::descuentoPorBeneficios; nunca se suman dos porcentajes).
+        const descuentoBeneficios = (total) => {
+            let fijo = 0;
+            let mejorPorcentaje = 0;
+            document.querySelectorAll('#checksBeneficios input:checked').forEach((c) => {
+                const valor = parseFloat(c.dataset.valor || 0);
+                if (c.dataset.tipo === "descuento") mejorPorcentaje = Math.max(mejorPorcentaje, valor);
+                else fijo += valor;
+            });
+            return Math.min(fijo + (total * mejorPorcentaje) / 100, total);
+        };
+
         const actualizar = () => {
             const opcion = $("tipo_id").selectedOptions[0];
             const opcionPlan = $("plan_pension_id").selectedOptions[0];
@@ -23,8 +37,10 @@
             const precio = precioHabitacion + precioPlan;
             const n = noches();
             const total = precio * n;
+            const descuento = descuentoBeneficios(total);
+            const totalConDescuento = total - descuento;
             const fraccionado = $("modalidad_pago").value === "fraccionado";
-            const ahora = fraccionado ? Math.round(total * porcentaje) / 100 : total;
+            const ahora = fraccionado ? Math.round(totalConDescuento * porcentaje) / 100 : totalConDescuento;
 
             $("r_habitacion").textContent = opcion?.value ? opcion.dataset.nombre : "—";
             $("r_piso").textContent = $("piso").value !== "0" ? "Piso " + $("piso").value : "Sin preferencia";
@@ -34,10 +50,12 @@
             $("r_plan").textContent = opcionPlan ? opcionPlan.textContent.trim() : "—";
             $("planDescripcion").textContent = opcionPlan?.dataset.descripcion || "";
             $("r_tarifa").textContent = soles(precio);
-            $("r_total").textContent = soles(total);
+            $("r_descuento_fila").classList.toggle("d-none", descuento <= 0);
+            $("r_descuento").textContent = "-" + soles(descuento);
+            $("r_total").textContent = soles(totalConDescuento);
             $("r_ahora_txt").textContent = fraccionado ? "Pagas ahora (" + porcentaje + " %)" : "Pagas ahora (100 %)";
             $("r_ahora").textContent = soles(ahora);
-            $("r_saldo").textContent = soles(total - ahora);
+            $("r_saldo").textContent = soles(totalConDescuento - ahora);
         };
 
         // La salida debe ser al menos un dia despues de la llegada. Si esta vacia o quedo
@@ -184,11 +202,17 @@
         if (opcionFraccionada && btnVerificar) {
             const resultado = $("resultadoVerificacion");
             const puntosNecesarios = parseInt(opcionFraccionada.dataset.puntosRequeridos || "0", 10);
+            const cajaBeneficios = $("listaBeneficios");
+            const checksBeneficios = $("checksBeneficios");
 
+            // Los beneficios verificados son de OTRO documento: ya no valen, se ocultan.
             const invalidarVerificacion = () => {
                 opcionFraccionada.disabled = true;
-                if (selectModalidad.value === "fraccionado") { selectModalidad.value = "completo"; actualizar(); }
+                if (selectModalidad.value === "fraccionado") { selectModalidad.value = "completo"; }
                 resultado.textContent = "";
+                cajaBeneficios.classList.add("d-none");
+                checksBeneficios.innerHTML = "";
+                actualizar();
             };
             $("tipo_documento").addEventListener("change", invalidarVerificacion);
             $("numero_documento").addEventListener("input", invalidarVerificacion);
@@ -217,6 +241,22 @@
                         ? "Tienes " + datos.puntos + " puntos."
                             + (alcanza ? " Ya puedes elegir el pago fraccionado." : " Necesitas " + puntosNecesarios + " puntos.")
                         : "No encontramos estadías previas con ese documento. Empiezas con 0 puntos.";
+
+                    // Beneficios permanentes que ya le alcanzan: se ofrecen marcados por defecto
+                    // (son gratis, no hay motivo para no usarlos), pero el huesped puede destildar.
+                    const escapar = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+                    const beneficios = datos.beneficios || [];
+                    checksBeneficios.innerHTML = beneficios.map((b) => (
+                        '<div class="form-check mb-1">'
+                        + '<input class="form-check-input" type="checkbox" name="beneficios[]" value="' + b.id + '"'
+                        + ' id="beneficio_' + b.id + '" data-valor="' + b.valor + '" data-tipo="' + escapar(b.tipo) + '" checked>'
+                        + '<label class="form-check-label small" for="beneficio_' + b.id + '">'
+                        + '<strong>' + escapar(b.nombre) + '</strong> — ' + escapar(b.descripcion)
+                        + '</label></div>'
+                    )).join("");
+                    cajaBeneficios.classList.toggle("d-none", beneficios.length === 0);
+                    checksBeneficios.querySelectorAll("input").forEach((c) => c.addEventListener("change", actualizar));
+                    actualizar();
                 } catch {
                     resultado.className = "small text-danger";
                     resultado.textContent = "No se pudo verificar. Intenta nuevamente.";

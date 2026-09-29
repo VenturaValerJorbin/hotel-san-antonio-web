@@ -154,10 +154,12 @@ class Reserva
             $precioPorNoche = $tipo["precio_noche"] + $plan["precio_por_noche"];
             $total = round($noches * $precioPorNoche, 2);
 
-            // Beneficios de huesped frecuente: PERMANENTES, se revisan en vivo contra el saldo
-            // actual (no se gastan puntos, igual que el pago fraccionado). Se aplican solos, sin
-            // que nadie tenga que "canjear" nada: si ya tiene los puntos, ya tiene el beneficio.
-            $descuento = $this->descuentoPorPuntos($conn, $huespedId, $total);
+            // Beneficios de huesped frecuente: PERMANENTES (no se gastan puntos, igual que el pago
+            // fraccionado), pero el huesped elige cuales usar en ESTA reserva (puede marcar varios
+            // a la vez). Nunca se confia en lo que llego marcado desde el formulario: se vuelve a
+            // comprobar aqui, con el saldo real, cuales de esos beneficios le corresponden de verdad.
+            $idsElegidos = array_map("intval", $d["beneficios"] ?? []);
+            $descuento = $this->descuentoPorBeneficios($conn, $huespedId, $total, $idsElegidos);
 
             $fraccionado = $d["modalidad_pago"] === "fraccionado";
             $totalConDescuento = round($total - $descuento, 2);
@@ -285,14 +287,19 @@ class Reserva
     // solo uso). Se suman los beneficios de tipo "producto"/"plan_pension" que ya tenga ganados
     // (monto fijo, ej. el desayuno de cortesia), mas el MEJOR porcentaje de descuento que alcance
     // (no se suman varios descuentos, solo el mas alto: el de 500 puntos reemplaza al de 300).
-    private function descuentoPorPuntos(\PDO $conn, int $huespedId, float $total): float
+    private function descuentoPorBeneficios(\PDO $conn, int $huespedId, float $total, array $idsElegidos): float
     {
         $puntos = (new MovimientoPuntosDAO($conn))->saldo($huespedId);
         $fijo = 0.0;
         $mejorPorcentaje = 0.0;
         foreach ((new RecompensaDAO($conn))->listarActivas() as $r) {
-            if ($puntos < (int) $r["puntos_requeridos"] || (int) $r["consume_puntos"] === 1) {
+            $id = (int) $r["id"];
+            // El pago fraccionado se elige por su propio campo (modalidad_pago), no aqui.
+            if (!in_array($id, $idsElegidos, true) || $r["tipo"] === "pago_fraccionado" || (int) $r["consume_puntos"] === 1) {
                 continue;
+            }
+            if ($puntos < (int) $r["puntos_requeridos"]) {
+                continue;   // no se confia en lo marcado desde el formulario: se revisa el saldo real
             }
             if ($r["tipo"] === "descuento") {
                 $mejorPorcentaje = max($mejorPorcentaje, (float) $r["valor"]);

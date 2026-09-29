@@ -38,4 +38,5 @@ echo json_encode([
     "ok" => true,
     "encontrado" => $resultado["encontrado"],
     "puntos" => $resultado["puntos"],
+    "beneficios" => $resultado["beneficios"],
 ]);

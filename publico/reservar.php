@@ -164,6 +164,10 @@ hero(
                                 </div>
                             </div>
                         <?php endif ?>
+                        <div class="sa-caja-crema mt-2 p-3 d-none" id="listaBeneficios">
+                            <div class="small fw-bold mb-2"><i class="bi bi-stars text-danger"></i> Tus beneficios de huésped frecuente: elige los que quieras usar en esta reserva.</div>
+                            <div id="checksBeneficios"></div>
+                        </div>
                         <div class="form-text">
                             Acumulas puntos en cada estadía.
                             <a href="<?= url("publico/puntos.php") ?>#consulta" target="_blank" rel="noopener" id="linkVerPuntos" data-base="<?= url("publico/puntos.php") ?>">Consulta tus puntos</a>
@@ -208,6 +212,9 @@ hero(
                         <dt class="col-6 fw-normal text-muted">Tarifa por noche</dt><dd class="col-6 text-end" id="r_tarifa">S/ 0.00</dd>
                     </dl>
                     <hr>
+                    <div class="d-flex justify-content-between mb-2 text-success d-none" id="r_descuento_fila">
+                        <span>Descuento huésped frecuente</span><strong id="r_descuento">-S/ 0.00</strong>
+                    </div>
                     <div class="d-flex justify-content-between fw-bold mb-2"><span>Total de la reserva</span><span id="r_total">S/ 0.00</span></div>
                     <div class="sa-caja-pago mb-2">
                         <div class="d-flex justify-content-between"><span id="r_ahora_txt">Pagas ahora (100 %)</span><strong id="r_ahora">S/ 0.00</strong></div>

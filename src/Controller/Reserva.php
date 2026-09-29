@@ -42,6 +42,9 @@ class Reserva extends Controlador
             "correo" => trim($p["correo"] ?? "") ?: null,   // opcional
             "modalidad_pago" => $p["modalidad_pago"] ?? "",
             "metodo_pago" => $p["metodo_pago"] ?? "",
+            // Beneficios de huesped frecuente que eligio usar en esta reserva (el BO vuelve a
+            // comprobar contra el saldo real; esto es solo lo que el formulario mando marcado).
+            "beneficios" => array_map("intval", $p["beneficios"] ?? []),
         ];
 
         $errores = $this->validar($datos, isset($p["acepta"]));
