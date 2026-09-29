@@ -159,7 +159,7 @@ class Reserva
             // a la vez). Nunca se confia en lo que llego marcado desde el formulario: se vuelve a
             // comprobar aqui, con el saldo real, cuales de esos beneficios le corresponden de verdad.
             $idsElegidos = array_map("intval", $d["beneficios"] ?? []);
-            $descuento = $this->descuentoPorBeneficios($conn, $huespedId, $total, $idsElegidos);
+            $descuento = $this->descuentoPorBeneficios($conn, $huespedId, $total, $idsElegidos, $noches);
 
             $fraccionado = $d["modalidad_pago"] === "fraccionado";
             $totalConDescuento = round($total - $descuento, 2);
@@ -287,7 +287,7 @@ class Reserva
     // solo uso). Se suman los beneficios de tipo "producto"/"plan_pension" que ya tenga ganados
     // (monto fijo, ej. el desayuno de cortesia), mas el MEJOR porcentaje de descuento que alcance
     // (no se suman varios descuentos, solo el mas alto: el de 500 puntos reemplaza al de 300).
-    private function descuentoPorBeneficios(\PDO $conn, int $huespedId, float $total, array $idsElegidos): float
+    private function descuentoPorBeneficios(\PDO $conn, int $huespedId, float $total, array $idsElegidos, int $noches): float
     {
         $puntos = (new MovimientoPuntosDAO($conn))->saldo($huespedId);
         $mejorComida = 0.0;    // "producto" y "plan_pension": el mayor ya incluye al menor (la
@@ -300,6 +300,11 @@ class Reserva
             }
             if ($puntos < (int) $r["puntos_requeridos"]) {
                 continue;   // no se confia en lo marcado desde el formulario: se revisa el saldo real
+            }
+            // Beneficios con noches minimas (ej. "pension completa" pide 2+): una estadia mas
+            // corta no alcanza a justificar un dia entero de comida gratis.
+            if ($r["noches_minimas"] !== null && $noches < (int) $r["noches_minimas"]) {
+                continue;
             }
             if ($r["tipo"] === "descuento") {
                 $mejorPorcentaje = max($mejorPorcentaje, (float) $r["valor"]);

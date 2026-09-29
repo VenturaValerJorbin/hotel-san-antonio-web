@@ -43,14 +43,16 @@ class Puntos
 
     // Beneficios elegibles con ese saldo: el pago fraccionado no entra aqui (se elige aparte, con
     // su propio campo). De los descuentos en soles solo se ofrece el MEJOR (no tiene sentido
-    // ofrecer el de 300 puntos si ya alcanza el de 500, que es mas alto), y lo mismo con los
-    // beneficios de comida: "pension completa" ya incluye el desayuno dentro de sus 3 comidas,
-    // asi que si alcanza para las dos, solo se ofrece la mas completa (nunca las dos juntas).
+    // ofrecer el de 300 puntos si ya alcanza el de 500, que es mas alto). Los de comida
+    // (desayuno/pension completa) se devuelven TODOS los que alcance por puntos: el formulario
+    // los muestra como opciones excluyentes entre si (elige una), porque "pension completa" ya
+    // incluye al desayuno. Pension completa ademas trae "nochesMinimas": el formulario la
+    // deshabilita si la estadia elegida no llega a esas noches (no tiene sentido regalar un dia
+    // entero de comida si la reserva completa es de una sola noche).
     private function beneficiosPorPuntos(int $puntos): array
     {
         $beneficios = [];
         $mejorDescuento = null;
-        $mejorComida = null;
         foreach ((new RecompensaDAO())->listarActivas() as $r) {
             if ($r["tipo"] === "pago_fraccionado" || $puntos < (int) $r["puntos_requeridos"]) {
                 continue;
@@ -61,16 +63,7 @@ class Puntos
                 }
                 continue;
             }
-            if (in_array($r["tipo"], ["producto", "plan_pension"], true)) {
-                if (!$mejorComida || $r["valor"] > $mejorComida["valor"]) {
-                    $mejorComida = $r;
-                }
-                continue;
-            }
             $beneficios[] = $r;
-        }
-        if ($mejorComida) {
-            $beneficios[] = $mejorComida;
         }
         if ($mejorDescuento) {
             $beneficios[] = $mejorDescuento;
@@ -81,6 +74,8 @@ class Puntos
             "descripcion" => $r["descripcion"],
             "valor" => (float) $r["valor"],
             "tipo" => $r["tipo"],
+            "grupo" => in_array($r["tipo"], ["producto", "plan_pension"], true) ? "comida" : null,
+            "nochesMinimas" => $r["noches_minimas"] !== null ? (int) $r["noches_minimas"] : null,
         ], $beneficios);
     }
 }

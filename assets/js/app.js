@@ -65,6 +65,27 @@
             const precioPlan = parseFloat(opcionPlan?.dataset.precio || 0);
             const precio = precioHabitacion + precioPlan;
             const n = noches();
+
+            // Si las fechas cambiaron despues de verificar puntos, algun beneficio de comida
+            // puede dejar de alcanzar (o volver a alcanzar) segun las noches minimas que pida.
+            document.querySelectorAll('#checksBeneficios input[data-noches-minimas]').forEach((c) => {
+                const minimo = parseInt(c.dataset.nochesMinimas, 10);
+                if (n < minimo) {
+                    c.checked = false;
+                    c.disabled = true;
+                } else if (c.disabled) {
+                    c.disabled = false;
+                    c.checked = true;
+                    // Al reactivarse, destilda a los demas del mismo grupo (misma regla de
+                    // exclusion mutua que al hacer clic, para no dejar dos marcados a la vez).
+                    if (c.dataset.grupo) {
+                        document.querySelectorAll('#checksBeneficios input[data-grupo="' + c.dataset.grupo + '"]').forEach((otro) => {
+                            if (otro !== c) otro.checked = false;
+                        });
+                    }
+                }
+            });
+
             const total = precio * n;
             const descuento = descuentoBeneficios(total);
             const totalConDescuento = total - descuento;
@@ -273,17 +294,39 @@
 
                     // Beneficios permanentes que ya le alcanzan: se ofrecen marcados por defecto
                     // (son gratis, no hay motivo para no usarlos), pero el huesped puede destildar.
+                    // Los de "comida" son excluyentes entre si (pension completa ya incluye el
+                    // desayuno): se marca solo el mejor que ademas ya cumple las noches minimas.
                     const escapar = (t) => String(t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
                     const beneficios = datos.beneficios || [];
-                    checksBeneficios.innerHTML = beneficios.map((b) => (
-                        '<div class="form-check mb-1">'
-                        + '<input class="form-check-input" type="checkbox" name="beneficios[]" value="' + b.id + '"'
-                        + ' id="beneficio_' + b.id + '" data-valor="' + b.valor + '" data-tipo="' + escapar(b.tipo) + '" checked>'
-                        + '<label class="form-check-label small" for="beneficio_' + b.id + '">'
-                        + '<strong>' + escapar(b.nombre) + '</strong> — ' + escapar(b.descripcion)
-                        + '</label></div>'
-                    )).join("");
+                    const nochesActuales = noches();
+                    const mejorComidaUsable = beneficios
+                        .filter((b) => b.grupo === "comida" && (!b.nochesMinimas || nochesActuales >= b.nochesMinimas))
+                        .reduce((mejor, b) => (!mejor || b.valor > mejor.valor ? b : mejor), null);
+
+                    checksBeneficios.innerHTML = beneficios.map((b) => {
+                        const bloqueado = b.grupo === "comida" && b.nochesMinimas && nochesActuales < b.nochesMinimas;
+                        const marcado = b.grupo === "comida" ? (mejorComidaUsable && b.id === mejorComidaUsable.id) : true;
+                        return '<div class="form-check mb-1">'
+                            + '<input class="form-check-input" type="checkbox" name="beneficios[]" value="' + b.id + '"'
+                            + ' id="beneficio_' + b.id + '" data-valor="' + b.valor + '" data-tipo="' + escapar(b.tipo) + '"'
+                            + (b.grupo ? ' data-grupo="' + escapar(b.grupo) + '"' : "")
+                            + (b.nochesMinimas ? ' data-noches-minimas="' + b.nochesMinimas + '"' : "")
+                            + (marcado && !bloqueado ? " checked" : "") + (bloqueado ? " disabled" : "") + '>'
+                            + '<label class="form-check-label small" for="beneficio_' + b.id + '">'
+                            + '<strong>' + escapar(b.nombre) + '</strong> — ' + escapar(b.descripcion)
+                            + '</label></div>';
+                    }).join("");
                     cajaBeneficios.classList.toggle("d-none", beneficios.length === 0);
+
+                    // Elegir un beneficio de "comida" destilda a los demas del mismo grupo.
+                    checksBeneficios.querySelectorAll('input[data-grupo="comida"]').forEach((c) => {
+                        c.addEventListener("change", () => {
+                            if (!c.checked) return;
+                            checksBeneficios.querySelectorAll('input[data-grupo="comida"]').forEach((otro) => {
+                                if (otro !== c) otro.checked = false;
+                            });
+                        });
+                    });
                     checksBeneficios.querySelectorAll("input").forEach((c) => c.addEventListener("change", actualizar));
                     actualizar();
                 } catch {
