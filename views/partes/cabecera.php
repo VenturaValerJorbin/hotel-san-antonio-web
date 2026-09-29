@@ -36,10 +36,15 @@ $activa = $pagina === "habitacion.php" ? "habitaciones.php" : $pagina;   // se c
         <nav class="navbar navbar-expand-xl">
             <div class="container">
                 <?php require __DIR__ . "/logo.php" ?>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPublico"
-                    aria-controls="menuPublico" aria-expanded="false" aria-label="Abrir menú">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
+                <div class="d-flex align-items-center order-xl-last">
+                    <a class="sa-icono-cabecera" href="<?= url("publico/comprobante.php") ?>" title="Buscar mi reserva" aria-label="Buscar mi reserva">
+                        <i class="bi bi-search"></i>
+                    </a>
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPublico"
+                        aria-controls="menuPublico" aria-expanded="false" aria-label="Abrir menú">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                </div>
                 <div class="collapse navbar-collapse" id="menuPublico">
                     <ul class="navbar-nav ms-auto align-items-xl-center">
                         <?php foreach ($menu as $archivo => $texto) : ?>
