@@ -406,30 +406,30 @@ WHERE s.nombre = 'Agua caliente' AND t.nombre <> 'Simple';
 -- (relativa a la raiz del proyecto) y el orden en que aparecen en el carrusel.
 -- tipo_id 1 = Simple
 INSERT INTO foto_tipo_habitacion (tipo_id, ruta, orden) VALUES
-(1, 'assets/img/economic-room/economic-room1.avif', 1),
-(1, 'assets/img/economic-room/economic-room2.avif', 2),
-(1, 'assets/img/economic-room/economic-room3.avif', 3),
-(1, 'assets/img/economic-room/economic-room4.avif', 4),
-(1, 'assets/img/economic-room/economic-room5.avif', 5);
+(1, 'assets/img/simple/economic-room1.avif', 1),
+(1, 'assets/img/simple/economic-room2.avif', 2),
+(1, 'assets/img/simple/economic-room3.avif', 3),
+(1, 'assets/img/simple/economic-room4.avif', 4),
+(1, 'assets/img/simple/economic-room5.avif', 5);
 
 -- tipo_id 2 = Ejecutiva
 INSERT INTO foto_tipo_habitacion (tipo_id, ruta, orden) VALUES
-(2, 'assets/img/deluxe/hiabitacion_deluxe1.avif', 1),
-(2, 'assets/img/deluxe/hiabitacion_deluxe2.avif', 2),
-(2, 'assets/img/deluxe/hiabitacion_deluxe3.avif', 3),
-(2, 'assets/img/deluxe/hiabitacion_deluxe4.avif', 4),
-(2, 'assets/img/deluxe/hiabitacion_deluxe5.avif', 5),
-(2, 'assets/img/deluxe/hiabitacion_deluxe6.avif', 6),
-(2, 'assets/img/deluxe/hiabitacion_deluxe7.avif', 7),
-(2, 'assets/img/deluxe/hiabitacion_deluxe8.avif', 8),
-(2, 'assets/img/deluxe/9hiabitacion_deluxe.avif', 9);
+(2, 'assets/img/ejecutiva/hiabitacion_deluxe1.avif', 1),
+(2, 'assets/img/ejecutiva/hiabitacion_deluxe2.avif', 2),
+(2, 'assets/img/ejecutiva/hiabitacion_deluxe3.avif', 3),
+(2, 'assets/img/ejecutiva/hiabitacion_deluxe4.avif', 4),
+(2, 'assets/img/ejecutiva/hiabitacion_deluxe5.avif', 5),
+(2, 'assets/img/ejecutiva/hiabitacion_deluxe6.avif', 6),
+(2, 'assets/img/ejecutiva/hiabitacion_deluxe7.avif', 7),
+(2, 'assets/img/ejecutiva/hiabitacion_deluxe8.avif', 8),
+(2, 'assets/img/ejecutiva/9hiabitacion_deluxe.avif', 9);
 
 -- tipo_id 3 = Matrimonial
 INSERT INTO foto_tipo_habitacion (tipo_id, ruta, orden) VALUES
-(3, 'assets/img/deluxe-queen/habitacion_queen1.avif', 1),
-(3, 'assets/img/deluxe-queen/habitacion_queen2.avif', 2),
-(3, 'assets/img/deluxe-queen/habitacion_queen3.avif', 3),
-(3, 'assets/img/deluxe-queen/habitacion_queen4.avif', 4);
+(3, 'assets/img/matrimonial/habitacion_queen1.avif', 1),
+(3, 'assets/img/matrimonial/habitacion_queen2.avif', 2),
+(3, 'assets/img/matrimonial/habitacion_queen3.avif', 3),
+(3, 'assets/img/matrimonial/habitacion_queen4.avif', 4);
 
 -- tipo_id 4 = Doble
 INSERT INTO foto_tipo_habitacion (tipo_id, ruta, orden) VALUES
@@ -454,19 +454,19 @@ INSERT INTO foto_tipo_habitacion (tipo_id, ruta, orden) VALUES
 
 -- tipo_id 5 = Suite
 INSERT INTO foto_tipo_habitacion (tipo_id, ruta, orden) VALUES
-(5, 'assets/img/deluxe-suite/1deluxe-suite.avif', 1),
-(5, 'assets/img/deluxe-suite/2deluxe-suite.avif', 2),
-(5, 'assets/img/deluxe-suite/3deluxe-suite.avif', 3);
+(5, 'assets/img/suite/1deluxe-suite.avif', 1),
+(5, 'assets/img/suite/2deluxe-suite.avif', 2),
+(5, 'assets/img/suite/3deluxe-suite.avif', 3);
 
 -- tipo_id 6 = King
 INSERT INTO foto_tipo_habitacion (tipo_id, ruta, orden) VALUES
-(6, 'assets/img/junior-suite/unior-suite1.avif', 1),
-(6, 'assets/img/junior-suite/unior-suite2.avif', 2),
-(6, 'assets/img/junior-suite/unior-suite3.avif', 3),
-(6, 'assets/img/junior-suite/unior-suite4.avif', 4),
-(6, 'assets/img/junior-suite/unior-suite5.avif', 5),
-(6, 'assets/img/junior-suite/unior-suite6.avif', 6),
-(6, 'assets/img/junior-suite/unior-suite7.avif', 7);
+(6, 'assets/img/king/unior-suite1.avif', 1),
+(6, 'assets/img/king/unior-suite2.avif', 2),
+(6, 'assets/img/king/unior-suite3.avif', 3),
+(6, 'assets/img/king/unior-suite4.avif', 4),
+(6, 'assets/img/king/unior-suite5.avif', 5),
+(6, 'assets/img/king/unior-suite6.avif', 6),
+(6, 'assets/img/king/unior-suite7.avif', 7);
 
 INSERT INTO parametro (clave, valor, descripcion) VALUES
 ('soles_por_punto',   '10', 'Soles gastados por cada punto ganado'),
