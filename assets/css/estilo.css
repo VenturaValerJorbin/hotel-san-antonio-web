@@ -147,6 +147,12 @@ a:hover { color: var(--rojo-osc); }
 .sa-caja-pago strong { color: var(--rojo); }
 .sa-caja-crema { background: var(--crema); border-radius: .5rem; padding: .75rem 1rem; }
 
+/* Modal de confirmacion del panel (ver views/partes/panel_pie.php) */
+.sa-modal-confirmar { border-radius: .75rem; border: 0; }
+.sa-modal-confirmar .modal-header { background: var(--crema); border-bottom: 1px solid #E0D0BC; border-radius: .75rem .75rem 0 0; }
+.sa-modal-confirmar .modal-title { color: var(--marron); margin: 0; }
+.sa-modal-confirmar .modal-footer { border-top: 0; }
+
 /* Metodo de pago */
 .sa-metodo { display: block; cursor: pointer; }
 .sa-metodo input { position: absolute; opacity: 0; }

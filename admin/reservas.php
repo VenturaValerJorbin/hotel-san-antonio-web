@@ -69,7 +69,7 @@ $acciones = function ($r) {
     if ($r->estado === "confirmada") {
         echo '<a class="btn btn-sm btn-danger" href="' . url('admin/checkin.php') . '?id=' . $r->id . '">Check-in</a>';
     } elseif ($r->estado === "checkin") {
-        echo '<form action="' . url('procesar.php') . '" method="post" class="d-inline" onsubmit="return confirm(\'¿Registrar el check-out y cobrar el saldo?\')">'
+        echo '<form action="' . url('procesar.php') . '" method="post" class="d-inline" data-confirmar="¿Registrar el check-out y cobrar el saldo?">'
             . '<input type="hidden" name="modulo" value="reserva"><input type="hidden" name="accion" value="checkout">'
             . '<input type="hidden" name="id" value="' . $r->id . '"><button class="btn btn-sm btn-outline-danger">Check-out</button></form>';
     } else {

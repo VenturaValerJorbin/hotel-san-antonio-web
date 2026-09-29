@@ -3,6 +3,35 @@
 (function () {
     "use strict";
 
+    // ---- Modal de confirmacion del panel: reemplaza el confirm() gris del navegador en
+    // cualquier formulario con data-confirmar="mensaje" (funciona aunque haya varios en la
+    // misma pagina, ej. un boton de check-out por fila en admin/reservas.php) ----
+    const modalConfirmarEl = document.getElementById("modalConfirmar");
+    if (modalConfirmarEl && window.bootstrap) {
+        const modalConfirmar = new bootstrap.Modal(modalConfirmarEl);
+        const textoConfirmar = document.getElementById("modalConfirmarTexto");
+        const btnAceptar = document.getElementById("modalConfirmarAceptar");
+        let formPendiente = null;
+
+        document.querySelectorAll("form[data-confirmar]").forEach((form) => {
+            form.addEventListener("submit", (evento) => {
+                if (form.dataset.confirmado) return;   // ya se acepto: se deja enviar de verdad
+                evento.preventDefault();
+                formPendiente = form;
+                textoConfirmar.textContent = form.dataset.confirmar;
+                modalConfirmar.show();
+            });
+        });
+
+        btnAceptar.addEventListener("click", () => {
+            modalConfirmar.hide();
+            if (formPendiente) {
+                formPendiente.dataset.confirmado = "1";
+                formPendiente.requestSubmit();
+            }
+        });
+    }
+
     // ---- Formulario de reserva: resumen de pago en vivo ----
     const form = document.getElementById("formReserva");
     if (form) {

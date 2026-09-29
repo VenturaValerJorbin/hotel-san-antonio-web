@@ -88,7 +88,7 @@ $estados = ["disponible" => "Disponible", "ocupada" => "Ocupada", "limpieza" => 
                         <td>
                             <div class="d-flex gap-1">
                                 <a class="btn btn-sm btn-outline-secondary" href="<?= url("admin/gestion_habitaciones.php") ?>?editar=<?= $h->id ?>">Editar</a>
-                                <form action="<?= url("procesar.php") ?>" method="post" onsubmit="return confirm('¿Eliminar la habitación <?= e($h->numero) ?>?')">
+                                <form action="<?= url("procesar.php") ?>" method="post" data-confirmar="¿Eliminar la habitación <?= e($h->numero) ?>?">
                                     <input type="hidden" name="modulo" value="habitacion">
                                     <input type="hidden" name="accion" value="eliminar">
                                     <input type="hidden" name="id" value="<?= $h->id ?>">
