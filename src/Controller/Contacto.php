@@ -11,9 +11,25 @@ class Contacto extends Controlador
 
     public function manejar(string $accion, array $post): array
     {
-        return $accion === "enviar"
-            ? $this->enviar($post)
-            : $this->resultado(false, "Accion no valida.", "publico/contacto.php");
+        return match ($accion) {
+            "enviar" => $this->enviar($post),
+            "marcarLeido" => $this->marcarLeido($post),
+            default => $this->resultado(false, "Accion no valida.", "publico/contacto.php"),
+        };
+    }
+
+    private function marcarLeido(array $p): array
+    {
+        $id = (int) ($p["id"] ?? 0);
+        if ($id <= 0) {
+            return $this->resultado(false, "Datos no validos.", "admin/mensajes.php");
+        }
+        return $this->ejecutar(
+            fn() => (new ContactoBO())->marcarLeido($id),
+            "Mensaje marcado como leido.",
+            "admin/mensajes.php",
+            "admin/mensajes.php"
+        );
     }
 
     private function enviar(array $p): array

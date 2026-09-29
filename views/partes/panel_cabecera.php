@@ -2,13 +2,19 @@
 // Diseno del panel del personal: barra superior en el celular y menu lateral fijo en escritorio.
 // Cada pagina define $titulo y $activo ("reservas", "disponibilidad" o "habitaciones") antes de incluirla.
 require_once __DIR__ . "/ayudas.php";
+
+use App\Bo\Contacto as ContactoBO;
+
 /** @var array|null $flash Mensaje de la pagina anterior (lo crea views/partes/ayudas.php) */
 
 $opciones = [
     "reservas" => ["admin/reservas.php", "bi-journal-text", "Reservas"],
     "disponibilidad" => ["admin/disponibilidad.php", "bi-calendar3", "Disponibilidad"],
     "habitaciones" => ["admin/gestion_habitaciones.php", "bi-door-open", "Habitaciones"],
+    "mensajes" => ["admin/mensajes.php", "bi-envelope", "Mensajes"],
 ];
+// Aviso de mensajes sin leer, visible en el menu sin tener que entrar a revisar
+$mensajesNoLeidos = (new ContactoBO())->noLeidos();
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -43,6 +49,9 @@ $opciones = [
                     <?php foreach ($opciones as $clave => [$url, $icono, $texto]) : ?>
                         <a class="nav-link <?= ($activo ?? "") === $clave ? "active" : "" ?>" href="<?= url($url) ?>">
                             <i class="bi <?= $icono ?>"></i> <?= $texto ?>
+                            <?php if ($clave === "mensajes" && $mensajesNoLeidos > 0) : ?>
+                                <span class="badge rounded-pill text-bg-danger ms-1"><?= $mensajesNoLeidos ?></span>
+                            <?php endif ?>
                         </a>
                     <?php endforeach ?>
                     <a class="nav-link" href="<?= url("index.php") ?>"><i class="bi bi-box-arrow-up-right"></i> Ver sitio público</a>

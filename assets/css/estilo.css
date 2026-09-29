@@ -139,6 +139,8 @@ a:hover { color: var(--rojo-osc); }
 .pill-checkout, .pill-cancelada, .pill-no_show { background: #E9E4E1; color: #5c524c; }
 .pill-pagado { background: #DDF3E4; color: #1E6B3A; }
 .pill-saldo { background: #FBEFC9; color: #8A6A12; }
+/* Mensaje de contacto sin leer: se distingue sin necesidad de abrirlo */
+.sa-mensaje-nuevo { border-left: 3px solid var(--rojo); }
 
 /* Caja destacada de pago */
 .sa-caja-pago { background: var(--rosado); border-radius: .5rem; padding: .75rem 1rem; }
