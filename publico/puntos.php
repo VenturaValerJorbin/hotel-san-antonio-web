@@ -8,7 +8,7 @@ $solesPorPunto = $bo->solesPorPunto();
 $recompensas = $bo->recompensas();
 $montoEjemplo = 500;
 $fraccionado = current(array_filter($recompensas, fn($r) => $r["tipo"] === "pago_fraccionado")) ?: null;
-$iconos = ["pago_fraccionado" => "bi-cash-coin", "producto" => "bi-cup-hot", "descuento" => "bi-percent", "noche_gratis" => "bi-moon-stars"];
+$iconos = ["pago_fraccionado" => "bi-cash-coin", "producto" => "bi-cup-hot", "descuento" => "bi-percent", "noche_gratis" => "bi-moon-stars", "plan_pension" => "bi-egg-fried"];
 
 $titulo = "Programa de puntos";
 

@@ -203,19 +203,24 @@ CREATE TABLE pago (
 --   descuento        : canje, valor = % de descuento sobre la estadia
 --   producto         : canje, entrega un producto (ej. desayuno)
 --   noche_gratis     : canje, una noche de cortesia
+-- Catalogo ACUMULATIVO por niveles de puntos (como los planes de una suscripcion: cada nivel
+-- superior incluye lo del anterior y le suma algo mas). "pago_fraccionado" no consume puntos
+-- (es un beneficio permanente mientras se mantengan); los demas si se canjean (ver canje_recompensa).
 CREATE TABLE recompensa (
     id                 INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     nombre             VARCHAR(80)  NOT NULL,
     descripcion        VARCHAR(200) NULL,
     puntos_requeridos  INT UNSIGNED NOT NULL,
-    tipo               ENUM('pago_fraccionado','descuento','producto','noche_gratis') NOT NULL,
+    tipo               ENUM('pago_fraccionado','descuento','producto','noche_gratis','plan_pension') NOT NULL,
     valor              DECIMAL(5,2) NULL,
     producto_id        INT UNSIGNED NULL,
+    plan_pension_id    INT UNSIGNED NULL,
     consume_puntos     TINYINT(1)   NOT NULL DEFAULT 1,
     activo             TINYINT(1)   NOT NULL DEFAULT 1,
     created_at         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_recompensa_producto FOREIGN KEY (producto_id) REFERENCES producto(id)
+    CONSTRAINT fk_recompensa_producto     FOREIGN KEY (producto_id)     REFERENCES producto(id),
+    CONSTRAINT fk_recompensa_plan_pension FOREIGN KEY (plan_pension_id) REFERENCES plan_pension(id)
 ) ENGINE=InnoDB;
 
 CREATE TABLE canje_recompensa (
@@ -459,8 +464,8 @@ INSERT INTO parametro (clave, valor, descripcion) VALUES
 INSERT INTO plan_pension (nombre, descripcion, precio_por_noche, orden) VALUES
 ('Solo alojamiento', 'Solo la habitacion, sin comidas incluidas.', 0.00, 1),
 ('Alojamiento y desayuno', 'Incluye el desayuno para los huespedes de la habitacion.', 15.00, 2),
-('Media pension', 'Desayuno y una comida mas (almuerzo o cena, a eleccion), cualquier plato de la carta.', 35.00, 3),
-('Pension completa', 'Desayuno, almuerzo y cena incluidos, cualquier plato de la carta.', 55.00, 4);
+('Media pensión', 'Desayuno y una comida mas (almuerzo o cena, a eleccion), cualquier plato de la carta.', 35.00, 3),
+('Pensión completa', 'Desayuno, almuerzo y cena incluidos, cualquier plato de la carta.', 55.00, 4);
 
 INSERT INTO categoria_producto (nombre) VALUES ('Menú del día'),('Platos a la carta'),('Desayunos');
 
@@ -475,12 +480,17 @@ INSERT INTO producto (categoria_id, nombre, descripcion, precio) VALUES
 (2,'Gallina','Receta tradicional, preparada con el auténtico sabor de nuestra tierra.',NULL),
 (3,'Desayuno regional','Desayuno con productos de la región.',NULL);
 
-INSERT INTO recompensa (nombre, descripcion, puntos_requeridos, tipo, valor, producto_id, consume_puntos) VALUES
-('Pago fraccionado','Reserva pagando solo el 50 % ahora y el resto al llegar.',100,'pago_fraccionado',50,NULL,0),
-('Desayuno de cortesía','Un desayuno regional gratis durante la estadía.',150,'producto',NULL,
-    (SELECT id FROM producto WHERE nombre = 'Desayuno regional'),1),
-('10 % de descuento','Descuento sobre el costo de la estadía.',300,'descuento',10,NULL,1),
-('Noche de cortesía','Una noche gratis en habitación Simple.',500,'noche_gratis',NULL,NULL,1);
+-- Niveles acumulativos: 100 = fraccionado + desayuno; 150 suma pension completa de un dia;
+-- 300 suma 10% de descuento; 500 sube ese descuento a 15% (nunca "noche gratis": alguien podria
+-- reservar solo esa noche y el hotel no cobraria nada).
+INSERT INTO recompensa (nombre, descripcion, puntos_requeridos, tipo, valor, producto_id, plan_pension_id, consume_puntos) VALUES
+('Pago fraccionado','Reserva pagando solo el 50 % ahora y el resto al llegar.',100,'pago_fraccionado',50,NULL,NULL,0),
+('Desayuno de cortesía','Un desayuno regional gratis durante la estadía.',100,'producto',NULL,
+    (SELECT id FROM producto WHERE nombre = 'Desayuno regional'),NULL,1),
+('Pensión completa por un día','Un día de tu estadía con desayuno, almuerzo y cena incluidos.',150,'plan_pension',NULL,NULL,
+    (SELECT id FROM plan_pension WHERE nombre = 'Pensión completa'),1),
+('10 % de descuento','Descuento sobre el costo de la estadía.',300,'descuento',10,NULL,NULL,1),
+('15 % de descuento','El mayor descuento del programa, para nuestros huéspedes más frecuentes.',500,'descuento',15,NULL,NULL,1);
 
 -- La columna foto guarda la ruta de la imagen (relativa a la raiz del proyecto)
 INSERT INTO lugar_turistico (nombre, categoria, descripcion, foto) VALUES

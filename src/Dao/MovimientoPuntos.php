@@ -4,15 +4,16 @@ namespace App\Dao;
 
 class MovimientoPuntos extends Dao
 {
-    public function insertar(int $huespedId, ?int $reservaId, string $tipo, int $puntos, string $descripcion): int
+    public function insertar(int $huespedId, ?int $reservaId, string $tipo, int $puntos, string $descripcion, ?int $canjeId = null): int
     {
         $stmt = $this->conn->prepare(
-            "INSERT INTO movimiento_puntos (huesped_id, reserva_id, tipo, puntos, descripcion)
-             VALUES (:huesped_id, :reserva_id, :tipo, :puntos, :descripcion)"
+            "INSERT INTO movimiento_puntos (huesped_id, reserva_id, canje_id, tipo, puntos, descripcion)
+             VALUES (:huesped_id, :reserva_id, :canje_id, :tipo, :puntos, :descripcion)"
         );
         $this->enlazar($stmt, [
             ":huesped_id" => $huespedId,
             ":reserva_id" => $reservaId,
+            ":canje_id" => $canjeId,
             ":tipo" => $tipo,
             ":puntos" => $puntos,
             ":descripcion" => $descripcion,

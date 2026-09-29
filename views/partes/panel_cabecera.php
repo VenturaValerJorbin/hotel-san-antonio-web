@@ -11,6 +11,7 @@ $opciones = [
     "reservas" => ["admin/reservas.php", "bi-journal-text", "Reservas"],
     "disponibilidad" => ["admin/disponibilidad.php", "bi-calendar3", "Disponibilidad"],
     "habitaciones" => ["admin/gestion_habitaciones.php", "bi-door-open", "Habitaciones"],
+    "canjes" => ["admin/canjes.php", "bi-gift", "Canjes"],
     "mensajes" => ["admin/mensajes.php", "bi-envelope", "Mensajes"],
 ];
 // Aviso de mensajes sin leer, visible en el menu sin tener que entrar a revisar
