@@ -16,7 +16,9 @@ require __DIR__ . "/../views/partes/cabecera.php";
 // Valor de un campo: lo escrito antes de un error, o el que llega por la URL, o un valor por defecto
 $valor = fn($campo, $porDefecto = "") => $antiguo[$campo] ?? $porDefecto;
 $claseError = fn($campo) => isset($errores[$campo]) ? " is-invalid" : "";
-$mensaje = fn($campo) => isset($errores[$campo]) ? '<div class="invalid-feedback d-block">' . e($errores[$campo]) . "</div>" : "";
+// Siempre imprime el contenedor del mensaje (vacio si no hay error), con data-error para que
+// assets/js/app.js pueda mostrar y quitar los errores de validacion sin recargar la pagina.
+$mensaje = fn($campo) => '<div class="invalid-feedback' . (isset($errores[$campo]) ? " d-block" : "") . '" data-error="' . $campo . '">' . e($errores[$campo] ?? "") . '</div>';
 
 $tipoElegido = (string) ($antiguo["tipo_id"] ?? $_GET["tipo"] ?? "");
 $ingreso = $antiguo["fecha_ingreso"] ?? fechaGet("ingreso");
@@ -46,10 +48,7 @@ hero(
         <div class="row g-4">
             <div class="col-12 col-lg-7">
                 <section class="sa-card sa-card-cuerpo">
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
-                        <h2 class="h4 mb-0"><i class="bi bi-house-heart text-danger"></i> Datos de la reserva</h2>
-                        <span class="sa-caja-crema small py-1"><i class="bi bi-person"></i> Reserva sin crear cuenta</span>
-                    </div>
+                    <h2 class="h4 mb-3"><i class="bi bi-house-heart text-danger"></i> Datos de la reserva</h2>
 
                     <div class="row g-3">
                         <div class="col-12">
@@ -94,8 +93,16 @@ hero(
                                 placeholder="Ej. Juan Pérez García" value="<?= e($valor("nombre_completo")) ?>" autocomplete="name" required>
                             <?= $mensaje("nombre_completo") ?>
                         </div>
-                        <div class="col-12 col-sm-6">
-                            <label class="form-label requerido" for="numero_documento">DNI / Pasaporte</label>
+                        <div class="col-12 col-sm-4">
+                            <label class="form-label requerido" for="tipo_documento">Tipo de documento</label>
+                            <select class="form-select<?= $claseError("tipo_documento") ?>" id="tipo_documento" name="tipo_documento" required>
+                                <option value="DNI" <?= $valor("tipo_documento", "DNI") === "DNI" ? "selected" : "" ?>>DNI</option>
+                                <option value="PASAPORTE" <?= $valor("tipo_documento", "DNI") === "PASAPORTE" ? "selected" : "" ?>>Pasaporte</option>
+                            </select>
+                            <?= $mensaje("tipo_documento") ?>
+                        </div>
+                        <div class="col-12 col-sm-8">
+                            <label class="form-label requerido" for="numero_documento">Número de documento</label>
                             <input class="form-control<?= $claseError("numero_documento") ?>" id="numero_documento" name="numero_documento" maxlength="12"
                                 placeholder="Ej. 12345678" value="<?= e($valor("numero_documento")) ?>" inputmode="text" required>
                             <?= $mensaje("numero_documento") ?>

@@ -1,4 +1,8 @@
 <?php
+// Zona horaria del hotel. Sin esto, PHP usa la del servidor (o UTC), y "hoy" puede
+// adelantarse un dia entero respecto a la hora real de Bagua (Peru no usa horario de verano).
+date_default_timezone_set("America/Lima");
+
 // Autoload estilo PSR-4: el prefijo del namespace se reemplaza por una carpeta base.
 //   App\Dao\Habitacion  ->  <raiz del proyecto>/src/Dao/Habitacion.php
 //   App\Bo\Reserva      ->  <raiz del proyecto>/src/Bo/Reserva.php

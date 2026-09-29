@@ -33,8 +33,8 @@ class Reserva extends Controlador
             "fecha_salida" => $p["fecha_salida"] ?? "",
             "num_huespedes" => 1,
             "piso" => (int) ($p["piso"] ?? 0),   // 0 = sin preferencia
-            // Un solo campo "DNI / Pasaporte": 8 digitos es DNI, cualquier otro formato valido es pasaporte
-            "tipo_documento" => preg_match('/^\d{8}$/', $documento) ? "DNI" : "PASAPORTE",
+            // El huesped elige el tipo; cada uno tiene su propio formato valido (ver validar())
+            "tipo_documento" => $p["tipo_documento"] ?? "",
             "numero_documento" => $documento,
             "nombre_completo" => trim($p["nombre_completo"] ?? ""),
             "telefono" => trim($p["telefono"] ?? ""),
@@ -123,8 +123,16 @@ class Reserva extends Controlador
         } elseif ((new \DateTime($d["fecha_ingreso"]))->diff(new \DateTime($d["fecha_salida"]))->days > 30) {
             $e["fecha_salida"] = "La estadia maxima es de 30 noches.";
         }
-        if (!preg_match('/^(\d{8}|[A-Z0-9]{6,12})$/', $d["numero_documento"])) {
-            $e["numero_documento"] = "Ingresa un DNI (8 digitos) o un pasaporte (6 a 12 letras o numeros).";
+        // El formato valido del numero depende del tipo elegido; un DNI de puros digitos
+        // no debe poder colarse como si fuera un pasaporte (y viceversa).
+        if (!in_array($d["tipo_documento"], ["DNI", "PASAPORTE"], true)) {
+            $e["tipo_documento"] = "Elige un tipo de documento.";
+        } elseif ($d["tipo_documento"] === "DNI") {
+            if (!preg_match('/^\d{8}$/', $d["numero_documento"])) {
+                $e["numero_documento"] = "El DNI debe tener exactamente 8 digitos.";
+            }
+        } elseif (!preg_match('/^(?=.*[A-Z])[A-Z0-9]{6,12}$/', $d["numero_documento"])) {
+            $e["numero_documento"] = "El pasaporte debe tener de 6 a 12 letras o numeros, con al menos una letra.";
         }
         if (!preg_match("/^[\\p{L}][\\p{L} '.\\-]{3,158}$/u", $d["nombre_completo"]) || !str_contains($d["nombre_completo"], " ")) {
             $e["nombre_completo"] = "Escribe tu nombre y apellido (solo letras).";

@@ -58,6 +58,91 @@
         form.addEventListener("change", actualizar);
         limitarSalida();
         actualizar();
+
+        // ---- Validacion en el navegador: mismas reglas que el servidor (src/Controller/Reserva.php) ----
+        // El servidor vuelve a validar todo (es la validacion real); esto solo marca cada campo
+        // al instante, sin esperar a que la pagina se recargue.
+        const hoy = $("fecha_ingreso").min;
+
+        const leerDatos = () => ({
+            tipo_id: $("tipo_id").value,
+            fecha_ingreso: $("fecha_ingreso").value,
+            fecha_salida: $("fecha_salida").value,
+            nombre_completo: $("nombre_completo").value.trim(),
+            tipo_documento: $("tipo_documento").value,
+            numero_documento: $("numero_documento").value.trim().toUpperCase(),
+            telefono: $("telefono").value.trim(),
+            modalidad_pago: form.querySelector("input[name=modalidad_pago]:checked")?.value || "",
+            metodo_pago: form.querySelector("input[name=metodo_pago]:checked")?.value || "",
+            acepta: $("acepta").checked,
+        });
+
+        const reglas = {
+            tipo_id: (d) => d.tipo_id ? null : "Selecciona una habitación.",
+            fecha_ingreso: (d) => (!d.fecha_ingreso || d.fecha_ingreso < hoy) ? "Ingresa una fecha de llegada válida (hoy o posterior)." : null,
+            fecha_salida: (d) => {
+                if (!d.fecha_salida || d.fecha_salida <= d.fecha_ingreso) return "La salida debe ser posterior a la llegada.";
+                const noches = (new Date(d.fecha_salida) - new Date(d.fecha_ingreso)) / 86400000;
+                return noches > 30 ? "La estadía máxima es de 30 noches." : null;
+            },
+            nombre_completo: (d) => (/^[\p{L}][\p{L} '.-]{3,158}$/u.test(d.nombre_completo) && d.nombre_completo.includes(" "))
+                ? null : "Escribe tu nombre y apellido (solo letras).",
+            tipo_documento: (d) => ["DNI", "PASAPORTE"].includes(d.tipo_documento) ? null : "Elige un tipo de documento.",
+            numero_documento: (d) => {
+                if (d.tipo_documento === "DNI") return /^\d{8}$/.test(d.numero_documento) ? null : "El DNI debe tener exactamente 8 dígitos.";
+                if (d.tipo_documento === "PASAPORTE") return /^(?=.*[A-Z])[A-Z0-9]{6,12}$/.test(d.numero_documento) ? null : "El pasaporte debe tener de 6 a 12 letras o números, con al menos una letra.";
+                return null; // el error de tipo_documento ya avisa
+            },
+            telefono: (d) => /^\+?\d{7,15}$/.test(d.telefono) ? null : "Celular no válido (solo números, 7 a 15 dígitos).",
+            modalidad_pago: (d) => d.modalidad_pago ? null : "Elige cómo pagar.",
+            metodo_pago: (d) => d.metodo_pago ? null : "Elige un método de pago.",
+            acepta: (d) => d.acepta ? null : "Debes aceptar los términos y condiciones.",
+        };
+
+        const mostrarError = (campo, mensaje) => {
+            const contenedor = form.querySelector('[data-error="' + campo + '"]');
+            if (contenedor) {
+                contenedor.textContent = mensaje || "";
+                contenedor.classList.toggle("d-block", Boolean(mensaje));
+            }
+            const control = $(campo);
+            if (control) control.classList.toggle("is-invalid", Boolean(mensaje));
+            return !mensaje;
+        };
+
+        const validarCampo = (campo) => !mostrarError(campo, reglas[campo](leerDatos()));
+
+        // Ajusta el marcador segun el tipo de documento elegido (DNI: 8 digitos, pasaporte: hasta 12)
+        const actualizarDocumento = () => {
+            const esDni = $("tipo_documento").value === "DNI";
+            $("numero_documento").maxLength = esDni ? 8 : 12;
+            $("numero_documento").placeholder = esDni ? "Ej. 12345678" : "Ej. AB123456";
+        };
+        actualizarDocumento();
+        $("tipo_documento").addEventListener("change", () => { actualizarDocumento(); validarCampo("numero_documento"); });
+
+        // Revalida un campo apenas el huesped lo corrige, sin esperar a reenviar el formulario
+        ["tipo_id", "fecha_ingreso", "fecha_salida", "nombre_completo", "numero_documento", "telefono"].forEach((campo) => {
+            $(campo).addEventListener("input", () => { if ($(campo).classList.contains("is-invalid")) validarCampo(campo); });
+        });
+        form.querySelectorAll("input[name=modalidad_pago], input[name=metodo_pago]").forEach((radio) => {
+            radio.addEventListener("change", () => validarCampo(radio.name));
+        });
+        $("acepta").addEventListener("change", () => validarCampo("acepta"));
+
+        form.addEventListener("submit", (evento) => {
+            const datos = leerDatos();
+            let primerError = null;
+            for (const campo in reglas) {
+                if (!mostrarError(campo, reglas[campo](datos)) && !primerError) primerError = campo;
+            }
+            if (primerError) {
+                evento.preventDefault();
+                const el = $(primerError) || form.querySelector('[name="' + primerError + '"]');
+                el?.scrollIntoView({ behavior: "smooth", block: "center" });
+                el?.focus();
+            }
+        });
     }
 
     // ---- Boton "Copiar direccion" ----
