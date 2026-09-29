@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Bo\Contacto as ContactoBO;
+use App\Bo\LimiteIntento as LimiteIntentoBO;
 
 // Controlador del formulario de contacto.
 class Contacto extends Controlador
@@ -34,6 +35,13 @@ class Contacto extends Controlador
 
     private function enviar(array $p): array
     {
+        // Sin esto, un script podria mandar cientos de mensajes seguidos (spam).
+        try {
+            (new LimiteIntentoBO())->verificar("contacto", 5, 600);
+        } catch (\DomainException $e) {
+            return $this->resultado(false, $e->getMessage(), "publico/contacto.php");
+        }
+
         $datos = [
             "nombre" => trim($p["nombre"] ?? ""),
             "correo" => trim($p["correo"] ?? ""),

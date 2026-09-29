@@ -4,15 +4,25 @@
 // no crea ni modifica nada: es una lectura (GET), no una accion (POST).
 require __DIR__ . "/../config/Autoload.php";
 
+use App\Bo\LimiteIntento as LimiteIntentoBO;
 use App\Bo\Puntos as PuntosBO;
 
 header("Content-Type: application/json; charset=utf-8");
+
+// Sin esto, un script podria probar miles de documentos seguidos y ver quien tiene puntos.
+try {
+    (new LimiteIntentoBO())->verificar("consultar_puntos", 15, 60);
+} catch (\DomainException $e) {
+    http_response_code(429);
+    echo json_encode(["ok" => false, "mensaje" => $e->getMessage()]);
+    exit;
+}
 
 $tipoDocumento = strtoupper(trim($_GET["tipo_documento"] ?? ""));
 $numeroDocumento = strtoupper(trim($_GET["numero_documento"] ?? ""));
 
 $documentoValido = match ($tipoDocumento) {
-    "DNI" => (bool) preg_match('/^\d{8}$/', $numeroDocumento),
+    "DNI" => (bool) preg_match('/^(?!(\d)\1{7}$)\d{8}$/', $numeroDocumento),
     "PASAPORTE" => (bool) preg_match('/^(?=.*[A-Z])[A-Z0-9]{6,12}$/', $numeroDocumento),
     default => false,
 };

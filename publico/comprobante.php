@@ -1,13 +1,24 @@
 <?php
 require __DIR__ . "/../config/Autoload.php";
 
+use App\Bo\LimiteIntento as LimiteIntentoBO;
 use App\Bo\Reserva as ReservaBO;
 
 $titulo = "Comprobante de reserva";
 $codigo = strtoupper(trim($_GET["codigo"] ?? ""));
 $documento = strtoupper(trim($_GET["numero_documento"] ?? ""));
 $buscado = $codigo !== "" || $documento !== "";
-$reserva = $buscado ? (new ReservaBO())->buscarComprobante($codigo, $documento) : null;
+$limiteSuperado = false;
+$reserva = null;
+if ($buscado) {
+    // Sin esto, alguien podria probar miles de combinaciones de codigo+documento seguidas.
+    try {
+        (new LimiteIntentoBO())->verificar("comprobante", 10, 60);
+        $reserva = (new ReservaBO())->buscarComprobante($codigo, $documento);
+    } catch (\DomainException $e) {
+        $limiteSuperado = true;
+    }
+}
 
 $estados = ["pendiente" => "Pendiente", "confirmada" => "Confirmada", "checkin" => "En el hotel",
     "checkout" => "Finalizada", "cancelada" => "Cancelada", "no_show" => "No llegó"];
@@ -24,7 +35,9 @@ hero(
 ?>
 <main class="container py-4 py-lg-5">
     <?php if (!$reserva) : ?>
-        <?php if ($buscado) : ?>
+        <?php if ($limiteSuperado) : ?>
+            <div class="alert alert-warning">Hiciste demasiadas búsquedas seguidas. Espera un momento y vuelve a intentar.</div>
+        <?php elseif ($buscado) : ?>
             <div class="alert alert-warning">No encontramos ninguna reserva con ese código y ese documento. Verifica ambos datos.</div>
         <?php endif ?>
         <section class="sa-card sa-card-cuerpo mx-auto" style="max-width: 32rem">

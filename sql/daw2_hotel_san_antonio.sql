@@ -310,6 +310,17 @@ CREATE TABLE mensaje_contacto (
     created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
+-- Limite de intentos por IP en consultas/formularios publicos sensibles (evita fuerza bruta y
+-- spam). No guarda quien es la persona, solo su IP, la accion y cuando. Las filas viejas se
+-- borran solas (ver Dao\LimiteIntento::limpiarAntiguos), no hay tarea programada en el proyecto.
+CREATE TABLE limite_intento (
+    id         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    ip         VARCHAR(45)  NOT NULL,
+    accion     VARCHAR(40)  NOT NULL,
+    creado_en  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_limite (ip, accion, creado_en)
+) ENGINE=InnoDB;
+
 -- ---------------------------------------------------------------------
 -- VISTAS: valores calculados (asi las tablas se mantienen en 3FN)
 -- ---------------------------------------------------------------------
