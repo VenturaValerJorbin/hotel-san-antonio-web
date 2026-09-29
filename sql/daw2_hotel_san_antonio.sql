@@ -13,6 +13,11 @@ DROP DATABASE IF EXISTS daw2_hotel_san_antonio;
 CREATE DATABASE daw2_hotel_san_antonio CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE daw2_hotel_san_antonio;
 
+-- Fuerza utf8mb4 en esta sesion sin importar la codificacion por defecto de quien importe el
+-- archivo (phpMyAdmin, la terminal de MySQL, etc.). Sin esto, un cliente con otra codificacion
+-- por defecto puede guardar mal las tildes y enies de los datos de ejemplo.
+SET NAMES utf8mb4;
+
 -- ---------------------------------------------------------------------
 -- HABITACIONES
 -- ---------------------------------------------------------------------
