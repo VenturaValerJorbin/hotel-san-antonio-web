@@ -69,7 +69,8 @@ hero(
                 <dt class="col-6 fw-normal text-muted">Ingreso</dt><dd class="col-6 text-end"><?= fechaLarga($reserva["fecha_ingreso"]) ?></dd>
                 <dt class="col-6 fw-normal text-muted">Salida</dt><dd class="col-6 text-end"><?= fechaLarga($reserva["fecha_salida"]) ?></dd>
                 <dt class="col-6 fw-normal text-muted">Estadía</dt><dd class="col-6 text-end"><?= (int) $reserva["noches"] ?> <?= (int) $reserva["noches"] === 1 ? "noche" : "noches" ?></dd>
-                <dt class="col-6 fw-normal text-muted">Tarifa por noche</dt><dd class="col-6 text-end"><?= soles($reserva["precio_noche"]) ?></dd>
+                <dt class="col-6 fw-normal text-muted">Plan de alimentación</dt><dd class="col-6 text-end"><?= e($reserva["plan_pension"]) ?></dd>
+                <dt class="col-6 fw-normal text-muted">Tarifa por noche</dt><dd class="col-6 text-end"><?= soles($reserva["precio_noche"] + $reserva["precio_plan_pension"]) ?></dd>
             </dl>
 
             <h3 class="h6 text-muted">Pago</h3>

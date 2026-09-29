@@ -137,26 +137,43 @@ CREATE TABLE producto (
 -- ---------------------------------------------------------------------
 -- RESERVAS Y PAGOS
 -- ---------------------------------------------------------------------
+-- Plan de pension (regimen alimenticio): igual que en cualquier sistema hotelero real, el huesped
+-- elige cuantas comidas quiere incluidas en su estadia. Con media pension o pension completa puede
+-- pedir cualquier plato de la carta (no un menu fijo): no se factura plato por plato, ya esta
+-- pagado por noche en la reserva. El precio se suma por noche (no por huesped: la reserva no pide
+-- cuantos son en el grupo).
+CREATE TABLE plan_pension (
+    id                INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    nombre            VARCHAR(40)  NOT NULL,
+    descripcion       VARCHAR(200) NULL,
+    precio_por_noche  DECIMAL(6,2) NOT NULL DEFAULT 0,   -- precios de ejemplo, por confirmar con el hotel
+    orden             TINYINT UNSIGNED NOT NULL DEFAULT 0,
+    activo            TINYINT(1)   NOT NULL DEFAULT 1
+) ENGINE=InnoDB;
+
 CREATE TABLE reserva (
-    id               INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    codigo           VARCHAR(12)  NOT NULL UNIQUE,
-    huesped_id       INT UNSIGNED NOT NULL,
-    habitacion_id    INT UNSIGNED NOT NULL,
-    fecha_ingreso    DATE         NOT NULL,
-    fecha_salida     DATE         NOT NULL,
-    num_huespedes    TINYINT UNSIGNED NOT NULL DEFAULT 1,
-    precio_noche     DECIMAL(8,2) NOT NULL,             -- foto del precio al reservar
-    monto_descuento  DECIMAL(9,2) NOT NULL DEFAULT 0,   -- descuento por canje de puntos
-    monto_adelanto   DECIMAL(9,2) NOT NULL,             -- lo que se cobra online al reservar
-    modalidad_pago   ENUM('completo','fraccionado') NOT NULL DEFAULT 'completo',
-    estado           ENUM('pendiente','confirmada','checkin','checkout','cancelada','no_show') NOT NULL DEFAULT 'pendiente',
-    observaciones    VARCHAR(255) NULL,
-    usuario_id       INT UNSIGNED NULL,
-    created_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_reserva_huesped    FOREIGN KEY (huesped_id)    REFERENCES huesped(id),
-    CONSTRAINT fk_reserva_habitacion FOREIGN KEY (habitacion_id) REFERENCES habitacion(id),
-    CONSTRAINT fk_reserva_usuario    FOREIGN KEY (usuario_id)    REFERENCES usuario(id),
+    id                   INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    codigo               VARCHAR(12)  NOT NULL UNIQUE,
+    huesped_id           INT UNSIGNED NOT NULL,
+    habitacion_id        INT UNSIGNED NOT NULL,
+    fecha_ingreso        DATE         NOT NULL,
+    fecha_salida         DATE         NOT NULL,
+    num_huespedes        TINYINT UNSIGNED NOT NULL DEFAULT 1,
+    precio_noche         DECIMAL(8,2) NOT NULL,             -- foto del precio al reservar
+    plan_pension_id      INT UNSIGNED NOT NULL DEFAULT 1,   -- 1 = Solo alojamiento
+    precio_plan_pension  DECIMAL(6,2) NOT NULL DEFAULT 0,   -- foto del precio del plan al reservar
+    monto_descuento      DECIMAL(9,2) NOT NULL DEFAULT 0,   -- descuento por canje de puntos
+    monto_adelanto       DECIMAL(9,2) NOT NULL,             -- lo que se cobra online al reservar
+    modalidad_pago       ENUM('completo','fraccionado') NOT NULL DEFAULT 'completo',
+    estado               ENUM('pendiente','confirmada','checkin','checkout','cancelada','no_show') NOT NULL DEFAULT 'pendiente',
+    observaciones        VARCHAR(255) NULL,
+    usuario_id           INT UNSIGNED NULL,
+    created_at           TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at           TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_reserva_huesped     FOREIGN KEY (huesped_id)      REFERENCES huesped(id),
+    CONSTRAINT fk_reserva_habitacion  FOREIGN KEY (habitacion_id)   REFERENCES habitacion(id),
+    CONSTRAINT fk_reserva_usuario     FOREIGN KEY (usuario_id)      REFERENCES usuario(id),
+    CONSTRAINT fk_reserva_plan_pension FOREIGN KEY (plan_pension_id) REFERENCES plan_pension(id),
     CONSTRAINT ck_reserva_fechas CHECK (fecha_salida > fecha_ingreso),
     INDEX idx_reserva_fechas (habitacion_id, fecha_ingreso, fecha_salida)
 ) ENGINE=InnoDB;
@@ -293,11 +310,11 @@ CREATE TABLE mensaje_contacto (
 -- ---------------------------------------------------------------------
 CREATE VIEW vista_reserva AS
 SELECT r.*,
-       DATEDIFF(r.fecha_salida, r.fecha_ingreso)                              AS noches,
-       DATEDIFF(r.fecha_salida, r.fecha_ingreso) * r.precio_noche - r.monto_descuento AS monto_total,
-       COALESCE(p.pagado, 0)                                                  AS monto_pagado,
-       DATEDIFF(r.fecha_salida, r.fecha_ingreso) * r.precio_noche - r.monto_descuento
-           - COALESCE(p.pagado, 0)                                            AS saldo_pendiente
+       DATEDIFF(r.fecha_salida, r.fecha_ingreso)                                                     AS noches,
+       DATEDIFF(r.fecha_salida, r.fecha_ingreso) * (r.precio_noche + r.precio_plan_pension) - r.monto_descuento AS monto_total,
+       COALESCE(p.pagado, 0)                                                                         AS monto_pagado,
+       DATEDIFF(r.fecha_salida, r.fecha_ingreso) * (r.precio_noche + r.precio_plan_pension) - r.monto_descuento
+           - COALESCE(p.pagado, 0)                                                                   AS saldo_pendiente
 FROM reserva r
 LEFT JOIN (SELECT reserva_id, SUM(monto) AS pagado
            FROM pago WHERE estado = 'aprobado' GROUP BY reserva_id) p ON p.reserva_id = r.id;
@@ -437,6 +454,13 @@ INSERT INTO foto_tipo_habitacion (tipo_id, ruta, orden) VALUES
 INSERT INTO parametro (clave, valor, descripcion) VALUES
 ('soles_por_punto',   '10', 'Soles gastados por cada punto ganado'),
 ('puntos_bienvenida', '0',  'Puntos otorgados al registrarse un huesped nuevo');
+
+-- Planes de pension (regimen alimenticio). Precios de ejemplo, por confirmar con el hotel.
+INSERT INTO plan_pension (nombre, descripcion, precio_por_noche, orden) VALUES
+('Solo alojamiento', 'Solo la habitacion, sin comidas incluidas.', 0.00, 1),
+('Alojamiento y desayuno', 'Incluye el desayuno para los huespedes de la habitacion.', 15.00, 2),
+('Media pension', 'Desayuno y una comida mas (almuerzo o cena, a eleccion), cualquier plato de la carta.', 35.00, 3),
+('Pension completa', 'Desayuno, almuerzo y cena incluidos, cualquier plato de la carta.', 55.00, 4);
 
 INSERT INTO categoria_producto (nombre) VALUES ('Menú del día'),('Platos a la carta'),('Desayunos');
 

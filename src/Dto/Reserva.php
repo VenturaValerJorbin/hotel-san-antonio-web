@@ -18,7 +18,8 @@ class Reserva
         public float $montoPagado = 0,
         public float $saldoPendiente = 0,
         public string $modalidadPago = "completo",
-        public string $estado = "pendiente"
+        public string $estado = "pendiente",
+        public string $planPension = "Solo alojamiento"
     ) {
     }
 }

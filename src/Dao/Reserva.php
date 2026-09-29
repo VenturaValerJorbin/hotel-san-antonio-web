@@ -51,9 +51,11 @@ class Reserva extends Dao
     {
         $stmt = $this->conn->prepare(
             "INSERT INTO reserva (codigo, huesped_id, habitacion_id, fecha_ingreso, fecha_salida,
-                                  num_huespedes, precio_noche, monto_adelanto, modalidad_pago, estado)
+                                  num_huespedes, precio_noche, plan_pension_id, precio_plan_pension,
+                                  monto_adelanto, modalidad_pago, estado)
              VALUES (:codigo, :huesped_id, :habitacion_id, :fecha_ingreso, :fecha_salida,
-                     :num_huespedes, :precio_noche, :monto_adelanto, :modalidad_pago, :estado)"
+                     :num_huespedes, :precio_noche, :plan_pension_id, :precio_plan_pension,
+                     :monto_adelanto, :modalidad_pago, :estado)"
         );
         $this->enlazar($stmt, [
             ":codigo" => $d["codigo"],
@@ -63,6 +65,8 @@ class Reserva extends Dao
             ":fecha_salida" => $d["fecha_salida"],
             ":num_huespedes" => $d["num_huespedes"],
             ":precio_noche" => $d["precio_noche"],
+            ":plan_pension_id" => $d["plan_pension_id"],
+            ":precio_plan_pension" => $d["precio_plan_pension"],
             ":monto_adelanto" => $d["monto_adelanto"],
             ":modalidad_pago" => $d["modalidad_pago"],
             ":estado" => $d["estado"],
@@ -92,12 +96,14 @@ class Reserva extends Dao
 
         $stmt = $this->conn->prepare(
             "SELECT v.id, v.codigo, hu.nombre_completo AS huesped, hu.numero_documento,
-                    hab.numero AS habitacion, t.nombre AS tipo, v.fecha_ingreso, v.fecha_salida, v.noches,
+                    hab.numero AS habitacion, t.nombre AS tipo, pp.nombre AS plan_pension,
+                    v.fecha_ingreso, v.fecha_salida, v.noches,
                     v.monto_total, v.monto_pagado, v.saldo_pendiente, v.modalidad_pago, v.estado
              FROM vista_reserva v
              JOIN huesped hu ON hu.id = v.huesped_id
              JOIN habitacion hab ON hab.id = v.habitacion_id
-             JOIN tipo_habitacion t ON t.id = hab.tipo_id"
+             JOIN tipo_habitacion t ON t.id = hab.tipo_id
+             JOIN plan_pension pp ON pp.id = v.plan_pension_id"
             . ($donde ? " WHERE " . implode(" AND ", $donde) : "") .
             " ORDER BY v.fecha_ingreso DESC, v.id DESC"
         );
@@ -145,11 +151,12 @@ class Reserva extends Dao
     {
         $stmt = $this->conn->prepare(
             "SELECT v.*, hu.nombre_completo, hu.tipo_documento, hu.numero_documento, hu.telefono, hu.correo,
-                    hab.numero AS habitacion, hab.tipo_id, t.nombre AS tipo
+                    hab.numero AS habitacion, hab.tipo_id, t.nombre AS tipo, pp.nombre AS plan_pension
              FROM vista_reserva v
              JOIN huesped hu ON hu.id = v.huesped_id
              JOIN habitacion hab ON hab.id = v.habitacion_id
              JOIN tipo_habitacion t ON t.id = hab.tipo_id
+             JOIN plan_pension pp ON pp.id = v.plan_pension_id
              WHERE v.id = :id"
         );
         $this->enlazar($stmt, [":id" => $id]);
@@ -163,11 +170,12 @@ class Reserva extends Dao
     {
         $stmt = $this->conn->prepare(
             "SELECT v.*, hu.nombre_completo, hu.tipo_documento, hu.numero_documento, hu.telefono, hu.correo,
-                    hab.numero AS habitacion, hab.piso, t.nombre AS tipo
+                    hab.numero AS habitacion, hab.piso, t.nombre AS tipo, pp.nombre AS plan_pension
              FROM vista_reserva v
              JOIN huesped hu ON hu.id = v.huesped_id
              JOIN habitacion hab ON hab.id = v.habitacion_id
              JOIN tipo_habitacion t ON t.id = hab.tipo_id
+             JOIN plan_pension pp ON pp.id = v.plan_pension_id
              WHERE v.codigo = :codigo AND hu.numero_documento = :documento"
         );
         $this->enlazar($stmt, [":codigo" => $codigo, ":documento" => $numeroDocumento]);

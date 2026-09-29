@@ -82,7 +82,10 @@ $acciones = function ($r) {
     <?php foreach ($reservas as $r) : ?>
         <article class="sa-card sa-card-cuerpo mb-2">
             <div class="d-flex justify-content-between"><strong><?= e($r->huesped) ?></strong><span class="pill pill-<?= e($r->estado) ?>"><?= e($estados[$r->estado] ?? $r->estado) ?></span></div>
-            <div class="small text-muted"><?= e($r->tipo) ?> · Hab. <?= e($r->habitacion) ?> · <?= e($r->codigo) ?></div>
+            <div class="small text-muted">
+                <?= e($r->tipo) ?> · Hab. <?= e($r->habitacion) ?> · <?= e($r->codigo) ?>
+                <?php if ($r->planPension !== "Solo alojamiento") : ?> · <?= e($r->planPension) ?><?php endif ?>
+            </div>
             <div class="small my-2"><i class="bi bi-calendar3"></i> <?= fechaLarga($r->fechaIngreso) ?> → <?= fechaLarga($r->fechaSalida) ?></div>
             <div class="d-flex justify-content-between align-items-center"><?= $pago($r) ?><span><?php $acciones($r) ?></span></div>
         </article>
@@ -100,7 +103,10 @@ $acciones = function ($r) {
                 <?php foreach ($reservas as $r) : ?>
                     <tr>
                         <td><?= e($r->huesped) ?><br><small class="text-muted"><?= e($r->documento) ?> · <?= e($r->codigo) ?></small></td>
-                        <td><?= e($r->tipo) ?><br><small class="text-muted">Hab. <?= e($r->habitacion) ?></small></td>
+                        <td>
+                            <?= e($r->tipo) ?><br><small class="text-muted">Hab. <?= e($r->habitacion) ?></small>
+                            <?php if ($r->planPension !== "Solo alojamiento") : ?><br><small class="text-muted"><?= e($r->planPension) ?></small><?php endif ?>
+                        </td>
                         <td><?= fechaLarga($r->fechaIngreso) ?></td>
                         <td><?= fechaLarga($r->fechaSalida) ?></td>
                         <td><span class="pill pill-<?= e($r->estado) ?>"><?= e($estados[$r->estado] ?? $r->estado) ?></span></td>

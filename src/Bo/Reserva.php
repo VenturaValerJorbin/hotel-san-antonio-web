@@ -8,9 +8,11 @@ use App\Dao\Huesped as HuespedDAO;
 use App\Dao\MovimientoPuntos as MovimientoPuntosDAO;
 use App\Dao\Pago as PagoDAO;
 use App\Dao\Parametro as ParametroDAO;
+use App\Dao\PlanPension as PlanPensionDAO;
 use App\Dao\Recompensa as RecompensaDAO;
 use App\Dao\Reserva as ReservaDAO;
 use App\Dao\TipoHabitacion as TipoHabitacionDAO;
+use App\Dto\PlanPension as PlanPensionDTO;
 use App\Dto\Reserva as ReservaDTO;
 
 // BO de reservas: reglas del hotel (disponibilidad, puntos, pago 100 % o 50 %)
@@ -43,7 +45,7 @@ class Reserva
             fn($f) => new ReservaDTO(
                 $f["id"], $f["codigo"], $f["huesped"], $f["numero_documento"], $f["habitacion"], $f["tipo"],
                 $f["fecha_ingreso"], $f["fecha_salida"], $f["noches"], $f["monto_total"], $f["monto_pagado"],
-                $f["saldo_pendiente"], $f["modalidad_pago"], $f["estado"]
+                $f["saldo_pendiente"], $f["modalidad_pago"], $f["estado"], $f["plan_pension"]
             ),
             (new ReservaDAO())->listar($filtros)
         );
@@ -58,6 +60,15 @@ class Reserva
     public function beneficioFraccionado(): ?array
     {
         return (new RecompensaDAO())->obtenerPorTipo("pago_fraccionado");
+    }
+
+    // Planes de pension (solo alojamiento, desayuno, media pension, pension completa), para el formulario
+    public function planesPension(): array
+    {
+        return array_map(
+            fn($p) => new PlanPensionDTO((int) $p["id"], $p["nombre"], $p["descripcion"] ?? "", (float) $p["precio_por_noche"]),
+            (new PlanPensionDAO())->listar()
+        );
     }
 
     // Datos de una reserva y habitaciones que se le pueden asignar (pantalla de check-in)
@@ -125,6 +136,9 @@ class Reserva
                         : "No hay habitaciones {$tipo['nombre']} disponibles en esas fechas."
                 );
 
+            $plan = (new PlanPensionDAO($conn))->obtener((int) $d["plan_pension_id"])
+                ?? throw new \DomainException("El plan de alimentacion elegido no existe.");
+
             $huespedDao = new HuespedDAO($conn);
             $huesped = $huespedDao->buscarPorDocumento($d["tipo_documento"], $d["numero_documento"]);
             if ($huesped) {
@@ -134,9 +148,11 @@ class Reserva
                 $huespedId = $huespedDao->insertar($d);
             }
 
-            // Montos: el total se calcula, el adelanto depende de la modalidad elegida
+            // Montos: el total se calcula, el adelanto depende de la modalidad elegida.
+            // El plan de pension se suma por noche (no por huesped: la reserva hoy no pide cuantos son).
             $noches = (new \DateTime($d["fecha_ingreso"]))->diff(new \DateTime($d["fecha_salida"]))->days;
-            $total = round($noches * $tipo["precio_noche"], 2);
+            $precioPorNoche = $tipo["precio_noche"] + $plan["precio_por_noche"];
+            $total = round($noches * $precioPorNoche, 2);
             $fraccionado = $d["modalidad_pago"] === "fraccionado";
             $adelanto = $fraccionado ? $this->adelantoFraccionado($conn, $huespedId, $total) : $total;
 
@@ -150,6 +166,8 @@ class Reserva
                 "fecha_salida" => $d["fecha_salida"],
                 "num_huespedes" => $d["num_huespedes"],
                 "precio_noche" => $tipo["precio_noche"],
+                "plan_pension_id" => $plan["id"],
+                "precio_plan_pension" => $plan["precio_por_noche"],
                 "monto_adelanto" => $adelanto,
                 "modalidad_pago" => $d["modalidad_pago"],
                 "estado" => "confirmada",

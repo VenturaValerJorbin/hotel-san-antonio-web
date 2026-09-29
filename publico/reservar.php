@@ -5,8 +5,10 @@ use App\Bo\Habitacion as HabitacionBO;
 use App\Bo\Reserva as ReservaBO;
 
 $titulo = "Reservar";
+$reservaBo = new ReservaBO();
 $tipos = (new HabitacionBO())->tipos();
-$beneficio = (new ReservaBO())->beneficioFraccionado();
+$beneficio = $reservaBo->beneficioFraccionado();
+$planes = $reservaBo->planesPension();
 
 require __DIR__ . "/../views/partes/cabecera.php";
 /** @var array $hotel Datos del hotel (los crea views/partes/ayudas.php) */
@@ -33,6 +35,8 @@ foreach ($tipos as $t) {
     }
 }
 $porcentaje = $beneficio ? (float) $beneficio["valor"] : 50;
+// Plan de pension: sin eleccion previa, se ofrece el primero (Solo alojamiento)
+$planElegido = (int) $valor("plan_pension_id", $planes[0]->id ?? 0);
 
 hero(
     "Reserva tu habitación",
@@ -74,6 +78,19 @@ hero(
                                 <?php endforeach ?>
                             </select>
                             <?= $mensaje("piso") ?>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label requerido" for="plan_pension_id">Plan de alimentación</label>
+                            <select class="form-select<?= $claseError("plan_pension_id") ?>" id="plan_pension_id" name="plan_pension_id" required>
+                                <?php foreach ($planes as $p) : ?>
+                                    <option value="<?= $p->id ?>" data-precio="<?= $p->precioPorNoche ?>" data-descripcion="<?= e($p->descripcion) ?>"
+                                        <?= $planElegido === $p->id ? "selected" : "" ?>>
+                                        <?= e($p->nombre) ?><?= $p->precioPorNoche > 0 ? " (+" . soles($p->precioPorNoche) . " por noche)" : "" ?>
+                                    </option>
+                                <?php endforeach ?>
+                            </select>
+                            <div class="form-text" id="planDescripcion"></div>
+                            <?= $mensaje("plan_pension_id") ?>
                         </div>
                         <div class="col-12 col-sm-6">
                             <label class="form-label requerido" for="fecha_ingreso">Fecha de ingreso</label>
@@ -187,6 +204,7 @@ hero(
                         <dt class="col-6 fw-normal text-muted">Ingreso</dt><dd class="col-6 text-end" id="r_ingreso">—</dd>
                         <dt class="col-6 fw-normal text-muted">Salida</dt><dd class="col-6 text-end" id="r_salida">—</dd>
                         <dt class="col-6 fw-normal text-muted">Estadía</dt><dd class="col-6 text-end" id="r_noches">—</dd>
+                        <dt class="col-6 fw-normal text-muted">Plan de alimentación</dt><dd class="col-6 text-end" id="r_plan">—</dd>
                         <dt class="col-6 fw-normal text-muted">Tarifa por noche</dt><dd class="col-6 text-end" id="r_tarifa">S/ 0.00</dd>
                     </dl>
                     <hr>

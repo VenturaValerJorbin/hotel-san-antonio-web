@@ -63,6 +63,7 @@ $asignada = (int) ($antiguo["habitacion_id"] ?? $r["habitacion_id"]);
                     <div class="col-6"><label class="form-label">Salida</label><input class="form-control" value="<?= fechaLarga($r["fecha_salida"]) ?>" readonly></div>
                 </div>
                 <div class="mb-3"><label class="form-label">Tipo de habitación</label><input class="form-control" value="<?= e($r["tipo"]) ?>" readonly></div>
+                <div class="mb-3"><label class="form-label">Plan de alimentación</label><input class="form-control" value="<?= e($r["plan_pension"]) ?>" readonly></div>
                 <div class="mb-3">
                     <label class="form-label requerido" for="habitacion_id">Habitación asignada</label>
                     <select class="form-select" id="habitacion_id" name="habitacion_id" <?= $puedeIngresar ? "" : "disabled" ?> required>
@@ -83,7 +84,7 @@ $asignada = (int) ($antiguo["habitacion_id"] ?? $r["habitacion_id"]);
             <section class="sa-card sa-card-cuerpo h-100">
                 <h2 class="h5"><i class="bi bi-receipt text-danger"></i> Resumen de la estadía</h2>
                 <dl class="row mb-0">
-                    <dt class="col-7 fw-normal text-muted">Precio por noche</dt><dd class="col-5 text-end"><?= soles($r["precio_noche"]) ?></dd>
+                    <dt class="col-7 fw-normal text-muted">Precio por noche</dt><dd class="col-5 text-end"><?= soles($r["precio_noche"] + $r["precio_plan_pension"]) ?></dd>
                     <dt class="col-7 fw-normal text-muted">Noches</dt><dd class="col-5 text-end"><?= (int) $r["noches"] ?></dd>
                     <dt class="col-7">Total</dt><dd class="col-5 text-end fw-bold"><?= soles($r["monto_total"]) ?></dd>
                     <dt class="col-7 fw-normal text-muted">Pagado en línea</dt><dd class="col-5 text-end text-success"><?= soles($r["monto_pagado"]) ?></dd>

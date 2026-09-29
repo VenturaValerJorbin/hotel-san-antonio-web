@@ -17,7 +17,10 @@
 
         const actualizar = () => {
             const opcion = $("tipo_id").selectedOptions[0];
-            const precio = parseFloat(opcion?.dataset.precio || 0);
+            const opcionPlan = $("plan_pension_id").selectedOptions[0];
+            const precioHabitacion = parseFloat(opcion?.dataset.precio || 0);
+            const precioPlan = parseFloat(opcionPlan?.dataset.precio || 0);
+            const precio = precioHabitacion + precioPlan;
             const n = noches();
             const total = precio * n;
             const fraccionado = $("modalidad_pago").value === "fraccionado";
@@ -28,6 +31,8 @@
             $("r_ingreso").textContent = $("fecha_ingreso").value || "—";
             $("r_salida").textContent = $("fecha_salida").value || "—";
             $("r_noches").textContent = n ? n + (n === 1 ? " noche" : " noches") : "—";
+            $("r_plan").textContent = opcionPlan ? opcionPlan.textContent.trim() : "—";
+            $("planDescripcion").textContent = opcionPlan?.dataset.descripcion || "";
             $("r_tarifa").textContent = soles(precio);
             $("r_total").textContent = soles(total);
             $("r_ahora_txt").textContent = fraccionado ? "Pagas ahora (" + porcentaje + " %)" : "Pagas ahora (100 %)";

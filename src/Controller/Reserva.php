@@ -33,6 +33,7 @@ class Reserva extends Controlador
             "fecha_salida" => $p["fecha_salida"] ?? "",
             "num_huespedes" => 1,
             "piso" => (int) ($p["piso"] ?? 0),   // 0 = sin preferencia
+            "plan_pension_id" => (int) ($p["plan_pension_id"] ?? 0),
             // El huesped elige el tipo; cada uno tiene su propio formato valido (ver validar())
             "tipo_documento" => $p["tipo_documento"] ?? "",
             "numero_documento" => $documento,
@@ -114,6 +115,9 @@ class Reserva extends Controlador
         }
         if ($d["piso"] < 0 || $d["piso"] > 9) {
             $e["piso"] = "Elige un piso valido.";
+        }
+        if ($d["plan_pension_id"] <= 0) {
+            $e["plan_pension_id"] = "Elige un plan de alimentacion.";
         }
         if (!$this->fechaValida($d["fecha_ingreso"]) || $d["fecha_ingreso"] < $hoy) {
             $e["fecha_ingreso"] = "Ingresa una fecha de llegada valida (hoy o posterior).";
