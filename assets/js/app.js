@@ -20,7 +20,7 @@
             const precio = parseFloat(opcion?.dataset.precio || 0);
             const n = noches();
             const total = precio * n;
-            const fraccionado = form.querySelector("input[name=modalidad_pago]:checked")?.value === "fraccionado";
+            const fraccionado = $("modalidad_pago").value === "fraccionado";
             const ahora = fraccionado ? Math.round(total * porcentaje) / 100 : total;
 
             $("r_habitacion").textContent = opcion?.value ? opcion.dataset.nombre : "—";
@@ -72,7 +72,7 @@
             tipo_documento: $("tipo_documento").value,
             numero_documento: $("numero_documento").value.trim().toUpperCase(),
             telefono: $("telefono").value.trim(),
-            modalidad_pago: form.querySelector("input[name=modalidad_pago]:checked")?.value || "",
+            modalidad_pago: $("modalidad_pago").value,
             metodo_pago: form.querySelector("input[name=metodo_pago]:checked")?.value || "",
             acepta: $("acepta").checked,
         });
@@ -110,7 +110,7 @@
             return !mensaje;
         };
 
-        const validarCampo = (campo) => !mostrarError(campo, reglas[campo](leerDatos()));
+        const validarCampo = (campo) => mostrarError(campo, reglas[campo](leerDatos()));
 
         // Ajusta el marcador segun el tipo de documento elegido (DNI: 8 digitos, pasaporte: hasta 12)
         const actualizarDocumento = () => {
@@ -125,8 +125,9 @@
         ["tipo_id", "fecha_ingreso", "fecha_salida", "nombre_completo", "numero_documento", "telefono"].forEach((campo) => {
             $(campo).addEventListener("input", () => { if ($(campo).classList.contains("is-invalid")) validarCampo(campo); });
         });
-        form.querySelectorAll("input[name=modalidad_pago], input[name=metodo_pago]").forEach((radio) => {
-            radio.addEventListener("change", () => validarCampo(radio.name));
+        $("modalidad_pago").addEventListener("change", () => validarCampo("modalidad_pago"));
+        form.querySelectorAll("input[name=metodo_pago]").forEach((radio) => {
+            radio.addEventListener("change", () => validarCampo("metodo_pago"));
         });
         $("acepta").addEventListener("change", () => validarCampo("acepta"));
 
@@ -143,6 +144,112 @@
                 el?.focus();
             }
         });
+
+        // ---- Verificar puntos: el pago fraccionado solo se habilita si el documento realmente
+        // tiene los puntos necesarios (el servidor vuelve a comprobarlo igual al confirmar) ----
+        const selectModalidad = $("modalidad_pago");
+        const opcionFraccionada = selectModalidad.querySelector('option[value="fraccionado"]');
+        const btnVerificar = $("btnVerificarPuntos");
+        const linkVerPuntos = $("linkVerPuntos");
+
+        const actualizarLinkPuntos = () => {
+            if (!linkVerPuntos) return;
+            const numero = $("numero_documento").value.trim();
+            const base = linkVerPuntos.dataset.base + "#consulta";
+            linkVerPuntos.href = numero
+                ? base.replace("#consulta", "?tipo_documento=" + encodeURIComponent($("tipo_documento").value)
+                    + "&numero_documento=" + encodeURIComponent(numero) + "#consulta")
+                : base;
+        };
+        actualizarLinkPuntos();
+        $("tipo_documento").addEventListener("change", actualizarLinkPuntos);
+        $("numero_documento").addEventListener("input", actualizarLinkPuntos);
+
+        if (opcionFraccionada && btnVerificar) {
+            const resultado = $("resultadoVerificacion");
+            const puntosNecesarios = parseInt(opcionFraccionada.dataset.puntosRequeridos || "0", 10);
+
+            const invalidarVerificacion = () => {
+                opcionFraccionada.disabled = true;
+                if (selectModalidad.value === "fraccionado") { selectModalidad.value = "completo"; actualizar(); }
+                resultado.textContent = "";
+            };
+            $("tipo_documento").addEventListener("change", invalidarVerificacion);
+            $("numero_documento").addEventListener("input", invalidarVerificacion);
+
+            btnVerificar.addEventListener("click", async () => {
+                if (!validarCampo("tipo_documento") || !validarCampo("numero_documento")) {
+                    resultado.className = "small text-danger";
+                    resultado.textContent = "Revisa tu tipo y número de documento antes de verificar.";
+                    return;
+                }
+                const tipoDocumento = $("tipo_documento").value;
+                const numeroDocumento = $("numero_documento").value.trim();
+                resultado.className = "small text-muted";
+                resultado.textContent = "Verificando…";
+                btnVerificar.disabled = true;
+                try {
+                    const url = form.dataset.consultaPuntos + "?tipo_documento=" + encodeURIComponent(tipoDocumento)
+                        + "&numero_documento=" + encodeURIComponent(numeroDocumento);
+                    const respuesta = await fetch(url);
+                    const datos = await respuesta.json();
+                    if (!respuesta.ok || !datos.ok) throw new Error();
+                    const alcanza = datos.encontrado && datos.puntos >= puntosNecesarios;
+                    opcionFraccionada.disabled = !alcanza;
+                    resultado.className = "small " + (alcanza ? "text-success" : "text-muted");
+                    resultado.textContent = datos.encontrado
+                        ? "Tienes " + datos.puntos + " puntos."
+                            + (alcanza ? " Ya puedes elegir el pago fraccionado." : " Necesitas " + puntosNecesarios + " puntos.")
+                        : "No encontramos estadías previas con ese documento. Empiezas con 0 puntos.";
+                } catch {
+                    resultado.className = "small text-danger";
+                    resultado.textContent = "No se pudo verificar. Intenta nuevamente.";
+                } finally {
+                    btnVerificar.disabled = false;
+                }
+            });
+        }
+    }
+
+    // ---- Consulta de puntos (publico/puntos.php): el huesped ve su saldo con su documento ----
+    const formConsulta = document.getElementById("formConsultaPuntos");
+    if (formConsulta) {
+        const tipoSel = document.getElementById("consulta_tipo_documento");
+        const numInput = document.getElementById("consulta_numero_documento");
+        const resultado = document.getElementById("resultadoConsultaPuntos");
+        const url = formConsulta.dataset.consulta;
+
+        const consultar = async () => {
+            const tipo = tipoSel.value;
+            const numero = numInput.value.trim().toUpperCase();
+            const valido = tipo === "DNI" ? /^\d{8}$/.test(numero) : /^(?=.*[A-Z])[A-Z0-9]{6,12}$/.test(numero);
+            if (!valido) {
+                resultado.innerHTML = '<div class="text-danger small">Ingresa un '
+                    + (tipo === "DNI" ? "DNI de 8 dígitos" : "pasaporte válido (6 a 12 letras o números, con al menos una letra)") + ".</div>";
+                return;
+            }
+            resultado.innerHTML = '<div class="text-muted small">Consultando…</div>';
+            try {
+                const respuesta = await fetch(url + "?tipo_documento=" + encodeURIComponent(tipo) + "&numero_documento=" + encodeURIComponent(numero));
+                const datos = await respuesta.json();
+                if (!respuesta.ok || !datos.ok) throw new Error();
+                resultado.innerHTML = datos.encontrado
+                    ? '<div class="sa-caja-crema d-inline-block"><span class="sa-nivel-puntos">' + datos.puntos + " <small>puntos</small></span></div>"
+                    : '<div class="sa-caja-crema small d-inline-block">Aún no registramos estadías con ese documento. Empiezas con 0 puntos.</div>';
+            } catch {
+                resultado.innerHTML = '<div class="text-danger small">No se pudo consultar. Intenta nuevamente.</div>';
+            }
+        };
+
+        formConsulta.addEventListener("submit", (evento) => { evento.preventDefault(); consultar(); });
+
+        // Si se llega desde el formulario de reserva con el documento ya escrito, se completa y consulta sola
+        const parametros = new URLSearchParams(location.search);
+        if (parametros.get("numero_documento")) {
+            if (parametros.get("tipo_documento") === "PASAPORTE") tipoSel.value = "PASAPORTE";
+            numInput.value = parametros.get("numero_documento");
+            consultar();
+        }
     }
 
     // ---- Boton "Copiar direccion" ----

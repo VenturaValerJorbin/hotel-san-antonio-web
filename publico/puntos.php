@@ -21,6 +21,29 @@ hero(
 );
 ?>
 <main class="container py-4 py-lg-5">
+    <!-- Consulta de puntos: el huesped ve su saldo con su documento, sin crear cuenta -->
+    <section class="sa-card sa-card-cuerpo mb-5" id="consulta">
+        <h2 class="h4"><i class="bi bi-search-heart text-danger"></i> Consulta tus puntos</h2>
+        <p class="text-muted small mb-3">Ingresa tu documento para ver cuántos puntos tienes acumulados.</p>
+        <form id="formConsultaPuntos" class="row g-2 align-items-end" data-consulta="<?= url("publico/consultar_puntos.php") ?>">
+            <div class="col-6 col-sm-3">
+                <label class="form-label small mb-1" for="consulta_tipo_documento">Tipo de documento</label>
+                <select class="form-select form-select-sm" id="consulta_tipo_documento">
+                    <option value="DNI">DNI</option>
+                    <option value="PASAPORTE">Pasaporte</option>
+                </select>
+            </div>
+            <div class="col-6 col-sm-4">
+                <label class="form-label small mb-1" for="consulta_numero_documento">Número de documento</label>
+                <input class="form-control form-control-sm" id="consulta_numero_documento" placeholder="Ej. 12345678" maxlength="12">
+            </div>
+            <div class="col-12 col-sm-3">
+                <button class="btn-sa btn-sm w-100" type="submit">Consultar</button>
+            </div>
+        </form>
+        <div class="mt-3" id="resultadoConsultaPuntos"></div>
+    </section>
+
     <!-- Como funciona -->
     <div class="sa-subtitulo">Tan simple como hospedarte</div>
     <h2 class="h3">¿Cómo funciona?</h2>

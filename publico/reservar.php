@@ -41,7 +41,8 @@ hero(
 );
 ?>
 <main class="container py-4 py-lg-5">
-    <form id="formReserva" action="<?= url("procesar.php") ?>" method="post" novalidate data-porcentaje="<?= $porcentaje ?>">
+    <form id="formReserva" action="<?= url("procesar.php") ?>" method="post" novalidate data-porcentaje="<?= $porcentaje ?>"
+        data-consulta-puntos="<?= url("publico/consultar_puntos.php") ?>">
         <input type="hidden" name="modulo" value="reserva">
         <input type="hidden" name="accion" value="crear">
 
@@ -120,21 +121,32 @@ hero(
                     <p class="text-muted small">Selecciona cuánto pagar ahora y cómo deseas hacerlo.</p>
 
                     <div class="mb-3">
-                        <div class="form-check mb-1">
-                            <input class="form-check-input" type="radio" name="modalidad_pago" id="m_completo" value="completo" <?= $modalidad === "completo" ? "checked" : "" ?>>
-                            <label class="form-check-label" for="m_completo">Pagar el 100 % ahora</label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="modalidad_pago" id="m_fraccionado" value="fraccionado" <?= $modalidad === "fraccionado" ? "checked" : "" ?>>
-                            <label class="form-check-label" for="m_fraccionado">
-                                Pagar el <?= $porcentaje ?> % ahora y el resto al llegar
-                                <?php if ($beneficio) : ?>
-                                    <span class="badge text-bg-warning">Huéspedes frecuentes · <?= $beneficio["puntos_requeridos"] ?> puntos</span>
-                                <?php endif ?>
-                            </label>
-                        </div>
+                        <label class="form-label requerido" for="modalidad_pago">Modalidad de pago</label>
+                        <select class="form-select<?= $claseError("modalidad_pago") ?>" id="modalidad_pago" name="modalidad_pago" required>
+                            <option value="completo" <?= $modalidad === "completo" ? "selected" : "" ?>>Pagar el 100 % ahora</option>
+                            <?php if ($beneficio) : ?>
+                                <option value="fraccionado" data-puntos-requeridos="<?= (int) $beneficio["puntos_requeridos"] ?>"
+                                    <?= $modalidad === "fraccionado" ? "selected" : "" ?> disabled>
+                                    Pagar el <?= $porcentaje ?> % ahora y el resto al llegar (huéspedes frecuentes)
+                                </option>
+                            <?php endif ?>
+                        </select>
                         <?= $mensaje("modalidad_pago") ?>
-                        <div class="form-text">Acumulas puntos en cada estadía. Se valida con tu DNI o pasaporte al confirmar. <a href="<?= url("publico/puntos.php") ?>">Conoce el programa de puntos</a>.</div>
+
+                        <?php if ($beneficio) : ?>
+                            <div class="sa-caja-crema mt-2 p-3" id="verificarPuntos">
+                                <div class="small fw-bold mb-2"><i class="bi bi-award text-danger"></i> ¿Eres huésped frecuente? Verifica tus puntos para desbloquear el pago del <?= $porcentaje ?> %</div>
+                                <div class="d-flex flex-wrap gap-2 align-items-center">
+                                    <button type="button" class="btn-linea btn-sm" id="btnVerificarPuntos">Verificar mis puntos</button>
+                                    <span class="small" id="resultadoVerificacion"></span>
+                                </div>
+                            </div>
+                        <?php endif ?>
+                        <div class="form-text">
+                            Acumulas puntos en cada estadía.
+                            <a href="<?= url("publico/puntos.php") ?>#consulta" target="_blank" rel="noopener" id="linkVerPuntos" data-base="<?= url("publico/puntos.php") ?>">Consulta tus puntos</a>
+                            o <a href="<?= url("publico/puntos.php") ?>">conoce el programa completo</a>.
+                        </div>
                     </div>
 
                     <div class="row g-2 mb-1">
