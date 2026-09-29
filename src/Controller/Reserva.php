@@ -132,8 +132,10 @@ class Reserva extends Controlador
         if (!in_array($d["tipo_documento"], ["DNI", "PASAPORTE"], true)) {
             $e["tipo_documento"] = "Elige un tipo de documento.";
         } elseif ($d["tipo_documento"] === "DNI") {
-            if (!preg_match('/^\d{8}$/', $d["numero_documento"])) {
-                $e["numero_documento"] = "El DNI debe tener exactamente 8 digitos.";
+            // Ademas del formato, se rechazan los 8 digitos repetidos (00000000, 11111111...):
+            // ningun DNI real es asi, es el truco mas comun para colar un documento inventado.
+            if (!preg_match('/^(?!(\d)\1{7}$)\d{8}$/', $d["numero_documento"])) {
+                $e["numero_documento"] = "Ingresa un DNI real de 8 digitos.";
             }
         } elseif (!preg_match('/^(?=.*[A-Z])[A-Z0-9]{6,12}$/', $d["numero_documento"])) {
             $e["numero_documento"] = "El pasaporte debe tener de 6 a 12 letras o numeros, con al menos una letra.";

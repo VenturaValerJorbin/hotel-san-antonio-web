@@ -103,7 +103,7 @@
                 ? null : "Escribe tu nombre y apellido (solo letras).",
             tipo_documento: (d) => ["DNI", "PASAPORTE"].includes(d.tipo_documento) ? null : "Elige un tipo de documento.",
             numero_documento: (d) => {
-                if (d.tipo_documento === "DNI") return /^\d{8}$/.test(d.numero_documento) ? null : "El DNI debe tener exactamente 8 dígitos.";
+                if (d.tipo_documento === "DNI") return /^(?!(\d)\1{7}$)\d{8}$/.test(d.numero_documento) ? null : "Ingresa un DNI real de 8 dígitos.";
                 if (d.tipo_documento === "PASAPORTE") return /^(?=.*[A-Z])[A-Z0-9]{6,12}$/.test(d.numero_documento) ? null : "El pasaporte debe tener de 6 a 12 letras o números, con al menos una letra.";
                 return null; // el error de tipo_documento ya avisa
             },
@@ -250,10 +250,10 @@
         const consultar = async () => {
             const tipo = tipoSel.value;
             const numero = numInput.value.trim().toUpperCase();
-            const valido = tipo === "DNI" ? /^\d{8}$/.test(numero) : /^(?=.*[A-Z])[A-Z0-9]{6,12}$/.test(numero);
+            const valido = tipo === "DNI" ? /^(?!(\d)\1{7}$)\d{8}$/.test(numero) : /^(?=.*[A-Z])[A-Z0-9]{6,12}$/.test(numero);
             if (!valido) {
                 resultado.innerHTML = '<div class="text-danger small">Ingresa un '
-                    + (tipo === "DNI" ? "DNI de 8 dígitos" : "pasaporte válido (6 a 12 letras o números, con al menos una letra)") + ".</div>";
+                    + (tipo === "DNI" ? "DNI real de 8 dígitos" : "pasaporte válido (6 a 12 letras o números, con al menos una letra)") + ".</div>";
                 return;
             }
             resultado.innerHTML = '<div class="text-muted small">Consultando…</div>';
