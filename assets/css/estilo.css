@@ -234,6 +234,7 @@ a:hover { color: var(--rojo-osc); }
     .panel-contenido { padding: 1.5rem; }
     .sa-hero-foto { background-position: center; }
     .sa-hero-foto-habitaciones { background-position: center; min-height: 26rem; }
+    .sa-hero-foto-restaurante { background-position: center; min-height: 26rem; }
 }
 
 /* ============================================================
@@ -244,6 +245,7 @@ a:hover { color: var(--rojo-osc); }
     .sa-hero-grande { padding: 5rem 0 6rem; }
     .sa-hero-grande h1 { font-size: 3.8rem; }
     .sa-hero-foto-habitaciones { min-height: 32rem; }
+    .sa-hero-foto-restaurante { min-height: 32rem; }
     .panel { display: grid; grid-template-columns: 250px 1fr; min-height: 100vh; }
     .panel-lado { position: sticky; top: 0; height: 100vh; }
     .panel-contenido { padding: 2rem; }
