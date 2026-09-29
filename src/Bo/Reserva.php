@@ -181,6 +181,12 @@ class Reserva
             if ($reserva["estado"] !== "confirmada") {
                 throw new \DomainException("Solo se puede hacer check-in de una reserva confirmada.");
             }
+            if ($reserva["fecha_ingreso"] > date("Y-m-d")) {
+                throw new \DomainException(
+                    "Todavia no es la fecha de ingreso de esta reserva ("
+                    . date("d/m/Y", strtotime($reserva["fecha_ingreso"])) . ")."
+                );
+            }
 
             $libres = $reservaDao->habitacionesLibres(
                 (int) $reserva["tipo_id"], $reserva["fecha_ingreso"], $reserva["fecha_salida"], $id

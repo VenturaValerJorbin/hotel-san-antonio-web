@@ -16,10 +16,15 @@ if (!$r) {
 require __DIR__ . "/../views/partes/panel_cabecera.php";
 /** @var array $antiguo Datos escritos antes de un error (los crea views/partes/ayudas.php) */
 
-$puedeIngresar = $r["estado"] === "confirmada";
+$llegaAntesDeHoy = $r["fecha_ingreso"] > date("Y-m-d");
+$puedeIngresar = $r["estado"] === "confirmada" && !$llegaAntesDeHoy;
 $asignada = (int) ($antiguo["habitacion_id"] ?? $r["habitacion_id"]);
 ?>
 <h1 class="h3 mb-3">Registro de check-in</h1>
+
+<?php if ($r["estado"] === "confirmada" && $llegaAntesDeHoy) : ?>
+    <div class="alert alert-warning">Esta reserva ingresa el <?= fechaLarga($r["fecha_ingreso"]) ?>. El check-in se habilita ese día.</div>
+<?php endif ?>
 
 <section class="sa-card sa-card-cuerpo mb-3">
     <h2 class="h5"><i class="bi bi-file-earmark-text text-warning"></i> Reserva asociada</h2>
