@@ -77,6 +77,7 @@
 
         const leerDatos = () => ({
             tipo_id: $("tipo_id").value,
+            plan_pension_id: $("plan_pension_id").value,
             fecha_ingreso: $("fecha_ingreso").value,
             fecha_salida: $("fecha_salida").value,
             nombre_completo: $("nombre_completo").value.trim(),
@@ -91,6 +92,7 @@
 
         const reglas = {
             tipo_id: (d) => d.tipo_id ? null : "Selecciona una habitación.",
+            plan_pension_id: (d) => d.plan_pension_id ? null : "Elige un plan de alimentación.",
             fecha_ingreso: (d) => (!d.fecha_ingreso || d.fecha_ingreso < hoy) ? "Ingresa una fecha de llegada válida (hoy o posterior)." : null,
             fecha_salida: (d) => {
                 if (!d.fecha_salida || d.fecha_salida <= d.fecha_ingreso) return "La salida debe ser posterior a la llegada.";
@@ -138,6 +140,7 @@
         ["tipo_id", "fecha_ingreso", "fecha_salida", "nombre_completo", "numero_documento", "telefono", "correo"].forEach((campo) => {
             $(campo).addEventListener("input", () => { if ($(campo).classList.contains("is-invalid")) validarCampo(campo); });
         });
+        $("plan_pension_id").addEventListener("change", () => validarCampo("plan_pension_id"));
         $("modalidad_pago").addEventListener("change", () => validarCampo("modalidad_pago"));
         form.querySelectorAll("input[name=metodo_pago]").forEach((radio) => {
             radio.addEventListener("change", () => validarCampo("metodo_pago"));
