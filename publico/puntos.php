@@ -113,7 +113,7 @@ hero(
                 <?php if ($fraccionado) : ?>
                     <li>Con <?= (int) $fraccionado["puntos_requeridos"] ?> puntos pagas solo el <?= (float) $fraccionado["valor"] ?> % al reservar y el resto al llegar al hotel. Este beneficio se mantiene mientras conserves esos puntos.</li>
                 <?php endif ?>
-                <li>Los demás beneficios descuentan sus puntos de tu saldo y se solicitan en recepción.</li>
+                <li>Todos los beneficios son permanentes: si ya tienes los puntos, se aplican solos en cada reserva, sin gastar tu saldo.</li>
                 <li>El pago realizado no es reembolsable, según nuestros <a href="<?= url("publico/terminos.php") ?>">términos y condiciones</a>.</li>
             </ul>
         </div>

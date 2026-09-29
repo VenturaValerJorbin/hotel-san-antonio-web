@@ -13,7 +13,6 @@ $controladores = [
     "habitacion" => \App\Controller\Habitacion::class,
     "reserva" => \App\Controller\Reserva::class,
     "contacto" => \App\Controller\Contacto::class,
-    "puntos" => \App\Controller\Puntos::class,
 ];
 
 $clase = $controladores[$_POST["modulo"] ?? ""] ?? null;

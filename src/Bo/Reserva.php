@@ -153,8 +153,15 @@ class Reserva
             $noches = (new \DateTime($d["fecha_ingreso"]))->diff(new \DateTime($d["fecha_salida"]))->days;
             $precioPorNoche = $tipo["precio_noche"] + $plan["precio_por_noche"];
             $total = round($noches * $precioPorNoche, 2);
+
+            // Beneficios de huesped frecuente: PERMANENTES, se revisan en vivo contra el saldo
+            // actual (no se gastan puntos, igual que el pago fraccionado). Se aplican solos, sin
+            // que nadie tenga que "canjear" nada: si ya tiene los puntos, ya tiene el beneficio.
+            $descuento = $this->descuentoPorPuntos($conn, $huespedId, $total);
+
             $fraccionado = $d["modalidad_pago"] === "fraccionado";
-            $adelanto = $fraccionado ? $this->adelantoFraccionado($conn, $huespedId, $total) : $total;
+            $totalConDescuento = round($total - $descuento, 2);
+            $adelanto = $fraccionado ? $this->adelantoFraccionado($conn, $huespedId, $totalConDescuento) : $totalConDescuento;
 
             $reservaDao = new ReservaDAO($conn);
             $codigo = "SA" . strtoupper(bin2hex(random_bytes(4)));
@@ -168,6 +175,7 @@ class Reserva
                 "precio_noche" => $tipo["precio_noche"],
                 "plan_pension_id" => $plan["id"],
                 "precio_plan_pension" => $plan["precio_por_noche"],
+                "monto_descuento" => $descuento,
                 "monto_adelanto" => $adelanto,
                 "modalidad_pago" => $d["modalidad_pago"],
                 "estado" => "confirmada",
@@ -187,7 +195,7 @@ class Reserva
 
             $conn->commit();
             return [
-                "codigo" => $codigo, "total" => $total, "pagado" => $adelanto, "saldo" => round($total - $adelanto, 2),
+                "codigo" => $codigo, "total" => $totalConDescuento, "pagado" => $adelanto, "saldo" => round($totalConDescuento - $adelanto, 2),
                 "habitacion" => $habitacion["numero"], "piso" => (int) $habitacion["piso"],
             ];
         } catch (\Throwable $e) {
@@ -271,6 +279,29 @@ class Reserva
             );
         }
         return round($total * $beneficio["valor"] / 100, 2);
+    }
+
+    // Descuento por huesped frecuente: PERMANENTE, no gasta puntos (a diferencia del canje de un
+    // solo uso). Se suman los beneficios de tipo "producto"/"plan_pension" que ya tenga ganados
+    // (monto fijo, ej. el desayuno de cortesia), mas el MEJOR porcentaje de descuento que alcance
+    // (no se suman varios descuentos, solo el mas alto: el de 500 puntos reemplaza al de 300).
+    private function descuentoPorPuntos(\PDO $conn, int $huespedId, float $total): float
+    {
+        $puntos = (new MovimientoPuntosDAO($conn))->saldo($huespedId);
+        $fijo = 0.0;
+        $mejorPorcentaje = 0.0;
+        foreach ((new RecompensaDAO($conn))->listarActivas() as $r) {
+            if ($puntos < (int) $r["puntos_requeridos"] || (int) $r["consume_puntos"] === 1) {
+                continue;
+            }
+            if ($r["tipo"] === "descuento") {
+                $mejorPorcentaje = max($mejorPorcentaje, (float) $r["valor"]);
+            } elseif (in_array($r["tipo"], ["producto", "plan_pension"], true) && $r["valor"] !== null) {
+                $fijo += (float) $r["valor"];
+            }
+        }
+        $descuento = round($fijo + $total * $mejorPorcentaje / 100, 2);
+        return min($descuento, $total);
     }
 
     // Al salir: se cobra lo que falta y se suman los puntos de la estadia

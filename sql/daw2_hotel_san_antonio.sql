@@ -491,17 +491,19 @@ INSERT INTO producto (categoria_id, nombre, descripcion, precio) VALUES
 (2,'Gallina','Receta tradicional, preparada con el auténtico sabor de nuestra tierra.',NULL),
 (3,'Desayuno regional','Desayuno con productos de la región.',NULL);
 
--- Niveles acumulativos: 100 = fraccionado + desayuno; 150 suma pension completa de un dia;
--- 300 suma 10% de descuento; 500 sube ese descuento a 15% (nunca "noche gratis": alguien podria
--- reservar solo esa noche y el hotel no cobraria nada).
+-- Niveles ACUMULATIVOS y PERMANENTES (como el pago fraccionado: se revisan en vivo contra el
+-- saldo actual, nunca se gastan puntos; no hay canje, se aplican solos al reservar).
+-- 100 = fraccionado + desayuno (S/15 de descuento fijo); 150 suma pension completa de un dia
+-- (S/55 fijo); 300 suma 10% de descuento; 500 sube ese descuento a 15% (reemplaza al de 300,
+-- no se suman). Ver Bo\Reserva::descuentoPorPuntos.
 INSERT INTO recompensa (nombre, descripcion, puntos_requeridos, tipo, valor, producto_id, plan_pension_id, consume_puntos) VALUES
 ('Pago fraccionado','Reserva pagando solo el 50 % ahora y el resto al llegar.',100,'pago_fraccionado',50,NULL,NULL,0),
-('Desayuno de cortesía','Un desayuno regional gratis durante la estadía.',100,'producto',NULL,
-    (SELECT id FROM producto WHERE nombre = 'Desayuno regional'),NULL,1),
-('Pensión completa por un día','Un día de tu estadía con desayuno, almuerzo y cena incluidos.',150,'plan_pension',NULL,NULL,
-    (SELECT id FROM plan_pension WHERE nombre = 'Pensión completa'),1),
-('10 % de descuento','Descuento sobre el costo de la estadía.',300,'descuento',10,NULL,NULL,1),
-('15 % de descuento','El mayor descuento del programa, para nuestros huéspedes más frecuentes.',500,'descuento',15,NULL,NULL,1);
+('Desayuno de cortesía','Descuento fijo en tu reserva, equivalente a un desayuno, en cada estadía.',100,'producto',15.00,
+    (SELECT id FROM producto WHERE nombre = 'Desayuno regional'),NULL,0),
+('Pensión completa por un día','Descuento fijo en tu reserva, equivalente a un día de pensión completa, en cada estadía.',150,'plan_pension',55.00,NULL,
+    (SELECT id FROM plan_pension WHERE nombre = 'Pensión completa'),0),
+('10 % de descuento','Descuento sobre el costo de la estadía.',300,'descuento',10,NULL,NULL,0),
+('15 % de descuento','El mayor descuento del programa, para nuestros huéspedes más frecuentes.',500,'descuento',15,NULL,NULL,0);
 
 -- La columna foto guarda la ruta de la imagen (relativa a la raiz del proyecto)
 INSERT INTO lugar_turistico (nombre, categoria, descripcion, foto) VALUES

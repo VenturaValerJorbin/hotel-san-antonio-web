@@ -89,6 +89,9 @@ hero(
             <h3 class="h6 text-muted">Pago</h3>
             <dl class="row mb-1">
                 <dt class="col-6 fw-normal text-muted">Modalidad</dt><dd class="col-6 text-end"><?= $reserva["modalidad_pago"] === "fraccionado" ? "Pago fraccionado" : "Pago completo" ?></dd>
+                <?php if ($reserva["monto_descuento"] > 0) : ?>
+                    <dt class="col-6 fw-normal text-muted">Descuento huésped frecuente</dt><dd class="col-6 text-end text-success">-<?= soles($reserva["monto_descuento"]) ?></dd>
+                <?php endif ?>
                 <dt class="col-6 fw-normal text-muted">Total de la reserva</dt><dd class="col-6 text-end fw-bold"><?= soles($reserva["monto_total"]) ?></dd>
                 <dt class="col-6 fw-normal text-muted">Pagado</dt><dd class="col-6 text-end"><?= soles($reserva["monto_pagado"]) ?></dd>
                 <dt class="col-6 fw-normal text-muted">Saldo pendiente (al llegar)</dt><dd class="col-6 text-end"><?= soles($reserva["saldo_pendiente"]) ?></dd>

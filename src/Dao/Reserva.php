@@ -52,10 +52,10 @@ class Reserva extends Dao
         $stmt = $this->conn->prepare(
             "INSERT INTO reserva (codigo, huesped_id, habitacion_id, fecha_ingreso, fecha_salida,
                                   num_huespedes, precio_noche, plan_pension_id, precio_plan_pension,
-                                  monto_adelanto, modalidad_pago, estado)
+                                  monto_descuento, monto_adelanto, modalidad_pago, estado)
              VALUES (:codigo, :huesped_id, :habitacion_id, :fecha_ingreso, :fecha_salida,
                      :num_huespedes, :precio_noche, :plan_pension_id, :precio_plan_pension,
-                     :monto_adelanto, :modalidad_pago, :estado)"
+                     :monto_descuento, :monto_adelanto, :modalidad_pago, :estado)"
         );
         $this->enlazar($stmt, [
             ":codigo" => $d["codigo"],
@@ -67,6 +67,7 @@ class Reserva extends Dao
             ":precio_noche" => $d["precio_noche"],
             ":plan_pension_id" => $d["plan_pension_id"],
             ":precio_plan_pension" => $d["precio_plan_pension"],
+            ":monto_descuento" => $d["monto_descuento"],
             ":monto_adelanto" => $d["monto_adelanto"],
             ":modalidad_pago" => $d["modalidad_pago"],
             ":estado" => $d["estado"],
