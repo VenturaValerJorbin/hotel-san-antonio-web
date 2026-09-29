@@ -74,7 +74,6 @@ hero(
                                 <?php endforeach ?>
                             </select>
                             <?= $mensaje("piso") ?>
-                            <div class="form-text"><i class="bi bi-building"></i> Elige en qué piso quieres alojarte, por ejemplo si te cuesta subir escaleras. Al confirmar verás el número y el piso de tu habitación.</div>
                         </div>
                         <div class="col-12 col-sm-6">
                             <label class="form-label requerido" for="fecha_ingreso">Fecha de ingreso</label>
