@@ -157,7 +157,7 @@ hero(
 
                         <?php if ($beneficio) : ?>
                             <div class="sa-caja-crema mt-2 p-3" id="verificarPuntos">
-                                <div class="small fw-bold mb-2"><i class="bi bi-award text-danger"></i> ¿Eres huésped frecuente? Verifica tus puntos para desbloquear el pago del <?= $porcentaje ?> %</div>
+                                <div class="small fw-bold mb-2"><i class="bi bi-award text-danger"></i> ¿Eres huésped frecuente? Verifica tus puntos para desbloquear tus beneficios (pago fraccionado, descuentos y más).</div>
                                 <div class="d-flex flex-wrap gap-2 align-items-center">
                                     <button type="button" class="btn-linea btn-sm" id="btnVerificarPuntos">Verificar mis puntos</button>
                                     <span class="small" id="resultadoVerificacion"></span>

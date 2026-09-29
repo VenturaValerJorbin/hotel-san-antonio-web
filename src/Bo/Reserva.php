@@ -290,8 +290,8 @@ class Reserva
     private function descuentoPorBeneficios(\PDO $conn, int $huespedId, float $total, array $idsElegidos): float
     {
         $puntos = (new MovimientoPuntosDAO($conn))->saldo($huespedId);
-        $fijo = 0.0;
-        $mejorPorcentaje = 0.0;
+        $mejorComida = 0.0;    // "producto" y "plan_pension": el mayor ya incluye al menor (la
+        $mejorPorcentaje = 0.0; // pension completa ya trae el desayuno), nunca se suman los dos.
         foreach ((new RecompensaDAO($conn))->listarActivas() as $r) {
             $id = (int) $r["id"];
             // El pago fraccionado se elige por su propio campo (modalidad_pago), no aqui.
@@ -304,10 +304,10 @@ class Reserva
             if ($r["tipo"] === "descuento") {
                 $mejorPorcentaje = max($mejorPorcentaje, (float) $r["valor"]);
             } elseif (in_array($r["tipo"], ["producto", "plan_pension"], true) && $r["valor"] !== null) {
-                $fijo += (float) $r["valor"];
+                $mejorComida = max($mejorComida, (float) $r["valor"]);
             }
         }
-        $descuento = round($fijo + $total * $mejorPorcentaje / 100, 2);
+        $descuento = round($mejorComida + $total * $mejorPorcentaje / 100, 2);
         return min($descuento, $total);
     }
 

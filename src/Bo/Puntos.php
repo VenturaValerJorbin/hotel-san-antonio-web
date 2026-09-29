@@ -42,12 +42,15 @@ class Puntos
     }
 
     // Beneficios elegibles con ese saldo: el pago fraccionado no entra aqui (se elige aparte, con
-    // su propio campo), y de los descuentos en soles solo se ofrece el MEJOR (no tiene sentido
-    // ofrecer el de 300 puntos si ya alcanza el de 500, que es mas alto).
+    // su propio campo). De los descuentos en soles solo se ofrece el MEJOR (no tiene sentido
+    // ofrecer el de 300 puntos si ya alcanza el de 500, que es mas alto), y lo mismo con los
+    // beneficios de comida: "pension completa" ya incluye el desayuno dentro de sus 3 comidas,
+    // asi que si alcanza para las dos, solo se ofrece la mas completa (nunca las dos juntas).
     private function beneficiosPorPuntos(int $puntos): array
     {
         $beneficios = [];
         $mejorDescuento = null;
+        $mejorComida = null;
         foreach ((new RecompensaDAO())->listarActivas() as $r) {
             if ($r["tipo"] === "pago_fraccionado" || $puntos < (int) $r["puntos_requeridos"]) {
                 continue;
@@ -58,7 +61,16 @@ class Puntos
                 }
                 continue;
             }
+            if (in_array($r["tipo"], ["producto", "plan_pension"], true)) {
+                if (!$mejorComida || $r["valor"] > $mejorComida["valor"]) {
+                    $mejorComida = $r;
+                }
+                continue;
+            }
             $beneficios[] = $r;
+        }
+        if ($mejorComida) {
+            $beneficios[] = $mejorComida;
         }
         if ($mejorDescuento) {
             $beneficios[] = $mejorDescuento;

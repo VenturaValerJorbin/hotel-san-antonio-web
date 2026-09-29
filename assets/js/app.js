@@ -48,14 +48,14 @@
         // entre si, pero de los de porcentaje solo cuenta el mas alto marcado (igual que en el
         // servidor, ver Bo\Reserva::descuentoPorBeneficios; nunca se suman dos porcentajes).
         const descuentoBeneficios = (total) => {
-            let fijo = 0;
+            let mejorComida = 0;      // "pension completa" ya incluye el desayuno: nunca se suman
             let mejorPorcentaje = 0;
             document.querySelectorAll('#checksBeneficios input:checked').forEach((c) => {
                 const valor = parseFloat(c.dataset.valor || 0);
                 if (c.dataset.tipo === "descuento") mejorPorcentaje = Math.max(mejorPorcentaje, valor);
-                else fijo += valor;
+                else mejorComida = Math.max(mejorComida, valor);
             });
-            return Math.min(fijo + (total * mejorPorcentaje) / 100, total);
+            return Math.min(mejorComida + (total * mejorPorcentaje) / 100, total);
         };
 
         const actualizar = () => {
