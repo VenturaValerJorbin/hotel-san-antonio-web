@@ -1,531 +1,1158 @@
--- =====================================================================
--- Hotel Turistico San Antonio - Aplicacion web (Desarrollo de Aplicaciones Web II)
--- Base de datos completa para las 3 unidades del curso.
---   Unidad I  : tipo_habitacion, habitacion, huesped, reserva, pago, puntos, contacto, carta
---   Unidad II : rol, usuario (login y RBAC)
---   Unidad III: pedido, comprobante (room service, reportes)
--- Convenciones pensadas para migrar luego a un framework (ORM):
---   id autoincremental, created_at / updated_at, borrado logico con "activo".
--- Normalizada a 3FN: los valores calculados (noches, total, saldo, puntos) salen de vistas.
--- =====================================================================
+-- phpMyAdmin SQL Dump
+-- version 5.2.1
+-- https://www.phpmyadmin.net/
+--
+-- Servidor: 127.0.0.1
+-- Tiempo de generación: 29-09-2026 a las 18:15:27
+-- Versión del servidor: 10.4.32-MariaDB
+-- Versión de PHP: 8.2.12
 
-DROP DATABASE IF EXISTS daw2_hotel_san_antonio;
-CREATE DATABASE daw2_hotel_san_antonio CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE daw2_hotel_san_antonio;
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+START TRANSACTION;
+SET time_zone = "+00:00";
 
--- Fuerza utf8mb4 en esta sesion sin importar la codificacion por defecto de quien importe el
--- archivo (phpMyAdmin, la terminal de MySQL, etc.). Sin esto, un cliente con otra codificacion
--- por defecto puede guardar mal las tildes y enies de los datos de ejemplo.
-SET NAMES utf8mb4;
 
--- ---------------------------------------------------------------------
--- HABITACIONES
--- ---------------------------------------------------------------------
-CREATE TABLE tipo_habitacion (
-    id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    nombre         VARCHAR(40)   NOT NULL UNIQUE,
-    descripcion    VARCHAR(255)  NOT NULL,
-    detalle        TEXT          NULL,
-    capacidad      TINYINT UNSIGNED NOT NULL,
-    precio_noche   DECIMAL(8,2)  NOT NULL CHECK (precio_noche > 0),
-    activo         TINYINT(1)    NOT NULL DEFAULT 1,
-    created_at     TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at     TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
 
-CREATE TABLE foto_tipo_habitacion (
-    id       INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    tipo_id  INT UNSIGNED NOT NULL,
-    ruta     VARCHAR(255) NOT NULL,
-    orden    TINYINT UNSIGNED NOT NULL DEFAULT 1,
-    CONSTRAINT fk_foto_tipo FOREIGN KEY (tipo_id) REFERENCES tipo_habitacion(id) ON DELETE CASCADE
-) ENGINE=InnoDB;
+--
+-- Base de datos: `daw2_hotel_san_antonio`
+--
 
-CREATE TABLE habitacion (
-    id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    numero       VARCHAR(5)   NOT NULL UNIQUE,
-    piso         TINYINT UNSIGNED NOT NULL,
-    tipo_id      INT UNSIGNED NOT NULL,
-    estado       ENUM('disponible','ocupada','limpieza','mantenimiento') NOT NULL DEFAULT 'disponible',
-    descripcion  VARCHAR(255) NULL,
-    activo       TINYINT(1)   NOT NULL DEFAULT 1,
-    created_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_habitacion_tipo FOREIGN KEY (tipo_id) REFERENCES tipo_habitacion(id)
-) ENGINE=InnoDB;
+-- --------------------------------------------------------
 
-CREATE TABLE servicio (
-    id      INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    nombre  VARCHAR(50) NOT NULL UNIQUE,
-    icono   VARCHAR(30) NULL
-) ENGINE=InnoDB;
+--
+-- Estructura de tabla para la tabla `canje_recompensa`
+--
 
--- Los servicios dependen del TIPO de habitacion (ej. la Simple no incluye agua caliente)
-CREATE TABLE tipo_servicio (
-    tipo_id      INT UNSIGNED NOT NULL,
-    servicio_id  INT UNSIGNED NOT NULL,
-    PRIMARY KEY (tipo_id, servicio_id),
-    CONSTRAINT fk_ts_tipo     FOREIGN KEY (tipo_id)     REFERENCES tipo_habitacion(id) ON DELETE CASCADE,
-    CONSTRAINT fk_ts_servicio FOREIGN KEY (servicio_id) REFERENCES servicio(id)        ON DELETE CASCADE
-) ENGINE=InnoDB;
+CREATE TABLE `canje_recompensa` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `huesped_id` int(10) UNSIGNED NOT NULL,
+  `recompensa_id` int(10) UNSIGNED NOT NULL,
+  `reserva_id` int(10) UNSIGNED DEFAULT NULL,
+  `estado` enum('pendiente','entregado','anulado') NOT NULL DEFAULT 'pendiente',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ---------------------------------------------------------------------
--- USUARIOS DEL PANEL (Unidad II: login y RBAC)
--- ---------------------------------------------------------------------
-CREATE TABLE rol (
-    id      INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    nombre  VARCHAR(30) NOT NULL UNIQUE
-) ENGINE=InnoDB;
+-- --------------------------------------------------------
 
-CREATE TABLE usuario (
-    id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    rol_id      INT UNSIGNED NOT NULL,
-    nombres     VARCHAR(80)  NOT NULL,
-    correo      VARCHAR(100) NOT NULL UNIQUE,
-    clave       VARCHAR(255) NOT NULL,
-    activo      TINYINT(1)   NOT NULL DEFAULT 1,
-    created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_usuario_rol FOREIGN KEY (rol_id) REFERENCES rol(id)
-) ENGINE=InnoDB;
+--
+-- Estructura de tabla para la tabla `categoria_producto`
+--
 
--- ---------------------------------------------------------------------
--- HUESPEDES Y PROGRAMA DE PUNTOS
--- ---------------------------------------------------------------------
-CREATE TABLE huesped (
-    id                INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    tipo_documento    ENUM('DNI','PASAPORTE','CE') NOT NULL DEFAULT 'DNI',
-    numero_documento  VARCHAR(20)  NOT NULL,
-    nombre_completo   VARCHAR(160) NOT NULL,
-    correo            VARCHAR(100) NULL,
-    telefono          VARCHAR(20)  NOT NULL,
-    created_at        TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at        TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    UNIQUE KEY uq_huesped_documento (tipo_documento, numero_documento)
-) ENGINE=InnoDB;
+CREATE TABLE `categoria_producto` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `nombre` varchar(40) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Reglas del programa de puntos editables por el administrador (no van fijas en el codigo)
-CREATE TABLE parametro (
-    clave        VARCHAR(50)  PRIMARY KEY,
-    valor        VARCHAR(50)  NOT NULL,
-    descripcion  VARCHAR(150) NOT NULL,
-    updated_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+--
+-- Volcado de datos para la tabla `categoria_producto`
+--
 
--- ---------------------------------------------------------------------
--- RESTAURANTE (carta publica y room service de la Unidad III)
--- ---------------------------------------------------------------------
-CREATE TABLE categoria_producto (
-    id      INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    nombre  VARCHAR(40) NOT NULL UNIQUE
-) ENGINE=InnoDB;
+INSERT INTO `categoria_producto` (`id`, `nombre`) VALUES
+(3, 'Desayunos'),
+(1, 'Menú del día'),
+(2, 'Platos a la carta');
 
--- precio NULL = plato "a la carta" cuyo precio se consulta en el restaurante
-CREATE TABLE producto (
-    id            INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    categoria_id  INT UNSIGNED NOT NULL,
-    nombre        VARCHAR(80)  NOT NULL,
-    descripcion   VARCHAR(200) NULL,
-    precio        DECIMAL(7,2) NULL CHECK (precio IS NULL OR precio > 0),
-    foto          VARCHAR(255) NULL,
-    activo        TINYINT(1)   NOT NULL DEFAULT 1,
-    created_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_producto_categoria FOREIGN KEY (categoria_id) REFERENCES categoria_producto(id)
-) ENGINE=InnoDB;
+-- --------------------------------------------------------
 
--- ---------------------------------------------------------------------
--- RESERVAS Y PAGOS
--- ---------------------------------------------------------------------
--- Plan de pension (regimen alimenticio): igual que en cualquier sistema hotelero real, el huesped
--- elige cuantas comidas quiere incluidas en su estadia. Con media pension o pension completa puede
--- pedir cualquier plato de la carta (no un menu fijo): no se factura plato por plato, ya esta
--- pagado por noche en la reserva. El precio se suma por noche (no por huesped: la reserva no pide
--- cuantos son en el grupo).
-CREATE TABLE plan_pension (
-    id                INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    nombre            VARCHAR(40)  NOT NULL,
-    descripcion       VARCHAR(200) NULL,
-    precio_por_noche  DECIMAL(6,2) NOT NULL DEFAULT 0,   -- precios de ejemplo, por confirmar con el hotel
-    orden             TINYINT UNSIGNED NOT NULL DEFAULT 0,
-    activo            TINYINT(1)   NOT NULL DEFAULT 1
-) ENGINE=InnoDB;
+--
+-- Estructura de tabla para la tabla `comprobante`
+--
 
-CREATE TABLE reserva (
-    id                   INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    codigo               VARCHAR(12)  NOT NULL UNIQUE,
-    huesped_id           INT UNSIGNED NOT NULL,
-    habitacion_id        INT UNSIGNED NOT NULL,
-    fecha_ingreso        DATE         NOT NULL,
-    fecha_salida         DATE         NOT NULL,
-    num_huespedes        TINYINT UNSIGNED NOT NULL DEFAULT 1,
-    precio_noche         DECIMAL(8,2) NOT NULL,             -- foto del precio al reservar
-    plan_pension_id      INT UNSIGNED NOT NULL DEFAULT 1,   -- 1 = Solo alojamiento
-    precio_plan_pension  DECIMAL(6,2) NOT NULL DEFAULT 0,   -- foto del precio del plan al reservar
-    monto_descuento      DECIMAL(9,2) NOT NULL DEFAULT 0,   -- descuento por canje de puntos
-    monto_adelanto       DECIMAL(9,2) NOT NULL,             -- lo que se cobra online al reservar
-    modalidad_pago       ENUM('completo','fraccionado') NOT NULL DEFAULT 'completo',
-    estado               ENUM('pendiente','confirmada','checkin','checkout','cancelada','no_show') NOT NULL DEFAULT 'pendiente',
-    observaciones        VARCHAR(255) NULL,
-    usuario_id           INT UNSIGNED NULL,
-    created_at           TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at           TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_reserva_huesped     FOREIGN KEY (huesped_id)      REFERENCES huesped(id),
-    CONSTRAINT fk_reserva_habitacion  FOREIGN KEY (habitacion_id)   REFERENCES habitacion(id),
-    CONSTRAINT fk_reserva_usuario     FOREIGN KEY (usuario_id)      REFERENCES usuario(id),
-    CONSTRAINT fk_reserva_plan_pension FOREIGN KEY (plan_pension_id) REFERENCES plan_pension(id),
-    CONSTRAINT ck_reserva_fechas CHECK (fecha_salida > fecha_ingreso),
-    INDEX idx_reserva_fechas (habitacion_id, fecha_ingreso, fecha_salida)
-) ENGINE=InnoDB;
+CREATE TABLE `comprobante` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `reserva_id` int(10) UNSIGNED DEFAULT NULL,
+  `pedido_id` int(10) UNSIGNED DEFAULT NULL,
+  `tipo` enum('boleta','factura') NOT NULL DEFAULT 'boleta',
+  `serie` varchar(4) NOT NULL,
+  `numero` int(10) UNSIGNED NOT NULL,
+  `monto` decimal(9,2) NOT NULL,
+  `emitido_en` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Una reserva puede tener varios pagos: adelanto online + saldo al llegar (o un pago total)
-CREATE TABLE pago (
-    id                   INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    reserva_id           INT UNSIGNED NOT NULL,
-    tipo                 ENUM('adelanto','saldo','total') NOT NULL,
-    monto                DECIMAL(9,2) NOT NULL CHECK (monto > 0),
-    metodo               ENUM('tarjeta','yape','transferencia','efectivo') NOT NULL,
-    estado               ENUM('pendiente','aprobado','rechazado','reembolsado') NOT NULL DEFAULT 'pendiente',
-    pasarela             VARCHAR(30)  NULL,
-    codigo_transaccion   VARCHAR(80)  NULL,
-    motivo_reembolso     VARCHAR(255) NULL,
-    fecha_pago           DATETIME     NULL,
-    fecha_reembolso      DATETIME     NULL,
-    usuario_id           INT UNSIGNED NULL,
-    created_at           TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at           TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_pago_reserva FOREIGN KEY (reserva_id) REFERENCES reserva(id),
-    CONSTRAINT fk_pago_usuario FOREIGN KEY (usuario_id) REFERENCES usuario(id)
-) ENGINE=InnoDB;
+-- --------------------------------------------------------
 
--- Catalogo de recompensas del programa de puntos (editable por el administrador)
---   pago_fraccionado : beneficio permanente, no gasta puntos (valor = % de adelanto)
---   descuento        : canje, valor = % de descuento sobre la estadia
---   producto         : canje, entrega un producto (ej. desayuno)
---   noche_gratis     : canje, una noche de cortesia
--- Catalogo ACUMULATIVO por niveles de puntos (como los planes de una suscripcion: cada nivel
--- superior incluye lo del anterior y le suma algo mas). "pago_fraccionado" no consume puntos
--- (es un beneficio permanente mientras se mantengan); los demas si se canjean (ver canje_recompensa).
-CREATE TABLE recompensa (
-    id                 INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    nombre             VARCHAR(80)  NOT NULL,
-    descripcion        VARCHAR(200) NULL,
-    puntos_requeridos  INT UNSIGNED NOT NULL,
-    tipo               ENUM('pago_fraccionado','descuento','producto','noche_gratis','plan_pension') NOT NULL,
-    valor              DECIMAL(5,2) NULL,
-    producto_id        INT UNSIGNED NULL,
-    plan_pension_id    INT UNSIGNED NULL,
-    consume_puntos     TINYINT(1)   NOT NULL DEFAULT 1,
-    activo             TINYINT(1)   NOT NULL DEFAULT 1,
-    created_at         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at         TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_recompensa_producto     FOREIGN KEY (producto_id)     REFERENCES producto(id),
-    CONSTRAINT fk_recompensa_plan_pension FOREIGN KEY (plan_pension_id) REFERENCES plan_pension(id)
-) ENGINE=InnoDB;
+--
+-- Estructura de tabla para la tabla `detalle_pedido`
+--
 
-CREATE TABLE canje_recompensa (
-    id            INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    huesped_id    INT UNSIGNED NOT NULL,
-    recompensa_id INT UNSIGNED NOT NULL,
-    reserva_id    INT UNSIGNED NULL,
-    estado        ENUM('pendiente','entregado','anulado') NOT NULL DEFAULT 'pendiente',
-    created_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_canje_huesped    FOREIGN KEY (huesped_id)    REFERENCES huesped(id),
-    CONSTRAINT fk_canje_recompensa FOREIGN KEY (recompensa_id) REFERENCES recompensa(id),
-    CONSTRAINT fk_canje_reserva    FOREIGN KEY (reserva_id)    REFERENCES reserva(id)
-) ENGINE=InnoDB;
+CREATE TABLE `detalle_pedido` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `pedido_id` int(10) UNSIGNED NOT NULL,
+  `producto_id` int(10) UNSIGNED NOT NULL,
+  `cantidad` smallint(5) UNSIGNED NOT NULL,
+  `precio_unitario` decimal(7,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Historial de puntos (ganado = positivo, canjeado = negativo). El saldo se calcula, no se guarda.
-CREATE TABLE movimiento_puntos (
-    id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    huesped_id   INT UNSIGNED NOT NULL,
-    reserva_id   INT UNSIGNED NULL,
-    canje_id     INT UNSIGNED NULL,
-    tipo         ENUM('ganado','canjeado','ajuste') NOT NULL,
-    puntos       INT          NOT NULL,
-    descripcion  VARCHAR(150) NULL,
-    created_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_mp_huesped FOREIGN KEY (huesped_id) REFERENCES huesped(id),
-    CONSTRAINT fk_mp_reserva FOREIGN KEY (reserva_id) REFERENCES reserva(id),
-    CONSTRAINT fk_mp_canje   FOREIGN KEY (canje_id)   REFERENCES canje_recompensa(id)
-) ENGINE=InnoDB;
+-- --------------------------------------------------------
 
--- ---------------------------------------------------------------------
--- ROOM SERVICE Y COMPROBANTES (Unidad III)
--- ---------------------------------------------------------------------
-CREATE TABLE pedido (
-    id             INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    reserva_id     INT UNSIGNED NULL,
-    tipo           ENUM('room_service','restaurante') NOT NULL,
-    estado         ENUM('pendiente','preparando','entregado','cancelado') NOT NULL DEFAULT 'pendiente',
-    created_at     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at     TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_pedido_reserva FOREIGN KEY (reserva_id) REFERENCES reserva(id)
-) ENGINE=InnoDB;
+--
+-- Estructura de tabla para la tabla `foto_tipo_habitacion`
+--
 
-CREATE TABLE detalle_pedido (
-    id               INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    pedido_id        INT UNSIGNED NOT NULL,
-    producto_id      INT UNSIGNED NOT NULL,
-    cantidad         SMALLINT UNSIGNED NOT NULL,
-    precio_unitario  DECIMAL(7,2) NOT NULL,
-    CONSTRAINT fk_dp_pedido   FOREIGN KEY (pedido_id)   REFERENCES pedido(id) ON DELETE CASCADE,
-    CONSTRAINT fk_dp_producto FOREIGN KEY (producto_id) REFERENCES producto(id)
-) ENGINE=InnoDB;
+CREATE TABLE `foto_tipo_habitacion` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `tipo_id` int(10) UNSIGNED NOT NULL,
+  `ruta` varchar(255) NOT NULL,
+  `orden` tinyint(3) UNSIGNED NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE comprobante (
-    id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    reserva_id  INT UNSIGNED NULL,
-    pedido_id   INT UNSIGNED NULL,
-    tipo        ENUM('boleta','factura') NOT NULL DEFAULT 'boleta',
-    serie       VARCHAR(4)   NOT NULL,
-    numero      INT UNSIGNED NOT NULL,
-    monto       DECIMAL(9,2) NOT NULL,
-    emitido_en  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE KEY uq_comprobante (serie, numero),
-    CONSTRAINT fk_comp_reserva FOREIGN KEY (reserva_id) REFERENCES reserva(id),
-    CONSTRAINT fk_comp_pedido  FOREIGN KEY (pedido_id)  REFERENCES pedido(id)
-) ENGINE=InnoDB;
+--
+-- Volcado de datos para la tabla `foto_tipo_habitacion`
+--
 
--- ---------------------------------------------------------------------
--- RECOMENDACIONES TURISTICAS Y CONTACTO
--- ---------------------------------------------------------------------
-CREATE TABLE lugar_turistico (
-    id           INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    nombre       VARCHAR(80)  NOT NULL,
-    categoria    VARCHAR(30)  NOT NULL,
-    descripcion  VARCHAR(255) NOT NULL,
-    foto         VARCHAR(255) NULL,
-    activo       TINYINT(1)   NOT NULL DEFAULT 1
-) ENGINE=InnoDB;
+INSERT INTO `foto_tipo_habitacion` (`id`, `tipo_id`, `ruta`, `orden`) VALUES
+(1, 1, 'assets/img/economic-room/economic-room1.avif', 1),
+(2, 1, 'assets/img/economic-room/economic-room2.avif', 2),
+(3, 1, 'assets/img/economic-room/economic-room3.avif', 3),
+(4, 1, 'assets/img/economic-room/economic-room4.avif', 4),
+(5, 1, 'assets/img/economic-room/economic-room5.avif', 5),
+(6, 2, 'assets/img/deluxe/hiabitacion_deluxe1.avif', 1),
+(7, 2, 'assets/img/deluxe/hiabitacion_deluxe2.avif', 2),
+(8, 2, 'assets/img/deluxe/hiabitacion_deluxe3.avif', 3),
+(9, 2, 'assets/img/deluxe/hiabitacion_deluxe4.avif', 4),
+(10, 2, 'assets/img/deluxe/hiabitacion_deluxe5.avif', 5),
+(11, 2, 'assets/img/deluxe/hiabitacion_deluxe6.avif', 6),
+(12, 2, 'assets/img/deluxe/hiabitacion_deluxe7.avif', 7),
+(13, 2, 'assets/img/deluxe/hiabitacion_deluxe8.avif', 8),
+(14, 2, 'assets/img/deluxe/9hiabitacion_deluxe.avif', 9),
+(15, 3, 'assets/img/deluxe-queen/habitacion_queen1.avif', 1),
+(16, 3, 'assets/img/deluxe-queen/habitacion_queen2.avif', 2),
+(17, 3, 'assets/img/deluxe-queen/habitacion_queen3.avif', 3),
+(18, 3, 'assets/img/deluxe-queen/habitacion_queen4.avif', 4),
+(19, 4, 'assets/img/doble/habitacion-doble1.avif', 1),
+(20, 4, 'assets/img/doble/habitacion-doble2.avif', 2),
+(21, 4, 'assets/img/doble/habitacion-doble3.avif', 3),
+(22, 4, 'assets/img/doble/habitacion-doble4.avif', 4),
+(23, 4, 'assets/img/doble/habitacion-doble5.avif', 5),
+(24, 4, 'assets/img/doble/habitacion-doble6.avif', 6),
+(25, 4, 'assets/img/doble/habitacion-doble7.avif', 7),
+(26, 4, 'assets/img/doble/habitacion-doble8.avif', 8),
+(27, 4, 'assets/img/doble/habitacion-doble9.avif', 9),
+(28, 4, 'assets/img/doble/habitacion-doble10.avif', 10),
+(29, 4, 'assets/img/doble/habitacion-doble11.avif', 11),
+(30, 4, 'assets/img/doble/habitacion-doble12.avif', 12),
+(31, 4, 'assets/img/doble/habitacion-doble13.avif', 13),
+(32, 4, 'assets/img/doble/habitacion-doble14.avif', 14),
+(33, 4, 'assets/img/doble/habitacion-doble15.avif', 15),
+(34, 4, 'assets/img/doble/habitacion-doble16.avif', 16),
+(35, 4, 'assets/img/doble/habitacion-doble17.avif', 17),
+(36, 4, 'assets/img/doble/habitacion-doble18.avif', 18),
+(37, 5, 'assets/img/deluxe-suite/1deluxe-suite.avif', 1),
+(38, 5, 'assets/img/deluxe-suite/2deluxe-suite.avif', 2),
+(39, 5, 'assets/img/deluxe-suite/3deluxe-suite.avif', 3),
+(40, 6, 'assets/img/junior-suite/unior-suite1.avif', 1),
+(41, 6, 'assets/img/junior-suite/unior-suite2.avif', 2),
+(42, 6, 'assets/img/junior-suite/unior-suite3.avif', 3),
+(43, 6, 'assets/img/junior-suite/unior-suite4.avif', 4),
+(44, 6, 'assets/img/junior-suite/unior-suite5.avif', 5),
+(45, 6, 'assets/img/junior-suite/unior-suite6.avif', 6),
+(46, 6, 'assets/img/junior-suite/unior-suite7.avif', 7);
 
-CREATE TABLE mensaje_contacto (
-    id          INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    nombre      VARCHAR(100) NOT NULL,
-    correo      VARCHAR(100) NOT NULL,
-    telefono    VARCHAR(20)  NOT NULL,
-    asunto      ENUM('reserva','consulta','sugerencia','reclamo') NOT NULL,
-    mensaje     VARCHAR(500) NOT NULL,
-    leido       TINYINT(1)   NOT NULL DEFAULT 0,
-    created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+-- --------------------------------------------------------
 
--- Limite de intentos por IP en consultas/formularios publicos sensibles (evita fuerza bruta y
--- spam). No guarda quien es la persona, solo su IP, la accion y cuando. Las filas viejas se
--- borran solas (ver Dao\LimiteIntento::limpiarAntiguos), no hay tarea programada en el proyecto.
-CREATE TABLE limite_intento (
-    id         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    ip         VARCHAR(45)  NOT NULL,
-    accion     VARCHAR(40)  NOT NULL,
-    creado_en  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    INDEX idx_limite (ip, accion, creado_en)
-) ENGINE=InnoDB;
+--
+-- Estructura de tabla para la tabla `habitacion`
+--
 
--- ---------------------------------------------------------------------
--- VISTAS: valores calculados (asi las tablas se mantienen en 3FN)
--- ---------------------------------------------------------------------
-CREATE VIEW vista_reserva AS
-SELECT r.*,
-       DATEDIFF(r.fecha_salida, r.fecha_ingreso)                                                     AS noches,
-       DATEDIFF(r.fecha_salida, r.fecha_ingreso) * (r.precio_noche + r.precio_plan_pension) - r.monto_descuento AS monto_total,
-       COALESCE(p.pagado, 0)                                                                         AS monto_pagado,
-       DATEDIFF(r.fecha_salida, r.fecha_ingreso) * (r.precio_noche + r.precio_plan_pension) - r.monto_descuento
-           - COALESCE(p.pagado, 0)                                                                   AS saldo_pendiente
-FROM reserva r
-LEFT JOIN (SELECT reserva_id, SUM(monto) AS pagado
-           FROM pago WHERE estado = 'aprobado' GROUP BY reserva_id) p ON p.reserva_id = r.id;
+CREATE TABLE `habitacion` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `numero` varchar(5) NOT NULL,
+  `piso` tinyint(3) UNSIGNED NOT NULL,
+  `tipo_id` int(10) UNSIGNED NOT NULL,
+  `estado` enum('disponible','ocupada','limpieza','mantenimiento') NOT NULL DEFAULT 'disponible',
+  `descripcion` varchar(255) DEFAULT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE VIEW vista_puntos_huesped AS
-SELECT h.id AS huesped_id, COALESCE(SUM(m.puntos), 0) AS puntos
-FROM huesped h
-LEFT JOIN movimiento_puntos m ON m.huesped_id = h.id
-GROUP BY h.id;
+--
+-- Volcado de datos para la tabla `habitacion`
+--
 
-CREATE VIEW vista_pedido AS
-SELECT p.*, COALESCE(SUM(d.cantidad * d.precio_unitario), 0) AS total
-FROM pedido p
-LEFT JOIN detalle_pedido d ON d.pedido_id = p.id
-GROUP BY p.id;
+INSERT INTO `habitacion` (`id`, `numero`, `piso`, `tipo_id`, `estado`, `descripcion`, `activo`, `created_at`, `updated_at`) VALUES
+(1, '101', 1, 1, 'disponible', NULL, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(2, '102', 1, 2, 'ocupada', NULL, 1, '2026-09-29 14:04:09', '2026-09-29 15:45:15'),
+(3, '103', 1, 2, 'disponible', NULL, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(4, '104', 1, 1, 'disponible', NULL, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(5, '105', 1, 2, 'disponible', NULL, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(6, '106', 1, 2, 'disponible', NULL, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(7, '201', 2, 3, 'disponible', NULL, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(8, '202', 2, 4, 'disponible', NULL, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(9, '203', 2, 5, 'disponible', NULL, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(10, '204', 2, 6, 'disponible', NULL, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(11, '205', 2, 3, 'disponible', NULL, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(12, '206', 2, 4, 'disponible', NULL, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(13, '301', 3, 1, 'disponible', NULL, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(14, '302', 3, 2, 'disponible', NULL, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(15, '303', 3, 3, 'disponible', NULL, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(16, '304', 3, 4, 'disponible', NULL, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(17, '305', 3, 5, 'disponible', NULL, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09');
 
--- =====================================================================
--- DATOS INICIALES
--- =====================================================================
-INSERT INTO rol (nombre) VALUES ('administrador'), ('recepcionista');
+-- --------------------------------------------------------
 
--- Clave de prueba de ambos usuarios: Admin123*  (guardada con password_hash)
-INSERT INTO usuario (rol_id, nombres, correo, clave) VALUES
-(1, 'Administrador San Antonio', 'admin@sanantonio.pe',
-    '$2y$10$wghTX6l0xeUQDUKKuBHiVuF6.xwUad30MKKYj7c65d2Hhg9l6Q2w6'),
-(2, 'Recepción Turno Día', 'recepcion@sanantonio.pe',
-    '$2y$10$wghTX6l0xeUQDUKKuBHiVuF6.xwUad30MKKYj7c65d2Hhg9l6Q2w6');
+--
+-- Estructura de tabla para la tabla `huesped`
+--
 
--- Los 6 tipos de habitacion y sus tarifas. Solo la Simple no incluye agua caliente.
-INSERT INTO tipo_habitacion (nombre, descripcion, detalle, capacidad, precio_noche) VALUES
-('Simple', 'Habitación sencilla y cómoda para una persona.',
- 'La habitación Simple del Hotel San Antonio ofrece un ambiente tranquilo y funcional, ideal para viajeros que buscan descanso y buen precio en el corazón de Bagua.', 1, 100.00),
-('Ejecutiva', 'Habitación ejecutiva con escritorio y agua caliente para una persona.',
- 'Pensada para quienes viajan por trabajo: escritorio, silla y aire acondicionado en un ambiente ordenado y silencioso, con baño privado con agua caliente para un mayor confort después de la jornada.', 1, 130.00),
-('Matrimonial', 'Cama de dos plazas para dos personas.',
- 'Habitación matrimonial amplia y acogedora, ideal para parejas que visitan Bagua por turismo o descanso.', 2, 130.00),
-('Doble', 'Dos camas para dos personas.',
- 'Habitación con dos camas individuales, perfecta para amigos, familiares o compañeros de viaje.', 2, 150.00),
-('Suite', 'Suite con mayor espacio para dos personas.',
- 'La Suite ofrece más espacio y comodidad, con un ambiente elegante para quienes desean una estadía especial.', 2, 150.00),
-('King', 'Amplia y cómoda, perfecta para una estadía de descanso.',
- 'La habitación King del Hotel San Antonio ofrece un ambiente amplio, elegante y acogedor, ideal para quienes buscan comodidad y tranquilidad en el corazón de la Amazonía. Disfruta de una cama king, espacios bien iluminados y una vista privilegiada a la naturaleza de Bagua.', 2, 180.00);
+CREATE TABLE `huesped` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `tipo_documento` enum('DNI','PASAPORTE','CE') NOT NULL DEFAULT 'DNI',
+  `numero_documento` varchar(20) NOT NULL,
+  `nombre_completo` varchar(160) NOT NULL,
+  `correo` varchar(100) DEFAULT NULL,
+  `telefono` varchar(20) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- 17 habitaciones en 3 pisos (cantidad por confirmar con el hotel).
--- El tipo se indica por su nombre, asi el orden de los tipos no afecta a las habitaciones.
-INSERT INTO habitacion (numero, piso, tipo_id)
-SELECT h.numero, h.piso, t.id
-FROM (
-    SELECT '101' AS numero, 1 AS piso, 'Simple' AS tipo UNION ALL SELECT '102', 1, 'Ejecutiva' UNION ALL SELECT '103', 1, 'Ejecutiva'
-    UNION ALL SELECT '104', 1, 'Simple' UNION ALL SELECT '105', 1, 'Ejecutiva' UNION ALL SELECT '106', 1, 'Ejecutiva'
-    UNION ALL SELECT '201', 2, 'Matrimonial' UNION ALL SELECT '202', 2, 'Doble' UNION ALL SELECT '203', 2, 'Suite'
-    UNION ALL SELECT '204', 2, 'King' UNION ALL SELECT '205', 2, 'Matrimonial' UNION ALL SELECT '206', 2, 'Doble'
-    UNION ALL SELECT '301', 3, 'Simple' UNION ALL SELECT '302', 3, 'Ejecutiva' UNION ALL SELECT '303', 3, 'Matrimonial'
-    UNION ALL SELECT '304', 3, 'Doble' UNION ALL SELECT '305', 3, 'Suite'
-) h
-JOIN tipo_habitacion t ON t.nombre = h.tipo
-ORDER BY h.numero;
+--
+-- Volcado de datos para la tabla `huesped`
+--
 
-INSERT INTO servicio (nombre, icono) VALUES
-('Baño privado','bi-droplet'),('Aire acondicionado','bi-snow'),('TV','bi-tv'),('Armario','bi-door-closed'),
-('Escritorio','bi-laptop'),('Wi-Fi gratis','bi-wifi'),('Cochera gratis','bi-car-front'),('Agua caliente','bi-thermometer-half');
+INSERT INTO `huesped` (`id`, `tipo_documento`, `numero_documento`, `nombre_completo`, `correo`, `telefono`, `created_at`, `updated_at`) VALUES
+(1, 'DNI', '70000001', 'Carlos Pérez Díaz', 'carlos@example.com', '999111222', '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(2, 'DNI', '70000002', 'María López Rojas', 'maria@example.com', '999333444', '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(3, 'DNI', '73568619', 'Jesús Anderson Bances Alburqueque', NULL, '953200488', '2026-09-29 14:31:38', '2026-09-29 14:31:38'),
+(4, 'DNI', '72245248', 'Cristian Jhoel Aguilar Vela', NULL, '923994454', '2026-09-29 15:39:54', '2026-09-29 15:39:54');
 
--- Todos los tipos: bano, aire, TV, armario, escritorio, Wi-Fi y cochera (Avance 01)
-INSERT INTO tipo_servicio (tipo_id, servicio_id)
-SELECT t.id, s.id FROM tipo_habitacion t CROSS JOIN servicio s WHERE s.nombre <> 'Agua caliente';
--- Agua caliente: todos los tipos menos la Simple
-INSERT INTO tipo_servicio (tipo_id, servicio_id)
-SELECT t.id, s.id FROM tipo_habitacion t CROSS JOIN servicio s
-WHERE s.nombre = 'Agua caliente' AND t.nombre <> 'Simple';
+-- --------------------------------------------------------
 
--- Fotos de cada tipo de habitacion. Las imagenes estan en assets/img/ y aqui solo se guarda su ruta
--- (relativa a la raiz del proyecto) y el orden en que aparecen en el carrusel.
--- tipo_id 1 = Simple
-INSERT INTO foto_tipo_habitacion (tipo_id, ruta, orden) VALUES
-(1, 'assets/img/economic-room/economic-room1.avif', 1),
-(1, 'assets/img/economic-room/economic-room2.avif', 2),
-(1, 'assets/img/economic-room/economic-room3.avif', 3),
-(1, 'assets/img/economic-room/economic-room4.avif', 4),
-(1, 'assets/img/economic-room/economic-room5.avif', 5);
+--
+-- Estructura de tabla para la tabla `limite_intento`
+--
 
--- tipo_id 2 = Ejecutiva
-INSERT INTO foto_tipo_habitacion (tipo_id, ruta, orden) VALUES
-(2, 'assets/img/deluxe/hiabitacion_deluxe1.avif', 1),
-(2, 'assets/img/deluxe/hiabitacion_deluxe2.avif', 2),
-(2, 'assets/img/deluxe/hiabitacion_deluxe3.avif', 3),
-(2, 'assets/img/deluxe/hiabitacion_deluxe4.avif', 4),
-(2, 'assets/img/deluxe/hiabitacion_deluxe5.avif', 5),
-(2, 'assets/img/deluxe/hiabitacion_deluxe6.avif', 6),
-(2, 'assets/img/deluxe/hiabitacion_deluxe7.avif', 7),
-(2, 'assets/img/deluxe/hiabitacion_deluxe8.avif', 8),
-(2, 'assets/img/deluxe/9hiabitacion_deluxe.avif', 9);
+CREATE TABLE `limite_intento` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `ip` varchar(45) NOT NULL,
+  `accion` varchar(40) NOT NULL,
+  `creado_en` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- tipo_id 3 = Matrimonial
-INSERT INTO foto_tipo_habitacion (tipo_id, ruta, orden) VALUES
-(3, 'assets/img/deluxe-queen/habitacion_queen1.avif', 1),
-(3, 'assets/img/deluxe-queen/habitacion_queen2.avif', 2),
-(3, 'assets/img/deluxe-queen/habitacion_queen3.avif', 3),
-(3, 'assets/img/deluxe-queen/habitacion_queen4.avif', 4);
+--
+-- Volcado de datos para la tabla `limite_intento`
+--
 
--- tipo_id 4 = Doble
-INSERT INTO foto_tipo_habitacion (tipo_id, ruta, orden) VALUES
-(4, 'assets/img/doble/habitacion-doble1.avif', 1),
-(4, 'assets/img/doble/habitacion-doble2.avif', 2),
-(4, 'assets/img/doble/habitacion-doble3.avif', 3),
-(4, 'assets/img/doble/habitacion-doble4.avif', 4),
-(4, 'assets/img/doble/habitacion-doble5.avif', 5),
-(4, 'assets/img/doble/habitacion-doble6.avif', 6),
-(4, 'assets/img/doble/habitacion-doble7.avif', 7),
-(4, 'assets/img/doble/habitacion-doble8.avif', 8),
-(4, 'assets/img/doble/habitacion-doble9.avif', 9),
-(4, 'assets/img/doble/habitacion-doble10.avif', 10),
-(4, 'assets/img/doble/habitacion-doble11.avif', 11),
-(4, 'assets/img/doble/habitacion-doble12.avif', 12),
-(4, 'assets/img/doble/habitacion-doble13.avif', 13),
-(4, 'assets/img/doble/habitacion-doble14.avif', 14),
-(4, 'assets/img/doble/habitacion-doble15.avif', 15),
-(4, 'assets/img/doble/habitacion-doble16.avif', 16),
-(4, 'assets/img/doble/habitacion-doble17.avif', 17),
-(4, 'assets/img/doble/habitacion-doble18.avif', 18);
+INSERT INTO `limite_intento` (`id`, `ip`, `accion`, `creado_en`) VALUES
+(2, '::1', 'comprobante', '2026-09-29 14:31:38'),
+(3, '::1', 'comprobante', '2026-09-29 15:39:54'),
+(4, '::1', 'comprobante', '2026-09-29 15:49:45'),
+(1, '::1', 'consultar_puntos', '2026-09-29 14:29:22');
 
--- tipo_id 5 = Suite
-INSERT INTO foto_tipo_habitacion (tipo_id, ruta, orden) VALUES
-(5, 'assets/img/deluxe-suite/1deluxe-suite.avif', 1),
-(5, 'assets/img/deluxe-suite/2deluxe-suite.avif', 2),
-(5, 'assets/img/deluxe-suite/3deluxe-suite.avif', 3);
+-- --------------------------------------------------------
 
--- tipo_id 6 = King
-INSERT INTO foto_tipo_habitacion (tipo_id, ruta, orden) VALUES
-(6, 'assets/img/junior-suite/unior-suite1.avif', 1),
-(6, 'assets/img/junior-suite/unior-suite2.avif', 2),
-(6, 'assets/img/junior-suite/unior-suite3.avif', 3),
-(6, 'assets/img/junior-suite/unior-suite4.avif', 4),
-(6, 'assets/img/junior-suite/unior-suite5.avif', 5),
-(6, 'assets/img/junior-suite/unior-suite6.avif', 6),
-(6, 'assets/img/junior-suite/unior-suite7.avif', 7);
+--
+-- Estructura de tabla para la tabla `lugar_turistico`
+--
 
-INSERT INTO parametro (clave, valor, descripcion) VALUES
-('soles_por_punto',   '10', 'Soles gastados por cada punto ganado'),
-('puntos_bienvenida', '0',  'Puntos otorgados al registrarse un huesped nuevo');
+CREATE TABLE `lugar_turistico` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `nombre` varchar(80) NOT NULL,
+  `categoria` varchar(30) NOT NULL,
+  `descripcion` varchar(255) NOT NULL,
+  `foto` varchar(255) DEFAULT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Planes de pension (regimen alimenticio). Precios de ejemplo, por confirmar con el hotel.
-INSERT INTO plan_pension (nombre, descripcion, precio_por_noche, orden) VALUES
-('Solo alojamiento', 'Solo la habitacion, sin comidas incluidas.', 0.00, 1),
-('Alojamiento y desayuno', 'Incluye el desayuno para los huespedes de la habitacion.', 15.00, 2),
-('Media pensión', 'Desayuno y una comida mas (almuerzo o cena, a eleccion), cualquier plato de la carta.', 35.00, 3),
-('Pensión completa', 'Desayuno, almuerzo y cena incluidos, cualquier plato de la carta.', 55.00, 4);
+--
+-- Volcado de datos para la tabla `lugar_turistico`
+--
 
-INSERT INTO categoria_producto (nombre) VALUES ('Menú del día'),('Platos a la carta'),('Desayunos');
+INSERT INTO `lugar_turistico` (`id`, `nombre`, `categoria`, `descripcion`, `foto`, `activo`) VALUES
+(1, 'Pongo de Rentema', 'Naturaleza', 'Impresionante cañón del río Marañón, con paisajes únicos y gran belleza natural.', 'assets/img/recomendaciones/pongo-rentema.avif', 1),
+(2, 'Sitio Arqueológico Las Juntas', 'Arqueología', 'Importante centro ceremonial prehispánico con historia y vistas privilegiadas.', 'assets/img/recomendaciones/las-juntas.avif', 1),
+(3, 'Catarata Tsuntsuntsa', 'Cascada', 'Espectacular caída de agua rodeada de vegetación, ideal para los amantes de la naturaleza.', 'assets/img/recomendaciones/tsuntsuntsa.avif', 1),
+(4, 'Catarata Nueva Esperanza (Numparket)', 'Cascada', 'Un paraíso natural de aguas cristalinas, perfecto para la aventura y el descanso.', 'assets/img/recomendaciones/nueva-esperanza.avif', 1),
+(5, 'Cataratas del Bijao', 'Cascada', 'Conjunto de hermosas caídas de agua y pozas naturales en un entorno selvático.', 'assets/img/recomendaciones/bijao.avif', 1),
+(6, 'Plaza de Armas de Bagua', 'Cultura', 'El corazón de la ciudad, con su iglesia, áreas verdes y el encanto de la vida local.', 'assets/img/recomendaciones/plaza-armas-bagua.avif', 1);
 
-INSERT INTO producto (categoria_id, nombre, descripcion, precio) VALUES
-(1,'Menú S/ 12','Sopa del día, segundo con guarnicion y bebida natural.',12.00),
-(1,'Menú S/ 16','Sopa del día, segundo con guarnicion, bebida natural y postre del día.',16.00),
-(2,'Cecina con patacones','Tradicional sabor amazónico, acompañada de patacones dorados.',NULL),
-(2,'Chaufa amazónico','Nuestro toque selvático del clásico chaufa, con ingredientes de la región.',NULL),
-(2,'Tilapia','Fresca y sabrosa, preparada al momento.',NULL),
-(2,'Trucha','Deliciosa trucha de la región, con el inconfundible sabor amazónico.',NULL),
-(2,'Pato','Una especialidad de la selva peruana, con sabor único y tradicional.',NULL),
-(2,'Gallina','Receta tradicional, preparada con el auténtico sabor de nuestra tierra.',NULL),
-(3,'Desayuno regional','Desayuno con productos de la región.',NULL);
+-- --------------------------------------------------------
 
--- Niveles ACUMULATIVOS y PERMANENTES (como el pago fraccionado: se revisan en vivo contra el
--- saldo actual, nunca se gastan puntos; no hay canje, se aplican solos al reservar).
--- 100 = fraccionado + desayuno (S/15 de descuento fijo); 150 suma pension completa de un dia
--- (S/55 fijo); 300 suma 10% de descuento; 500 sube ese descuento a 15% (reemplaza al de 300,
--- no se suman). Ver Bo\Reserva::descuentoPorPuntos.
-INSERT INTO recompensa (nombre, descripcion, puntos_requeridos, tipo, valor, producto_id, plan_pension_id, consume_puntos) VALUES
-('Pago fraccionado','Reserva pagando solo el 50 % ahora y el resto al llegar.',100,'pago_fraccionado',50,NULL,NULL,0),
-('Desayuno de cortesía','Descuento fijo en tu reserva, equivalente a un desayuno, en cada estadía.',100,'producto',15.00,
-    (SELECT id FROM producto WHERE nombre = 'Desayuno regional'),NULL,0),
-('Pensión completa por un día','Descuento fijo en tu reserva, equivalente a un día de pensión completa, en cada estadía.',150,'plan_pension',55.00,NULL,
-    (SELECT id FROM plan_pension WHERE nombre = 'Pensión completa'),0),
-('10 % de descuento','Descuento sobre el costo de la estadía.',300,'descuento',10,NULL,NULL,0),
-('15 % de descuento','El mayor descuento del programa, para nuestros huéspedes más frecuentes.',500,'descuento',15,NULL,NULL,0);
+--
+-- Estructura de tabla para la tabla `mensaje_contacto`
+--
 
--- La columna foto guarda la ruta de la imagen (relativa a la raiz del proyecto)
-INSERT INTO lugar_turistico (nombre, categoria, descripcion, foto) VALUES
-('Pongo de Rentema','Naturaleza','Impresionante cañón del río Marañón, con paisajes únicos y gran belleza natural.','assets/img/recomendaciones/pongo-rentema.avif'),
-('Sitio Arqueológico Las Juntas','Arqueología','Importante centro ceremonial prehispánico con historia y vistas privilegiadas.','assets/img/recomendaciones/las-juntas.avif'),
-('Catarata Tsuntsuntsa','Cascada','Espectacular caída de agua rodeada de vegetación, ideal para los amantes de la naturaleza.','assets/img/recomendaciones/tsuntsuntsa.avif'),
-('Catarata Nueva Esperanza (Numparket)','Cascada','Un paraíso natural de aguas cristalinas, perfecto para la aventura y el descanso.','assets/img/recomendaciones/nueva-esperanza.avif'),
-('Cataratas del Bijao','Cascada','Conjunto de hermosas caídas de agua y pozas naturales en un entorno selvático.','assets/img/recomendaciones/bijao.avif'),
-('Plaza de Armas de Bagua','Cultura','El corazón de la ciudad, con su iglesia, áreas verdes y el encanto de la vida local.','assets/img/recomendaciones/plaza-armas-bagua.avif');
+CREATE TABLE `mensaje_contacto` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `nombre` varchar(100) NOT NULL,
+  `correo` varchar(100) NOT NULL,
+  `telefono` varchar(20) NOT NULL,
+  `asunto` enum('reserva','consulta','sugerencia','reclamo') NOT NULL,
+  `mensaje` varchar(500) NOT NULL,
+  `leido` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Huespedes de prueba: Carlos ya tiene puntos suficientes para pagar el 50 %
-INSERT INTO huesped (tipo_documento, numero_documento, nombre_completo, correo, telefono) VALUES
-('DNI','70000001','Carlos Pérez Díaz','carlos@example.com','999111222'),
-('DNI','70000002','María López Rojas','maria@example.com','999333444');
+-- --------------------------------------------------------
 
-INSERT INTO movimiento_puntos (huesped_id, tipo, puntos, descripcion) VALUES
-(1, 'ajuste', 150, 'Puntos iniciales de prueba');
+--
+-- Estructura de tabla para la tabla `movimiento_puntos`
+--
 
--- Fotos de los platos de la carta (los platos ya existen mas arriba; aqui solo se les asigna la imagen)
-UPDATE producto SET foto = 'assets/img/restaurante/secina con patacones.jpg' WHERE nombre = 'Cecina con patacones';
-UPDATE producto SET foto = 'assets/img/restaurante/Chaufa amazónico.jpg'     WHERE nombre = 'Chaufa amazónico';
-UPDATE producto SET foto = 'assets/img/restaurante/Tilapia.jpg'              WHERE nombre = 'Tilapia';
-UPDATE producto SET foto = 'assets/img/restaurante/Trucha.jpg'               WHERE nombre = 'Trucha';
-UPDATE producto SET foto = 'assets/img/restaurante/Pato.jpg'                 WHERE nombre = 'Pato';
-UPDATE producto SET foto = 'assets/img/restaurante/Gallina.jpg'              WHERE nombre = 'Gallina';
+CREATE TABLE `movimiento_puntos` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `huesped_id` int(10) UNSIGNED NOT NULL,
+  `reserva_id` int(10) UNSIGNED DEFAULT NULL,
+  `canje_id` int(10) UNSIGNED DEFAULT NULL,
+  `tipo` enum('ganado','canjeado','ajuste') NOT NULL,
+  `puntos` int(11) NOT NULL,
+  `descripcion` varchar(150) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `movimiento_puntos`
+--
+
+INSERT INTO `movimiento_puntos` (`id`, `huesped_id`, `reserva_id`, `canje_id`, `tipo`, `puntos`, `descripcion`, `created_at`) VALUES
+(1, 1, NULL, NULL, 'ajuste', 150, 'Puntos iniciales de prueba', '2026-09-29 14:04:09');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `pago`
+--
+
+CREATE TABLE `pago` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `reserva_id` int(10) UNSIGNED NOT NULL,
+  `tipo` enum('adelanto','saldo','total') NOT NULL,
+  `monto` decimal(9,2) NOT NULL CHECK (`monto` > 0),
+  `metodo` enum('tarjeta','yape','transferencia','efectivo') NOT NULL,
+  `estado` enum('pendiente','aprobado','rechazado','reembolsado') NOT NULL DEFAULT 'pendiente',
+  `pasarela` varchar(30) DEFAULT NULL,
+  `codigo_transaccion` varchar(80) DEFAULT NULL,
+  `motivo_reembolso` varchar(255) DEFAULT NULL,
+  `fecha_pago` datetime DEFAULT NULL,
+  `fecha_reembolso` datetime DEFAULT NULL,
+  `usuario_id` int(10) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `pago`
+--
+
+INSERT INTO `pago` (`id`, `reserva_id`, `tipo`, `monto`, `metodo`, `estado`, `pasarela`, `codigo_transaccion`, `motivo_reembolso`, `fecha_pago`, `fecha_reembolso`, `usuario_id`, `created_at`, `updated_at`) VALUES
+(1, 1, 'total', 495.00, 'yape', 'aprobado', 'simulada', 'SIM-722FFA3F', NULL, '2026-09-29 09:31:38', NULL, NULL, '2026-09-29 14:31:38', '2026-09-29 14:31:38'),
+(2, 2, 'total', 290.00, 'tarjeta', 'aprobado', 'simulada', 'SIM-6A6FF732', NULL, '2026-09-29 10:39:54', NULL, NULL, '2026-09-29 15:39:54', '2026-09-29 15:39:54');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `parametro`
+--
+
+CREATE TABLE `parametro` (
+  `clave` varchar(50) NOT NULL,
+  `valor` varchar(50) NOT NULL,
+  `descripcion` varchar(150) NOT NULL,
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `parametro`
+--
+
+INSERT INTO `parametro` (`clave`, `valor`, `descripcion`, `updated_at`) VALUES
+('puntos_bienvenida', '0', 'Puntos otorgados al registrarse un huesped nuevo', '2026-09-29 14:04:09'),
+('soles_por_punto', '10', 'Soles gastados por cada punto ganado', '2026-09-29 14:04:09');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `pedido`
+--
+
+CREATE TABLE `pedido` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `reserva_id` int(10) UNSIGNED DEFAULT NULL,
+  `tipo` enum('room_service','restaurante') NOT NULL,
+  `estado` enum('pendiente','preparando','entregado','cancelado') NOT NULL DEFAULT 'pendiente',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `plan_pension`
+--
+
+CREATE TABLE `plan_pension` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `nombre` varchar(40) NOT NULL,
+  `descripcion` varchar(200) DEFAULT NULL,
+  `precio_por_noche` decimal(6,2) NOT NULL DEFAULT 0.00,
+  `orden` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
+  `activo` tinyint(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `plan_pension`
+--
+
+INSERT INTO `plan_pension` (`id`, `nombre`, `descripcion`, `precio_por_noche`, `orden`, `activo`) VALUES
+(1, 'Solo alojamiento', 'Solo la habitacion, sin comidas incluidas.', 0.00, 1, 1),
+(2, 'Alojamiento y desayuno', 'Incluye el desayuno para los huespedes de la habitacion.', 15.00, 2, 1),
+(3, 'Media pensión', 'Desayuno y una comida mas (almuerzo o cena, a eleccion), cualquier plato de la carta.', 35.00, 3, 1),
+(4, 'Pensión completa', 'Desayuno, almuerzo y cena incluidos, cualquier plato de la carta.', 55.00, 4, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `producto`
+--
+
+CREATE TABLE `producto` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `categoria_id` int(10) UNSIGNED NOT NULL,
+  `nombre` varchar(80) NOT NULL,
+  `descripcion` varchar(200) DEFAULT NULL,
+  `precio` decimal(7,2) DEFAULT NULL CHECK (`precio` is null or `precio` > 0),
+  `foto` varchar(255) DEFAULT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `producto`
+--
+
+INSERT INTO `producto` (`id`, `categoria_id`, `nombre`, `descripcion`, `precio`, `foto`, `activo`, `created_at`, `updated_at`) VALUES
+(1, 1, 'Menú S/ 12', 'Sopa del día, segundo con guarnicion y bebida natural.', 12.00, NULL, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(2, 1, 'Menú S/ 16', 'Sopa del día, segundo con guarnicion, bebida natural y postre del día.', 16.00, NULL, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(3, 2, 'Cecina con patacones', 'Tradicional sabor amazónico, acompañada de patacones dorados.', NULL, 'assets/img/restaurante/secina con patacones.jpg', 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(4, 2, 'Chaufa amazónico', 'Nuestro toque selvático del clásico chaufa, con ingredientes de la región.', NULL, 'assets/img/restaurante/Chaufa amazónico.jpg', 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(5, 2, 'Tilapia', 'Fresca y sabrosa, preparada al momento.', NULL, 'assets/img/restaurante/Tilapia.jpg', 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(6, 2, 'Trucha', 'Deliciosa trucha de la región, con el inconfundible sabor amazónico.', NULL, 'assets/img/restaurante/Trucha.jpg', 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(7, 2, 'Pato', 'Una especialidad de la selva peruana, con sabor único y tradicional.', NULL, 'assets/img/restaurante/Pato.jpg', 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(8, 2, 'Gallina', 'Receta tradicional, preparada con el auténtico sabor de nuestra tierra.', NULL, 'assets/img/restaurante/Gallina.jpg', 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(9, 3, 'Desayuno regional', 'Desayuno con productos de la región.', NULL, NULL, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `recompensa`
+--
+
+CREATE TABLE `recompensa` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `nombre` varchar(80) NOT NULL,
+  `descripcion` varchar(200) DEFAULT NULL,
+  `puntos_requeridos` int(10) UNSIGNED NOT NULL,
+  `tipo` enum('pago_fraccionado','descuento','producto','noche_gratis','plan_pension') NOT NULL,
+  `valor` decimal(5,2) DEFAULT NULL,
+  `producto_id` int(10) UNSIGNED DEFAULT NULL,
+  `plan_pension_id` int(10) UNSIGNED DEFAULT NULL,
+  `consume_puntos` tinyint(1) NOT NULL DEFAULT 1,
+  `activo` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `recompensa`
+--
+
+INSERT INTO `recompensa` (`id`, `nombre`, `descripcion`, `puntos_requeridos`, `tipo`, `valor`, `producto_id`, `plan_pension_id`, `consume_puntos`, `activo`, `created_at`, `updated_at`) VALUES
+(1, 'Pago fraccionado', 'Reserva pagando solo el 50 % ahora y el resto al llegar.', 100, 'pago_fraccionado', 50.00, NULL, NULL, 0, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(2, 'Desayuno de cortesía', 'Descuento fijo en tu reserva, equivalente a un desayuno, en cada estadía.', 100, 'producto', 15.00, 9, NULL, 0, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(3, 'Pensión completa por un día', 'Descuento fijo en tu reserva, equivalente a un día de pensión completa, en cada estadía.', 150, 'plan_pension', 55.00, NULL, 4, 0, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(4, '10 % de descuento', 'Descuento sobre el costo de la estadía.', 300, 'descuento', 10.00, NULL, NULL, 0, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(5, '15 % de descuento', 'El mayor descuento del programa, para nuestros huéspedes más frecuentes.', 500, 'descuento', 15.00, NULL, NULL, 0, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `reserva`
+--
+
+CREATE TABLE `reserva` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `codigo` varchar(12) NOT NULL,
+  `huesped_id` int(10) UNSIGNED NOT NULL,
+  `habitacion_id` int(10) UNSIGNED NOT NULL,
+  `fecha_ingreso` date NOT NULL,
+  `fecha_salida` date NOT NULL,
+  `num_huespedes` tinyint(3) UNSIGNED NOT NULL DEFAULT 1,
+  `precio_noche` decimal(8,2) NOT NULL,
+  `plan_pension_id` int(10) UNSIGNED NOT NULL DEFAULT 1,
+  `precio_plan_pension` decimal(6,2) NOT NULL DEFAULT 0.00,
+  `monto_descuento` decimal(9,2) NOT NULL DEFAULT 0.00,
+  `monto_adelanto` decimal(9,2) NOT NULL,
+  `modalidad_pago` enum('completo','fraccionado') NOT NULL DEFAULT 'completo',
+  `estado` enum('pendiente','confirmada','checkin','checkout','cancelada','no_show') NOT NULL DEFAULT 'pendiente',
+  `observaciones` varchar(255) DEFAULT NULL,
+  `usuario_id` int(10) UNSIGNED DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ;
+
+--
+-- Volcado de datos para la tabla `reserva`
+--
+
+INSERT INTO `reserva` (`id`, `codigo`, `huesped_id`, `habitacion_id`, `fecha_ingreso`, `fecha_salida`, `num_huespedes`, `precio_noche`, `plan_pension_id`, `precio_plan_pension`, `monto_descuento`, `monto_adelanto`, `modalidad_pago`, `estado`, `observaciones`, `usuario_id`, `created_at`, `updated_at`) VALUES
+(1, 'SA75962FD1', 3, 7, '2026-09-30', '2026-10-03', 1, 130.00, 3, 35.00, 0.00, 495.00, 'completo', 'confirmada', NULL, NULL, '2026-09-29 14:31:38', '2026-09-29 14:31:38'),
+(2, 'SADE628396', 4, 2, '2026-09-29', '2026-10-01', 1, 130.00, 2, 15.00, 0.00, 290.00, 'completo', 'checkin', NULL, NULL, '2026-09-29 15:39:54', '2026-09-29 15:45:15');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `rol`
+--
+
+CREATE TABLE `rol` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `nombre` varchar(30) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `rol`
+--
+
+INSERT INTO `rol` (`id`, `nombre`) VALUES
+(1, 'administrador'),
+(2, 'recepcionista');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `servicio`
+--
+
+CREATE TABLE `servicio` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `nombre` varchar(50) NOT NULL,
+  `icono` varchar(30) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `servicio`
+--
+
+INSERT INTO `servicio` (`id`, `nombre`, `icono`) VALUES
+(1, 'Baño privado', 'bi-droplet'),
+(2, 'Aire acondicionado', 'bi-snow'),
+(3, 'TV', 'bi-tv'),
+(4, 'Armario', 'bi-door-closed'),
+(5, 'Escritorio', 'bi-laptop'),
+(6, 'Wi-Fi gratis', 'bi-wifi'),
+(7, 'Cochera gratis', 'bi-car-front'),
+(8, 'Agua caliente', 'bi-thermometer-half');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tipo_habitacion`
+--
+
+CREATE TABLE `tipo_habitacion` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `nombre` varchar(40) NOT NULL,
+  `descripcion` varchar(255) NOT NULL,
+  `detalle` text DEFAULT NULL,
+  `capacidad` tinyint(3) UNSIGNED NOT NULL,
+  `precio_noche` decimal(8,2) NOT NULL CHECK (`precio_noche` > 0),
+  `activo` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `tipo_habitacion`
+--
+
+INSERT INTO `tipo_habitacion` (`id`, `nombre`, `descripcion`, `detalle`, `capacidad`, `precio_noche`, `activo`, `created_at`, `updated_at`) VALUES
+(1, 'Simple', 'Habitación sencilla y cómoda para una persona.', 'La habitación Simple del Hotel San Antonio ofrece un ambiente tranquilo y funcional, ideal para viajeros que buscan descanso y buen precio en el corazón de Bagua.', 1, 100.00, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(2, 'Ejecutiva', 'Habitación ejecutiva con escritorio y agua caliente para una persona.', 'Pensada para quienes viajan por trabajo: escritorio, silla y aire acondicionado en un ambiente ordenado y silencioso, con baño privado con agua caliente para un mayor confort después de la jornada.', 1, 130.00, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(3, 'Matrimonial', 'Cama de dos plazas para dos personas.', 'Habitación matrimonial amplia y acogedora, ideal para parejas que visitan Bagua por turismo o descanso.', 2, 130.00, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(4, 'Doble', 'Dos camas para dos personas.', 'Habitación con dos camas individuales, perfecta para amigos, familiares o compañeros de viaje.', 2, 150.00, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(5, 'Suite', 'Suite con mayor espacio para dos personas.', 'La Suite ofrece más espacio y comodidad, con un ambiente elegante para quienes desean una estadía especial.', 2, 150.00, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(6, 'King', 'Amplia y cómoda, perfecta para una estadía de descanso.', 'La habitación King del Hotel San Antonio ofrece un ambiente amplio, elegante y acogedor, ideal para quienes buscan comodidad y tranquilidad en el corazón de la Amazonía. Disfruta de una cama king, espacios bien iluminados y una vista privilegiada a la naturaleza de Bagua.', 2, 180.00, 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tipo_servicio`
+--
+
+CREATE TABLE `tipo_servicio` (
+  `tipo_id` int(10) UNSIGNED NOT NULL,
+  `servicio_id` int(10) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `tipo_servicio`
+--
+
+INSERT INTO `tipo_servicio` (`tipo_id`, `servicio_id`) VALUES
+(1, 1),
+(1, 2),
+(1, 3),
+(1, 4),
+(1, 5),
+(1, 6),
+(1, 7),
+(2, 1),
+(2, 2),
+(2, 3),
+(2, 4),
+(2, 5),
+(2, 6),
+(2, 7),
+(2, 8),
+(3, 1),
+(3, 2),
+(3, 3),
+(3, 4),
+(3, 5),
+(3, 6),
+(3, 7),
+(3, 8),
+(4, 1),
+(4, 2),
+(4, 3),
+(4, 4),
+(4, 5),
+(4, 6),
+(4, 7),
+(4, 8),
+(5, 1),
+(5, 2),
+(5, 3),
+(5, 4),
+(5, 5),
+(5, 6),
+(5, 7),
+(5, 8),
+(6, 1),
+(6, 2),
+(6, 3),
+(6, 4),
+(6, 5),
+(6, 6),
+(6, 7),
+(6, 8);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `usuario`
+--
+
+CREATE TABLE `usuario` (
+  `id` int(10) UNSIGNED NOT NULL,
+  `rol_id` int(10) UNSIGNED NOT NULL,
+  `nombres` varchar(80) NOT NULL,
+  `correo` varchar(100) NOT NULL,
+  `clave` varchar(255) NOT NULL,
+  `activo` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `usuario`
+--
+
+INSERT INTO `usuario` (`id`, `rol_id`, `nombres`, `correo`, `clave`, `activo`, `created_at`, `updated_at`) VALUES
+(1, 1, 'Administrador San Antonio', 'admin@sanantonio.pe', '$2y$10$wghTX6l0xeUQDUKKuBHiVuF6.xwUad30MKKYj7c65d2Hhg9l6Q2w6', 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09'),
+(2, 2, 'Recepción Turno Día', 'recepcion@sanantonio.pe', '$2y$10$wghTX6l0xeUQDUKKuBHiVuF6.xwUad30MKKYj7c65d2Hhg9l6Q2w6', 1, '2026-09-29 14:04:09', '2026-09-29 14:04:09');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura Stand-in para la vista `vista_pedido`
+-- (Véase abajo para la vista actual)
+--
+CREATE TABLE `vista_pedido` (
+`id` int(10) unsigned
+,`reserva_id` int(10) unsigned
+,`tipo` enum('room_service','restaurante')
+,`estado` enum('pendiente','preparando','entregado','cancelado')
+,`created_at` timestamp
+,`updated_at` timestamp
+,`total` decimal(34,2)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura Stand-in para la vista `vista_puntos_huesped`
+-- (Véase abajo para la vista actual)
+--
+CREATE TABLE `vista_puntos_huesped` (
+`huesped_id` int(10) unsigned
+,`puntos` decimal(32,0)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura Stand-in para la vista `vista_reserva`
+-- (Véase abajo para la vista actual)
+--
+CREATE TABLE `vista_reserva` (
+`id` int(10) unsigned
+,`codigo` varchar(12)
+,`huesped_id` int(10) unsigned
+,`habitacion_id` int(10) unsigned
+,`fecha_ingreso` date
+,`fecha_salida` date
+,`num_huespedes` tinyint(3) unsigned
+,`precio_noche` decimal(8,2)
+,`plan_pension_id` int(10) unsigned
+,`precio_plan_pension` decimal(6,2)
+,`monto_descuento` decimal(9,2)
+,`monto_adelanto` decimal(9,2)
+,`modalidad_pago` enum('completo','fraccionado')
+,`estado` enum('pendiente','confirmada','checkin','checkout','cancelada','no_show')
+,`observaciones` varchar(255)
+,`usuario_id` int(10) unsigned
+,`created_at` timestamp
+,`updated_at` timestamp
+,`noches` int(7)
+,`monto_total` decimal(16,2)
+,`monto_pagado` decimal(31,2)
+,`saldo_pendiente` decimal(32,2)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Estructura para la vista `vista_pedido`
+--
+DROP TABLE IF EXISTS `vista_pedido`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_pedido`  AS SELECT `p`.`id` AS `id`, `p`.`reserva_id` AS `reserva_id`, `p`.`tipo` AS `tipo`, `p`.`estado` AS `estado`, `p`.`created_at` AS `created_at`, `p`.`updated_at` AS `updated_at`, coalesce(sum(`d`.`cantidad` * `d`.`precio_unitario`),0) AS `total` FROM (`pedido` `p` left join `detalle_pedido` `d` on(`d`.`pedido_id` = `p`.`id`)) GROUP BY `p`.`id` ;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura para la vista `vista_puntos_huesped`
+--
+DROP TABLE IF EXISTS `vista_puntos_huesped`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_puntos_huesped`  AS SELECT `h`.`id` AS `huesped_id`, coalesce(sum(`m`.`puntos`),0) AS `puntos` FROM (`huesped` `h` left join `movimiento_puntos` `m` on(`m`.`huesped_id` = `h`.`id`)) GROUP BY `h`.`id` ;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura para la vista `vista_reserva`
+--
+DROP TABLE IF EXISTS `vista_reserva`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vista_reserva`  AS SELECT `r`.`id` AS `id`, `r`.`codigo` AS `codigo`, `r`.`huesped_id` AS `huesped_id`, `r`.`habitacion_id` AS `habitacion_id`, `r`.`fecha_ingreso` AS `fecha_ingreso`, `r`.`fecha_salida` AS `fecha_salida`, `r`.`num_huespedes` AS `num_huespedes`, `r`.`precio_noche` AS `precio_noche`, `r`.`plan_pension_id` AS `plan_pension_id`, `r`.`precio_plan_pension` AS `precio_plan_pension`, `r`.`monto_descuento` AS `monto_descuento`, `r`.`monto_adelanto` AS `monto_adelanto`, `r`.`modalidad_pago` AS `modalidad_pago`, `r`.`estado` AS `estado`, `r`.`observaciones` AS `observaciones`, `r`.`usuario_id` AS `usuario_id`, `r`.`created_at` AS `created_at`, `r`.`updated_at` AS `updated_at`, to_days(`r`.`fecha_salida`) - to_days(`r`.`fecha_ingreso`) AS `noches`, (to_days(`r`.`fecha_salida`) - to_days(`r`.`fecha_ingreso`)) * (`r`.`precio_noche` + `r`.`precio_plan_pension`) - `r`.`monto_descuento` AS `monto_total`, coalesce(`p`.`pagado`,0) AS `monto_pagado`, (to_days(`r`.`fecha_salida`) - to_days(`r`.`fecha_ingreso`)) * (`r`.`precio_noche` + `r`.`precio_plan_pension`) - `r`.`monto_descuento` - coalesce(`p`.`pagado`,0) AS `saldo_pendiente` FROM (`reserva` `r` left join (select `pago`.`reserva_id` AS `reserva_id`,sum(`pago`.`monto`) AS `pagado` from `pago` where `pago`.`estado` = 'aprobado' group by `pago`.`reserva_id`) `p` on(`p`.`reserva_id` = `r`.`id`)) ;
+
+--
+-- Índices para tablas volcadas
+--
+
+--
+-- Indices de la tabla `canje_recompensa`
+--
+ALTER TABLE `canje_recompensa`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_canje_huesped` (`huesped_id`),
+  ADD KEY `fk_canje_recompensa` (`recompensa_id`),
+  ADD KEY `fk_canje_reserva` (`reserva_id`);
+
+--
+-- Indices de la tabla `categoria_producto`
+--
+ALTER TABLE `categoria_producto`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `nombre` (`nombre`);
+
+--
+-- Indices de la tabla `comprobante`
+--
+ALTER TABLE `comprobante`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_comprobante` (`serie`,`numero`),
+  ADD KEY `fk_comp_reserva` (`reserva_id`),
+  ADD KEY `fk_comp_pedido` (`pedido_id`);
+
+--
+-- Indices de la tabla `detalle_pedido`
+--
+ALTER TABLE `detalle_pedido`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_dp_pedido` (`pedido_id`),
+  ADD KEY `fk_dp_producto` (`producto_id`);
+
+--
+-- Indices de la tabla `foto_tipo_habitacion`
+--
+ALTER TABLE `foto_tipo_habitacion`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_foto_tipo` (`tipo_id`);
+
+--
+-- Indices de la tabla `habitacion`
+--
+ALTER TABLE `habitacion`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `numero` (`numero`),
+  ADD KEY `fk_habitacion_tipo` (`tipo_id`);
+
+--
+-- Indices de la tabla `huesped`
+--
+ALTER TABLE `huesped`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `uq_huesped_documento` (`tipo_documento`,`numero_documento`);
+
+--
+-- Indices de la tabla `limite_intento`
+--
+ALTER TABLE `limite_intento`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_limite` (`ip`,`accion`,`creado_en`);
+
+--
+-- Indices de la tabla `lugar_turistico`
+--
+ALTER TABLE `lugar_turistico`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `mensaje_contacto`
+--
+ALTER TABLE `mensaje_contacto`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `movimiento_puntos`
+--
+ALTER TABLE `movimiento_puntos`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_mp_huesped` (`huesped_id`),
+  ADD KEY `fk_mp_reserva` (`reserva_id`),
+  ADD KEY `fk_mp_canje` (`canje_id`);
+
+--
+-- Indices de la tabla `pago`
+--
+ALTER TABLE `pago`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_pago_reserva` (`reserva_id`),
+  ADD KEY `fk_pago_usuario` (`usuario_id`);
+
+--
+-- Indices de la tabla `parametro`
+--
+ALTER TABLE `parametro`
+  ADD PRIMARY KEY (`clave`);
+
+--
+-- Indices de la tabla `pedido`
+--
+ALTER TABLE `pedido`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_pedido_reserva` (`reserva_id`);
+
+--
+-- Indices de la tabla `plan_pension`
+--
+ALTER TABLE `plan_pension`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- Indices de la tabla `producto`
+--
+ALTER TABLE `producto`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_producto_categoria` (`categoria_id`);
+
+--
+-- Indices de la tabla `recompensa`
+--
+ALTER TABLE `recompensa`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_recompensa_producto` (`producto_id`),
+  ADD KEY `fk_recompensa_plan_pension` (`plan_pension_id`);
+
+--
+-- Indices de la tabla `reserva`
+--
+ALTER TABLE `reserva`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `codigo` (`codigo`),
+  ADD KEY `fk_reserva_huesped` (`huesped_id`),
+  ADD KEY `fk_reserva_usuario` (`usuario_id`),
+  ADD KEY `fk_reserva_plan_pension` (`plan_pension_id`),
+  ADD KEY `idx_reserva_fechas` (`habitacion_id`,`fecha_ingreso`,`fecha_salida`);
+
+--
+-- Indices de la tabla `rol`
+--
+ALTER TABLE `rol`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `nombre` (`nombre`);
+
+--
+-- Indices de la tabla `servicio`
+--
+ALTER TABLE `servicio`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `nombre` (`nombre`);
+
+--
+-- Indices de la tabla `tipo_habitacion`
+--
+ALTER TABLE `tipo_habitacion`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `nombre` (`nombre`);
+
+--
+-- Indices de la tabla `tipo_servicio`
+--
+ALTER TABLE `tipo_servicio`
+  ADD PRIMARY KEY (`tipo_id`,`servicio_id`),
+  ADD KEY `fk_ts_servicio` (`servicio_id`);
+
+--
+-- Indices de la tabla `usuario`
+--
+ALTER TABLE `usuario`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `correo` (`correo`),
+  ADD KEY `fk_usuario_rol` (`rol_id`);
+
+--
+-- AUTO_INCREMENT de las tablas volcadas
+--
+
+--
+-- AUTO_INCREMENT de la tabla `canje_recompensa`
+--
+ALTER TABLE `canje_recompensa`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `categoria_producto`
+--
+ALTER TABLE `categoria_producto`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT de la tabla `comprobante`
+--
+ALTER TABLE `comprobante`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `detalle_pedido`
+--
+ALTER TABLE `detalle_pedido`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `foto_tipo_habitacion`
+--
+ALTER TABLE `foto_tipo_habitacion`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+
+--
+-- AUTO_INCREMENT de la tabla `habitacion`
+--
+ALTER TABLE `habitacion`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+
+--
+-- AUTO_INCREMENT de la tabla `huesped`
+--
+ALTER TABLE `huesped`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT de la tabla `limite_intento`
+--
+ALTER TABLE `limite_intento`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT de la tabla `lugar_turistico`
+--
+ALTER TABLE `lugar_turistico`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT de la tabla `mensaje_contacto`
+--
+ALTER TABLE `mensaje_contacto`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `movimiento_puntos`
+--
+ALTER TABLE `movimiento_puntos`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT de la tabla `pago`
+--
+ALTER TABLE `pago`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de la tabla `pedido`
+--
+ALTER TABLE `pedido`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `plan_pension`
+--
+ALTER TABLE `plan_pension`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT de la tabla `producto`
+--
+ALTER TABLE `producto`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
+
+--
+-- AUTO_INCREMENT de la tabla `recompensa`
+--
+ALTER TABLE `recompensa`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+
+--
+-- AUTO_INCREMENT de la tabla `reserva`
+--
+ALTER TABLE `reserva`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `rol`
+--
+ALTER TABLE `rol`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT de la tabla `servicio`
+--
+ALTER TABLE `servicio`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT de la tabla `tipo_habitacion`
+--
+ALTER TABLE `tipo_habitacion`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+
+--
+-- AUTO_INCREMENT de la tabla `usuario`
+--
+ALTER TABLE `usuario`
+  MODIFY `id` int(10) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- Restricciones para tablas volcadas
+--
+
+--
+-- Filtros para la tabla `canje_recompensa`
+--
+ALTER TABLE `canje_recompensa`
+  ADD CONSTRAINT `fk_canje_huesped` FOREIGN KEY (`huesped_id`) REFERENCES `huesped` (`id`),
+  ADD CONSTRAINT `fk_canje_recompensa` FOREIGN KEY (`recompensa_id`) REFERENCES `recompensa` (`id`),
+  ADD CONSTRAINT `fk_canje_reserva` FOREIGN KEY (`reserva_id`) REFERENCES `reserva` (`id`);
+
+--
+-- Filtros para la tabla `comprobante`
+--
+ALTER TABLE `comprobante`
+  ADD CONSTRAINT `fk_comp_pedido` FOREIGN KEY (`pedido_id`) REFERENCES `pedido` (`id`),
+  ADD CONSTRAINT `fk_comp_reserva` FOREIGN KEY (`reserva_id`) REFERENCES `reserva` (`id`);
+
+--
+-- Filtros para la tabla `detalle_pedido`
+--
+ALTER TABLE `detalle_pedido`
+  ADD CONSTRAINT `fk_dp_pedido` FOREIGN KEY (`pedido_id`) REFERENCES `pedido` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_dp_producto` FOREIGN KEY (`producto_id`) REFERENCES `producto` (`id`);
+
+--
+-- Filtros para la tabla `foto_tipo_habitacion`
+--
+ALTER TABLE `foto_tipo_habitacion`
+  ADD CONSTRAINT `fk_foto_tipo` FOREIGN KEY (`tipo_id`) REFERENCES `tipo_habitacion` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `habitacion`
+--
+ALTER TABLE `habitacion`
+  ADD CONSTRAINT `fk_habitacion_tipo` FOREIGN KEY (`tipo_id`) REFERENCES `tipo_habitacion` (`id`);
+
+--
+-- Filtros para la tabla `movimiento_puntos`
+--
+ALTER TABLE `movimiento_puntos`
+  ADD CONSTRAINT `fk_mp_canje` FOREIGN KEY (`canje_id`) REFERENCES `canje_recompensa` (`id`),
+  ADD CONSTRAINT `fk_mp_huesped` FOREIGN KEY (`huesped_id`) REFERENCES `huesped` (`id`),
+  ADD CONSTRAINT `fk_mp_reserva` FOREIGN KEY (`reserva_id`) REFERENCES `reserva` (`id`);
+
+--
+-- Filtros para la tabla `pago`
+--
+ALTER TABLE `pago`
+  ADD CONSTRAINT `fk_pago_reserva` FOREIGN KEY (`reserva_id`) REFERENCES `reserva` (`id`),
+  ADD CONSTRAINT `fk_pago_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id`);
+
+--
+-- Filtros para la tabla `pedido`
+--
+ALTER TABLE `pedido`
+  ADD CONSTRAINT `fk_pedido_reserva` FOREIGN KEY (`reserva_id`) REFERENCES `reserva` (`id`);
+
+--
+-- Filtros para la tabla `producto`
+--
+ALTER TABLE `producto`
+  ADD CONSTRAINT `fk_producto_categoria` FOREIGN KEY (`categoria_id`) REFERENCES `categoria_producto` (`id`);
+
+--
+-- Filtros para la tabla `recompensa`
+--
+ALTER TABLE `recompensa`
+  ADD CONSTRAINT `fk_recompensa_plan_pension` FOREIGN KEY (`plan_pension_id`) REFERENCES `plan_pension` (`id`),
+  ADD CONSTRAINT `fk_recompensa_producto` FOREIGN KEY (`producto_id`) REFERENCES `producto` (`id`);
+
+--
+-- Filtros para la tabla `reserva`
+--
+ALTER TABLE `reserva`
+  ADD CONSTRAINT `fk_reserva_habitacion` FOREIGN KEY (`habitacion_id`) REFERENCES `habitacion` (`id`),
+  ADD CONSTRAINT `fk_reserva_huesped` FOREIGN KEY (`huesped_id`) REFERENCES `huesped` (`id`),
+  ADD CONSTRAINT `fk_reserva_plan_pension` FOREIGN KEY (`plan_pension_id`) REFERENCES `plan_pension` (`id`),
+  ADD CONSTRAINT `fk_reserva_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuario` (`id`);
+
+--
+-- Filtros para la tabla `tipo_servicio`
+--
+ALTER TABLE `tipo_servicio`
+  ADD CONSTRAINT `fk_ts_servicio` FOREIGN KEY (`servicio_id`) REFERENCES `servicio` (`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_ts_tipo` FOREIGN KEY (`tipo_id`) REFERENCES `tipo_habitacion` (`id`) ON DELETE CASCADE;
+
+--
+-- Filtros para la tabla `usuario`
+--
+ALTER TABLE `usuario`
+  ADD CONSTRAINT `fk_usuario_rol` FOREIGN KEY (`rol_id`) REFERENCES `rol` (`id`);
+COMMIT;
+
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
