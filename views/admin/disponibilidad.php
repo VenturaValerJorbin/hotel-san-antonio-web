@@ -1,6 +1,6 @@
 <?php
-require __DIR__ . "/../config/Autoload.php";
-require_once __DIR__ . "/../views/partes/ayudas.php";
+require __DIR__ . "/../../config/Autoload.php";
+require_once __DIR__ . "/../partes/ayudas.php";
 
 use App\Bo\Reserva as ReservaBO;
 
@@ -17,7 +17,7 @@ $totales = $tablero["totales"];
 $textos = ["disponible" => "Disp.", "reservada" => "Res.", "ocupada" => "Ocup.", "mantenimiento" => "Mant."];
 $diasSemana = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
-require __DIR__ . "/../views/partes/panel_cabecera.php";
+require __DIR__ . "/../partes/panel_cabecera.php";
 ?>
 <h1 class="h3 mb-3">Tablero de disponibilidad</h1>
 
@@ -74,4 +74,4 @@ require __DIR__ . "/../views/partes/panel_cabecera.php";
         <span><span class="punto" style="background:#8a807a"></span>Mantenimiento</span>
     </div>
 </div>
-<?php require __DIR__ . "/../views/partes/panel_pie.php" ?>
+<?php require __DIR__ . "/../partes/panel_pie.php" ?>

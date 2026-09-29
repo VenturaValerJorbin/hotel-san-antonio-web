@@ -1,5 +1,5 @@
 <?php
-require __DIR__ . "/../config/Autoload.php";
+require __DIR__ . "/../../config/Autoload.php";
 
 use App\Bo\Habitacion as HabitacionBO;
 
@@ -12,7 +12,7 @@ $tipos = $bo->tipos();
 // Si viene ?editar=ID se carga la habitacion en el formulario (UPDATE); si no, el formulario crea (CREATE)
 $editar = isset($_GET["editar"]) ? $bo->obtener((int) $_GET["editar"]) : null;
 
-require __DIR__ . "/../views/partes/panel_cabecera.php";
+require __DIR__ . "/../partes/panel_cabecera.php";
 /** @var array $errores Errores del formulario (los crea views/partes/ayudas.php) */
 /** @var array $antiguo Datos escritos antes de un error (los crea views/partes/ayudas.php) */
 
@@ -68,7 +68,7 @@ $estados = ["disponible" => "Disponible", "ocupada" => "Ocupada", "limpieza" => 
         </div>
         <div class="col-12 d-flex gap-2">
             <button class="btn-sa" type="submit"><?= $editar ? "Guardar cambios" : "Registrar habitación" ?></button>
-            <?php if ($editar) : ?><a class="btn-linea text-decoration-none" href="<?= url("admin/gestion_habitaciones.php") ?>">Cancelar</a><?php endif ?>
+            <?php if ($editar) : ?><a class="btn-linea text-decoration-none" href="<?= url("views/admin/gestion_habitaciones.php") ?>">Cancelar</a><?php endif ?>
         </div>
     </form>
 </section>
@@ -87,7 +87,7 @@ $estados = ["disponible" => "Disponible", "ocupada" => "Ocupada", "limpieza" => 
                         <td><?= e($estados[$h->estado] ?? $h->estado) ?></td>
                         <td>
                             <div class="d-flex gap-1">
-                                <a class="btn btn-sm btn-outline-secondary" href="<?= url("admin/gestion_habitaciones.php") ?>?editar=<?= $h->id ?>">Editar</a>
+                                <a class="btn btn-sm btn-outline-secondary" href="<?= url("views/admin/gestion_habitaciones.php") ?>?editar=<?= $h->id ?>">Editar</a>
                                 <form action="<?= url("procesar.php") ?>" method="post" data-confirmar="¿Eliminar la habitación <?= e($h->numero) ?>?">
                                     <input type="hidden" name="modulo" value="habitacion">
                                     <input type="hidden" name="accion" value="eliminar">
@@ -102,4 +102,4 @@ $estados = ["disponible" => "Disponible", "ocupada" => "Ocupada", "limpieza" => 
         </table>
     </div>
 </div>
-<?php require __DIR__ . "/../views/partes/panel_pie.php" ?>
+<?php require __DIR__ . "/../partes/panel_pie.php" ?>

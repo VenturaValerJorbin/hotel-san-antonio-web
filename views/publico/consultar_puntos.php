@@ -2,7 +2,7 @@
 // Endpoint de solo lectura para consultar el saldo de puntos de un documento (usado por JS,
 // desde el formulario de reserva y desde la pagina de puntos). No pasa por procesar.php porque
 // no crea ni modifica nada: es una lectura (GET), no una accion (POST).
-require __DIR__ . "/../config/Autoload.php";
+require __DIR__ . "/../../config/Autoload.php";
 
 use App\Bo\LimiteIntento as LimiteIntentoBO;
 use App\Bo\Puntos as PuntosBO;

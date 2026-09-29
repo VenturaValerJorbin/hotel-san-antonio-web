@@ -8,10 +8,10 @@ use App\Bo\Contacto as ContactoBO;
 /** @var array|null $flash Mensaje de la pagina anterior (lo crea views/partes/ayudas.php) */
 
 $opciones = [
-    "reservas" => ["admin/reservas.php", "bi-journal-text", "Reservas"],
-    "disponibilidad" => ["admin/disponibilidad.php", "bi-calendar3", "Disponibilidad"],
-    "habitaciones" => ["admin/gestion_habitaciones.php", "bi-door-open", "Habitaciones"],
-    "mensajes" => ["admin/mensajes.php", "bi-envelope", "Mensajes"],
+    "reservas" => ["views/admin/reservas.php", "bi-journal-text", "Reservas"],
+    "disponibilidad" => ["views/admin/disponibilidad.php", "bi-calendar3", "Disponibilidad"],
+    "habitaciones" => ["views/admin/gestion_habitaciones.php", "bi-door-open", "Habitaciones"],
+    "mensajes" => ["views/admin/mensajes.php", "bi-envelope", "Mensajes"],
 ];
 // Aviso de mensajes sin leer, visible en el menu sin tener que entrar a revisar
 $mensajesNoLeidos = (new ContactoBO())->noLeidos();

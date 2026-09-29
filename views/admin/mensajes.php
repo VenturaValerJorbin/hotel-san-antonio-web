@@ -1,5 +1,5 @@
 <?php
-require __DIR__ . "/../config/Autoload.php";
+require __DIR__ . "/../../config/Autoload.php";
 
 use App\Bo\Contacto as ContactoBO;
 
@@ -13,7 +13,7 @@ $filtros = [
 ];
 $mensajes = $bo->listar($filtros);
 
-require __DIR__ . "/../views/partes/panel_cabecera.php";
+require __DIR__ . "/../partes/panel_cabecera.php";
 
 $asuntos = ["reserva" => "Reserva", "consulta" => "Consulta", "sugerencia" => "Sugerencia", "reclamo" => "Reclamo"];
 ?>
@@ -40,7 +40,7 @@ $asuntos = ["reserva" => "Reserva", "consulta" => "Consulta", "sugerencia" => "S
         </div>
         <div class="col-12 col-md-4 d-flex gap-2">
             <button class="btn-sa flex-grow-1" type="submit">Filtrar</button>
-            <a class="btn-linea text-decoration-none" href="<?= url("admin/mensajes.php") ?>" title="Quitar filtros"><i class="bi bi-x-lg"></i></a>
+            <a class="btn-linea text-decoration-none" href="<?= url("views/admin/mensajes.php") ?>" title="Quitar filtros"><i class="bi bi-x-lg"></i></a>
         </div>
     </div>
 </form>
@@ -73,4 +73,4 @@ $asuntos = ["reserva" => "Reserva", "consulta" => "Consulta", "sugerencia" => "S
 <?php if (!$mensajes) : ?>
     <p class="text-center text-muted my-4">No hay mensajes con esos filtros.</p>
 <?php endif ?>
-<?php require __DIR__ . "/../views/partes/panel_pie.php" ?>
+<?php require __DIR__ . "/../partes/panel_pie.php" ?>

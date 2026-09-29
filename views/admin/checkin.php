@@ -1,6 +1,6 @@
 <?php
-require __DIR__ . "/../config/Autoload.php";
-require_once __DIR__ . "/../views/partes/ayudas.php";
+require __DIR__ . "/../../config/Autoload.php";
+require_once __DIR__ . "/../partes/ayudas.php";
 
 use App\Bo\Reserva as ReservaBO;
 
@@ -9,11 +9,11 @@ $activo = "reservas";
 
 $r = (new ReservaBO())->detalleCheckin((int) ($_GET["id"] ?? 0));
 if (!$r) {
-    header("Location: " . url("admin/reservas.php"));
+    header("Location: " . url("views/admin/reservas.php"));
     exit;
 }
 
-require __DIR__ . "/../views/partes/panel_cabecera.php";
+require __DIR__ . "/../partes/panel_cabecera.php";
 /** @var array $antiguo Datos escritos antes de un error (los crea views/partes/ayudas.php) */
 
 $llegaAntesDeHoy = $r["fecha_ingreso"] > date("Y-m-d");
@@ -96,8 +96,8 @@ $asignada = (int) ($antiguo["habitacion_id"] ?? $r["habitacion_id"]);
     </div>
 
     <div class="d-flex justify-content-end gap-2 mt-3">
-        <a class="btn-linea text-decoration-none" href="<?= url("admin/reservas.php") ?>">Cancelar</a>
+        <a class="btn-linea text-decoration-none" href="<?= url("views/admin/reservas.php") ?>">Cancelar</a>
         <button class="btn-sa" type="submit" <?= $puedeIngresar ? "" : "disabled" ?>><i class="bi bi-person-check"></i> Registrar check-in</button>
     </div>
 </form>
-<?php require __DIR__ . "/../views/partes/panel_pie.php" ?>
+<?php require __DIR__ . "/../partes/panel_pie.php" ?>

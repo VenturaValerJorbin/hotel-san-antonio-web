@@ -20,7 +20,7 @@ class Reserva extends Controlador
             "crear" => $this->crear($post),
             "checkin" => $this->checkin($post),
             "checkout" => $this->checkout($post),
-            default => $this->resultado(false, "Accion no valida.", "publico/reservar.php"),
+            default => $this->resultado(false, "Accion no valida.", "views/publico/reservar.php"),
         };
     }
 
@@ -57,7 +57,7 @@ class Reserva extends Controlador
         return $this->ejecutar(
             fn() => $this->bo->reservar($datos),
             "Reserva confirmada. Aquí tienes tu comprobante.",
-            fn($r) => "publico/comprobante.php?" . http_build_query([
+            fn($r) => "views/publico/comprobante.php?" . http_build_query([
                 "codigo" => $r["codigo"],
                 "numero_documento" => $datos["numero_documento"],
             ]),
@@ -70,7 +70,7 @@ class Reserva extends Controlador
         $id = (int) ($p["id"] ?? 0);
         $habitacionId = (int) ($p["habitacion_id"] ?? 0);
         $observaciones = trim($p["observaciones"] ?? "");
-        $formulario = "admin/checkin.php?id=$id";
+        $formulario = "views/admin/checkin.php?id=$id";
 
         if ($id <= 0 || $habitacionId <= 0) {
             return $this->resultado(false, "Selecciona la habitacion a asignar.", $formulario);
@@ -81,7 +81,7 @@ class Reserva extends Controlador
         return $this->ejecutar(
             fn() => $this->bo->registrarCheckin($id, $habitacionId, $observaciones),
             "Check-in registrado.",
-            "admin/reservas.php",
+            "views/admin/reservas.php",
             $formulario
         );
     }
@@ -90,20 +90,20 @@ class Reserva extends Controlador
     {
         $id = (int) ($p["id"] ?? 0);
         if ($id <= 0) {
-            return $this->resultado(false, "Datos no validos.", "admin/reservas.php");
+            return $this->resultado(false, "Datos no validos.", "views/admin/reservas.php");
         }
         return $this->ejecutar(
             fn() => $this->bo->registrarCheckout($id),
             "Check-out registrado, saldo cobrado y puntos sumados.",
-            "admin/reservas.php",
-            "admin/reservas.php"
+            "views/admin/reservas.php",
+            "views/admin/reservas.php"
         );
     }
 
     // Al fallar se vuelve al formulario conservando la habitacion y las fechas elegidas
     private function volverAReservar(array $d): string
     {
-        return "publico/reservar.php?" . http_build_query(
+        return "views/publico/reservar.php?" . http_build_query(
             array_filter(["tipo" => $d["tipo_id"], "ingreso" => $d["fecha_ingreso"], "salida" => $d["fecha_salida"]])
         );
     }

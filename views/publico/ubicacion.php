@@ -1,9 +1,9 @@
 <?php
-require __DIR__ . "/../config/Autoload.php";
+require __DIR__ . "/../../config/Autoload.php";
 
 $titulo = "Ubicación";
 
-require __DIR__ . "/../views/partes/cabecera.php";
+require __DIR__ . "/../partes/cabecera.php";
 /** @var array $hotel Datos del hotel (los crea views/partes/ayudas.php) */
 
 $busqueda = urlencode("Hotel Turístico San Antonio, Jr. Amazonas 456, Bagua, Amazonas, Perú");
@@ -66,4 +66,4 @@ hero(
         <div class="col-12 col-md-4"><div class="sa-card sa-card-cuerpo h-100"><h3 class="h6"><i class="bi bi-pin-map text-danger"></i> Zona céntrica de Bagua</h3><p class="small mb-0 text-muted">Nos encontramos en una ubicación estratégica, cerca de los principales servicios de la ciudad.</p></div></div>
     </div>
 </main>
-<?php require __DIR__ . "/../views/partes/pie.php" ?>
+<?php require __DIR__ . "/../partes/pie.php" ?>

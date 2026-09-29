@@ -1,6 +1,6 @@
 <?php
-require __DIR__ . "/../config/Autoload.php";
-require_once __DIR__ . "/../views/partes/ayudas.php";
+require __DIR__ . "/../../config/Autoload.php";
+require_once __DIR__ . "/../partes/ayudas.php";
 
 use App\Bo\Habitacion as HabitacionBO;
 
@@ -18,7 +18,7 @@ if ($filtroTipo > 0) {
 }
 $consulta = $rangoValido ? http_build_query(["ingreso" => $ingreso, "salida" => $salida]) : "";
 
-require __DIR__ . "/../views/partes/cabecera.php";
+require __DIR__ . "/../partes/cabecera.php";
 hero("Nuestras habitaciones", "Comodidad, tranquilidad y una experiencia única en el corazón de la Amazonía.", [], "Descansa en Bagua", "sa-hero-foto-habitaciones");
 ?>
 <main class="container py-5">
@@ -29,7 +29,7 @@ hero("Nuestras habitaciones", "Comodidad, tranquilidad y una experiencia única 
     <?php if ($rangoValido) : ?>
         <div class="alert alert-light border small">
             Disponibilidad del <strong><?= fechaLarga($ingreso) ?></strong> al <strong><?= fechaLarga($salida) ?></strong>.
-            <a href="<?= url("publico/habitaciones.php") ?>">Quitar fechas</a>
+            <a href="<?= url("views/publico/habitaciones.php") ?>">Quitar fechas</a>
         </div>
     <?php elseif (isset($_GET["ingreso"]) || isset($_GET["salida"])) : ?>
         <div class="alert alert-warning small">Revisa las fechas: la salida debe ser posterior al ingreso.</div>
@@ -41,4 +41,4 @@ hero("Nuestras habitaciones", "Comodidad, tranquilidad y una experiencia única 
         } ?>
     </div>
 </main>
-<?php require __DIR__ . "/../views/partes/pie.php" ?>
+<?php require __DIR__ . "/../partes/pie.php" ?>

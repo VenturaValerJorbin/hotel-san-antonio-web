@@ -1,13 +1,13 @@
 
 <?php
-require __DIR__ . "/../config/Autoload.php";
+require __DIR__ . "/../../config/Autoload.php";
 
 use App\Bo\Restaurante as RestauranteBO;
 
 $titulo = "Restaurante";
 $carta = (new RestauranteBO())->carta();
 
-require __DIR__ . "/../views/partes/cabecera.php";
+require __DIR__ . "/../partes/cabecera.php";
 
 //imagen restaurante cabesera
 hero(
@@ -66,4 +66,4 @@ hero(
         Te invitamos a disfrutar de la gastronomía amazónica en un ambiente acogedor y familiar.
     </div>
 </main>
-<?php require __DIR__ . "/../views/partes/pie.php" ?>
+<?php require __DIR__ . "/../partes/pie.php" ?>

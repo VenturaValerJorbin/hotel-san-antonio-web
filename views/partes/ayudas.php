@@ -13,9 +13,9 @@ $hotel = require dirname(__DIR__, 2) . "/config/hotel.php";
 
 // Direccion base del proyecto (ej. /hotel_san_antonio_web/). Las paginas viven en la raiz, en publico/ o en admin/,
 // asi que se quita esa subcarpeta para que todos los enlaces partan siempre de la raiz.
-$base = rtrim(preg_replace("#/(publico|admin)$#", "", str_replace("\\", "/", dirname($_SERVER["SCRIPT_NAME"]))), "/") . "/";
+$base = rtrim(preg_replace("#/views/(publico|admin)$#", "", str_replace("\\", "/", dirname($_SERVER["SCRIPT_NAME"]))), "/") . "/";
 
-// Arma un enlace desde la raiz del proyecto: url("publico/reservar.php"), url("assets/css/estilo.css")
+// Arma un enlace desde la raiz del proyecto: url("views/publico/reservar.php"), url("assets/css/estilo.css")
 function url(string $ruta): string
 {
     global $base;
@@ -164,6 +164,6 @@ function tarjetaTipo(\App\Dto\TipoHabitacion $t, string $consulta = ""): void
         echo '<div class="small mb-2 ' . ($t->libres > 0 ? "text-success" : "text-danger") . ' fw-bold">'
             . ($t->libres > 0 ? $t->libres . " disponible(s) en tus fechas" : "Sin disponibilidad en tus fechas") . '</div>';
     }
-    echo '<a class="btn-linea d-block text-center text-decoration-none" href="' . e(url("publico/habitacion.php")) . '?id=' . $t->id . $sufijo . '">Ver detalle</a>';
+    echo '<a class="btn-linea d-block text-center text-decoration-none" href="' . e(url("views/publico/habitacion.php")) . '?id=' . $t->id . $sufijo . '">Ver detalle</a>';
     echo '</div></div></article></div>';
 }

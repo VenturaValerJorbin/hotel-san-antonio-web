@@ -1,5 +1,5 @@
 <?php
-require __DIR__ . "/../config/Autoload.php";
+require __DIR__ . "/../../config/Autoload.php";
 
 use App\Bo\Puntos as PuntosBO;
 
@@ -12,7 +12,7 @@ $iconos = ["pago_fraccionado" => "bi-cash-coin", "producto" => "bi-cup-hot", "de
 
 $titulo = "Programa de puntos";
 
-require __DIR__ . "/../views/partes/cabecera.php";
+require __DIR__ . "/../partes/cabecera.php";
 
 hero(
     "Programa de puntos",
@@ -25,7 +25,7 @@ hero(
     <section class="sa-card sa-card-cuerpo mb-5" id="consulta">
         <h2 class="h4"><i class="bi bi-search-heart text-danger"></i> Consulta tus puntos</h2>
         <p class="text-muted small mb-3">Ingresa tu documento para ver cuántos puntos tienes acumulados.</p>
-        <form id="formConsultaPuntos" class="row g-2 align-items-end" data-consulta="<?= url("publico/consultar_puntos.php") ?>">
+        <form id="formConsultaPuntos" class="row g-2 align-items-end" data-consulta="<?= url("views/publico/consultar_puntos.php") ?>">
             <div class="col-6 col-sm-3">
                 <label class="form-label small mb-1" for="consulta_tipo_documento">Tipo de documento</label>
                 <select class="form-select form-select-sm" id="consulta_tipo_documento">
@@ -114,7 +114,7 @@ hero(
                     <li>Con <?= (int) $fraccionado["puntos_requeridos"] ?> puntos pagas solo el <?= (float) $fraccionado["valor"] ?> % al reservar y el resto al llegar al hotel. Este beneficio se mantiene mientras conserves esos puntos.</li>
                 <?php endif ?>
                 <li>Todos los beneficios son permanentes: si ya tienes los puntos, se aplican solos en cada reserva, sin gastar tu saldo.</li>
-                <li>El pago realizado no es reembolsable, según nuestros <a href="<?= url("publico/terminos.php") ?>">términos y condiciones</a>.</li>
+                <li>El pago realizado no es reembolsable, según nuestros <a href="<?= url("views/publico/terminos.php") ?>">términos y condiciones</a>.</li>
             </ul>
         </div>
     </div>
@@ -125,9 +125,9 @@ hero(
             <p class="mb-0">Reserva en línea sin crear una cuenta.</p>
         </div>
         <div class="d-flex flex-column flex-sm-row gap-2">
-            <a class="btn-sa text-decoration-none text-center" href="<?= url("publico/reservar.php") ?>">Reservar ahora</a>
-            <a class="btn-linea text-decoration-none text-center" href="<?= url("publico/habitaciones.php") ?>">Ver habitaciones</a>
+            <a class="btn-sa text-decoration-none text-center" href="<?= url("views/publico/reservar.php") ?>">Reservar ahora</a>
+            <a class="btn-linea text-decoration-none text-center" href="<?= url("views/publico/habitaciones.php") ?>">Ver habitaciones</a>
         </div>
     </section>
 </main>
-<?php require __DIR__ . "/../views/partes/pie.php" ?>
+<?php require __DIR__ . "/../partes/pie.php" ?>

@@ -1,9 +1,9 @@
 <?php
-require __DIR__ . "/../config/Autoload.php";
+require __DIR__ . "/../../config/Autoload.php";
 
 $titulo = "Términos y condiciones";
 
-require __DIR__ . "/../views/partes/cabecera.php";
+require __DIR__ . "/../partes/cabecera.php";
 /** @var array $hotel Datos del hotel (los crea views/partes/ayudas.php) */
 
 hero(
@@ -28,18 +28,18 @@ hero(
             <p>El pago realizado no es reembolsable. La única excepción es que, al llegar al hotel, la habitación no corresponda a lo publicado en esta web; en ese caso el hotel registra el motivo y procede con el reembolso del pago correspondiente.</p>
 
             <h2 class="h5 mt-4">4. Programa de puntos</h2>
-            <p>Acumulas puntos por tus estadías completadas, que se suman al registrar tu salida (check-out). Los puntos te permiten acceder a beneficios, como el pago fraccionado al reservar. Las condiciones del programa pueden actualizarse; las vigentes se muestran en el formulario de reserva o puedes consultarlas en recepción. Conoce el detalle en la página del <a href="<?= url("publico/puntos.php") ?>">programa de puntos</a>.</p>
+            <p>Acumulas puntos por tus estadías completadas, que se suman al registrar tu salida (check-out). Los puntos te permiten acceder a beneficios, como el pago fraccionado al reservar. Las condiciones del programa pueden actualizarse; las vigentes se muestran en el formulario de reserva o puedes consultarlas en recepción. Conoce el detalle en la página del <a href="<?= url("views/publico/puntos.php") ?>">programa de puntos</a>.</p>
 
             <h2 class="h5 mt-4">5. Llegada y salida</h2>
             <p>Nuestra recepción atiende las 24 horas. Al llegar, debes presentar el documento de identidad con el que realizaste la reserva.</p>
 
             <h2 class="h5 mt-4">6. Datos personales</h2>
-            <p>El tratamiento de tus datos personales se rige por nuestra <a href="<?= url("publico/privacidad.php") ?>">política de privacidad</a>.</p>
+            <p>El tratamiento de tus datos personales se rige por nuestra <a href="<?= url("views/publico/privacidad.php") ?>">política de privacidad</a>.</p>
 
             <h2 class="h5 mt-4">7. Consultas y reclamos</h2>
-            <p>Puedes escribirnos por WhatsApp al <?= e($hotel["whatsapp_texto"]) ?> o al correo <?= e($hotel["correo"]) ?>. También puedes presentar un reclamo o una queja en nuestro <a href="<?= url("publico/libro_reclamaciones.php") ?>">Libro de Reclamaciones</a>.</p>
+            <p>Puedes escribirnos por WhatsApp al <?= e($hotel["whatsapp_texto"]) ?> o al correo <?= e($hotel["correo"]) ?>. También puedes presentar un reclamo o una queja en nuestro <a href="<?= url("views/publico/libro_reclamaciones.php") ?>">Libro de Reclamaciones</a>.</p>
             <p>Estos términos se rigen por las leyes de la República del Perú.</p>
         </div>
     </div>
 </main>
-<?php require __DIR__ . "/../views/partes/pie.php" ?>
+<?php require __DIR__ . "/../partes/pie.php" ?>

@@ -1,6 +1,6 @@
 <?php
-require __DIR__ . "/../config/Autoload.php";
-require_once __DIR__ . "/../views/partes/ayudas.php";
+require __DIR__ . "/../../config/Autoload.php";
+require_once __DIR__ . "/../partes/ayudas.php";
 
 use App\Bo\Habitacion as HabitacionBO;
 use App\Bo\Reserva as ReservaBO;
@@ -8,7 +8,7 @@ use App\Bo\Reserva as ReservaBO;
 $tipo = (new HabitacionBO())->tipo((int) ($_GET["id"] ?? 0));
 if (!$tipo) {
     http_response_code(404);
-    header("Location: " . url("publico/habitaciones.php"));
+    header("Location: " . url("views/publico/habitaciones.php"));
     exit;
 }
 
@@ -18,11 +18,11 @@ $query = http_build_query(array_filter([
     "tipo" => $tipo->id, "ingreso" => fechaGet("ingreso"), "salida" => fechaGet("salida"),
 ]));
 
-require __DIR__ . "/../views/partes/cabecera.php";
+require __DIR__ . "/../partes/cabecera.php";
 hero(
     "Habitación " . $tipo->nombre,
     $tipo->descripcion,
-    [["Inicio", "index.php"], ["Habitaciones", "publico/habitaciones.php"], [$tipo->nombre, null]]
+    [["Inicio", "index.php"], ["Habitaciones", "views/publico/habitaciones.php"], [$tipo->nombre, null]]
 );
 ?>
 <main class="container py-4 py-lg-5">
@@ -76,14 +76,14 @@ hero(
                 <div class="sa-caja-pago mb-2 small">
                     <strong>Pago de la reserva en línea.</strong>
                     Pagas el 100 % al reservar<?= $beneficio ? ", o solo el " . (float) $beneficio["valor"] . " % si eres huésped frecuente (" . $beneficio["puntos_requeridos"] . " puntos)" : "" ?>.
-                    <a href="<?= url("publico/puntos.php") ?>">Conoce el programa de puntos</a>.
+                    <a href="<?= url("views/publico/puntos.php") ?>">Conoce el programa de puntos</a>.
                 </div>
                 <div class="sa-caja-crema mb-3 small"><strong>Reserva sin crear cuenta.</strong> Haz tu reserva de forma rápida y sencilla.</div>
 
-                <a class="btn-sa d-block text-center text-decoration-none" href="<?= url("publico/reservar.php") ?>?<?= e($query) ?>">Reservar</a>
+                <a class="btn-sa d-block text-center text-decoration-none" href="<?= url("views/publico/reservar.php") ?>?<?= e($query) ?>">Reservar</a>
                 <p class="text-center small text-muted mt-2 mb-0"><i class="bi bi-calendar-heart"></i> Tu descanso te espera en Bagua.</p>
             </aside>
         </div>
     </div>
 </main>
-<?php require __DIR__ . "/../views/partes/pie.php" ?>
+<?php require __DIR__ . "/../partes/pie.php" ?>

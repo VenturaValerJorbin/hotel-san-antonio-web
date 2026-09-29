@@ -1,9 +1,9 @@
 <?php
-require __DIR__ . "/../config/Autoload.php";
+require __DIR__ . "/../../config/Autoload.php";
 
 $titulo = "Política de privacidad";
 
-require __DIR__ . "/../views/partes/cabecera.php";
+require __DIR__ . "/../partes/cabecera.php";
 /** @var array $hotel Datos del hotel (los crea views/partes/ayudas.php) */
 
 hero(
@@ -38,4 +38,4 @@ hero(
         </div>
     </div>
 </main>
-<?php require __DIR__ . "/../views/partes/pie.php" ?>
+<?php require __DIR__ . "/../partes/pie.php" ?>

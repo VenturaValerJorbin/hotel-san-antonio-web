@@ -1,9 +1,9 @@
 <?php
-require __DIR__ . "/../config/Autoload.php";
+require __DIR__ . "/../../config/Autoload.php";
 
 $titulo = "Nosotros";
 
-require __DIR__ . "/../views/partes/cabecera.php";
+require __DIR__ . "/../partes/cabecera.php";
 /** @var array $hotel Datos del hotel (los crea views/partes/ayudas.php) */
 
 // Los valores salen de los mock-ups del Avance 01 (naturaleza, atencion personalizada, comodidad, hospitalidad)
@@ -99,9 +99,9 @@ hero(
             <p class="mb-0">Reserva tu habitación en línea o escríbenos, con gusto te atendemos.</p>
         </div>
         <div class="d-flex flex-column flex-sm-row gap-2">
-            <a class="btn-sa text-decoration-none text-center" href="<?= url("publico/reservar.php") ?>">Reservar ahora</a>
-            <a class="btn-linea text-decoration-none text-center" href="<?= url("publico/contacto.php") ?>">Contáctanos</a>
+            <a class="btn-sa text-decoration-none text-center" href="<?= url("views/publico/reservar.php") ?>">Reservar ahora</a>
+            <a class="btn-linea text-decoration-none text-center" href="<?= url("views/publico/contacto.php") ?>">Contáctanos</a>
         </div>
     </section>
 </main>
-<?php require __DIR__ . "/../views/partes/pie.php" ?>
+<?php require __DIR__ . "/../partes/pie.php" ?>

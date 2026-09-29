@@ -1,9 +1,9 @@
 <?php
-require __DIR__ . "/../config/Autoload.php";
+require __DIR__ . "/../../config/Autoload.php";
 
 $titulo = "Libro de Reclamaciones";
 
-require __DIR__ . "/../views/partes/cabecera.php";
+require __DIR__ . "/../partes/cabecera.php";
 /** @var array $hotel Datos del hotel (los crea views/partes/ayudas.php) */
 
 hero(
@@ -35,7 +35,7 @@ hero(
             <aside class="sa-card sa-card-cuerpo resumen-fijo">
                 <h2 class="h5"><i class="bi bi-journal-bookmark text-danger"></i> Presenta tu reclamo</h2>
                 <p class="small text-muted">Completa el formulario de contacto con el asunto "Reclamo" y cuéntanos qué ocurrió.</p>
-                <a class="btn-sa d-block text-center text-decoration-none" href="<?= url("publico/contacto.php") ?>?asunto=reclamo">Ir al formulario</a>
+                <a class="btn-sa d-block text-center text-decoration-none" href="<?= url("views/publico/contacto.php") ?>?asunto=reclamo">Ir al formulario</a>
                 <hr>
                 <p class="small mb-1"><strong>Otros canales</strong></p>
                 <p class="small mb-0"><i class="bi bi-whatsapp text-danger"></i> WhatsApp <?= e($hotel["whatsapp_texto"]) ?><br><i class="bi bi-envelope text-danger"></i> <?= e($hotel["correo"]) ?></p>
@@ -43,4 +43,4 @@ hero(
         </div>
     </div>
 </main>
-<?php require __DIR__ . "/../views/partes/pie.php" ?>
+<?php require __DIR__ . "/../partes/pie.php" ?>

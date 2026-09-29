@@ -20,14 +20,14 @@ class Habitacion extends Controlador
         return match ($accion) {
             "guardar" => $this->guardar($post),
             "eliminar" => $this->eliminar($post),
-            default => $this->resultado(false, "Accion no valida.", "admin/gestion_habitaciones.php"),
+            default => $this->resultado(false, "Accion no valida.", "views/admin/gestion_habitaciones.php"),
         };
     }
 
     private function guardar(array $p): array
     {
         $id = (int) ($p["id"] ?? 0);
-        $formulario = "admin/gestion_habitaciones.php" . ($id > 0 ? "?editar=$id" : "");
+        $formulario = "views/admin/gestion_habitaciones.php" . ($id > 0 ? "?editar=$id" : "");
 
         $datos = [
             "numero" => trim($p["numero"] ?? ""),
@@ -45,7 +45,7 @@ class Habitacion extends Controlador
         return $this->ejecutar(
             fn() => $this->bo->guardar($id, $datos),
             $id > 0 ? "Habitacion actualizada." : "Habitacion registrada.",
-            "admin/gestion_habitaciones.php",
+            "views/admin/gestion_habitaciones.php",
             $formulario
         );
     }
@@ -54,9 +54,9 @@ class Habitacion extends Controlador
     {
         $id = (int) ($p["id"] ?? 0);
         if ($id <= 0) {
-            return $this->resultado(false, "Habitacion no valida.", "admin/gestion_habitaciones.php");
+            return $this->resultado(false, "Habitacion no valida.", "views/admin/gestion_habitaciones.php");
         }
-        return $this->ejecutar(fn() => $this->bo->eliminar($id), "Habitacion eliminada.", "admin/gestion_habitaciones.php", "admin/gestion_habitaciones.php");
+        return $this->ejecutar(fn() => $this->bo->eliminar($id), "Habitacion eliminada.", "views/admin/gestion_habitaciones.php", "views/admin/gestion_habitaciones.php");
     }
 
     // Validacion de forma: formato, rango y valores permitidos

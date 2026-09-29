@@ -1,9 +1,9 @@
 <?php
-require __DIR__ . "/../config/Autoload.php";
+require __DIR__ . "/../../config/Autoload.php";
 
 $titulo = "Contacto";
 
-require __DIR__ . "/../views/partes/cabecera.php";
+require __DIR__ . "/../partes/cabecera.php";
 /** @var array $hotel Datos del hotel (los crea views/partes/ayudas.php) */
 /** @var array $errores Errores del formulario (los crea views/partes/ayudas.php) */
 /** @var array $antiguo Datos escritos antes de un error (los crea views/partes/ayudas.php) */
@@ -67,7 +67,7 @@ hero(
                         <?= $mensaje("mensaje") ?>
                     </div>
                     <button class="btn-sa w-100" type="submit"><i class="bi bi-send"></i> Enviar mensaje</button>
-                    <p class="form-text mt-2 mb-0">Al enviar este formulario aceptas nuestra <a href="<?= url("publico/privacidad.php") ?>" target="_blank" rel="noopener">política de privacidad</a>.</p>
+                    <p class="form-text mt-2 mb-0">Al enviar este formulario aceptas nuestra <a href="<?= url("views/publico/privacidad.php") ?>" target="_blank" rel="noopener">política de privacidad</a>.</p>
                 </form>
             </section>
         </div>
@@ -95,4 +95,4 @@ hero(
         </div>
     </div>
 </main>
-<?php require __DIR__ . "/../views/partes/pie.php" ?>
+<?php require __DIR__ . "/../partes/pie.php" ?>

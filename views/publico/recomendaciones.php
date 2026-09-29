@@ -1,5 +1,5 @@
 <?php
-require __DIR__ . "/../config/Autoload.php";
+require __DIR__ . "/../../config/Autoload.php";
 
 use App\Bo\Turismo as TurismoBO;
 
@@ -9,7 +9,7 @@ $lugares = (new TurismoBO())->lugares();
 // Color de la etiqueta segun la categoria del lugar
 $colores = ["Naturaleza" => "success", "Arqueología" => "secondary", "Cascada" => "primary", "Cultura" => "warning"];
 
-require __DIR__ . "/../views/partes/cabecera.php";
+require __DIR__ . "/../partes/cabecera.php";
 /** @var array $hotel Datos del hotel (los crea views/partes/ayudas.php) */
 hero(
     "Recomendaciones turísticas",
@@ -44,4 +44,4 @@ hero(
         <a class="btn-sa text-decoration-none text-center" href="https://wa.me/<?= e($hotel["whatsapp"]) ?>"><i class="bi bi-whatsapp"></i> <?= e($hotel["whatsapp_texto"]) ?></a>
     </div>
 </main>
-<?php require __DIR__ . "/../views/partes/pie.php" ?>
+<?php require __DIR__ . "/../partes/pie.php" ?>

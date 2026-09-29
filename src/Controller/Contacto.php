@@ -15,7 +15,7 @@ class Contacto extends Controlador
         return match ($accion) {
             "enviar" => $this->enviar($post),
             "marcarLeido" => $this->marcarLeido($post),
-            default => $this->resultado(false, "Accion no valida.", "publico/contacto.php"),
+            default => $this->resultado(false, "Accion no valida.", "views/publico/contacto.php"),
         };
     }
 
@@ -23,13 +23,13 @@ class Contacto extends Controlador
     {
         $id = (int) ($p["id"] ?? 0);
         if ($id <= 0) {
-            return $this->resultado(false, "Datos no validos.", "admin/mensajes.php");
+            return $this->resultado(false, "Datos no validos.", "views/admin/mensajes.php");
         }
         return $this->ejecutar(
             fn() => (new ContactoBO())->marcarLeido($id),
             "Mensaje marcado como leido.",
-            "admin/mensajes.php",
-            "admin/mensajes.php"
+            "views/admin/mensajes.php",
+            "views/admin/mensajes.php"
         );
     }
 
@@ -39,7 +39,7 @@ class Contacto extends Controlador
         try {
             (new LimiteIntentoBO())->verificar("contacto", 5, 600);
         } catch (\DomainException $e) {
-            return $this->resultado(false, $e->getMessage(), "publico/contacto.php");
+            return $this->resultado(false, $e->getMessage(), "views/publico/contacto.php");
         }
 
         $datos = [
@@ -67,14 +67,14 @@ class Contacto extends Controlador
             $errores["mensaje"] = "El mensaje debe tener entre 10 y 500 caracteres.";
         }
         if ($errores) {
-            return $this->resultado(false, "Revisa los datos marcados en el formulario.", "publico/contacto.php", $errores);
+            return $this->resultado(false, "Revisa los datos marcados en el formulario.", "views/publico/contacto.php", $errores);
         }
 
         return $this->ejecutar(
             fn() => (new ContactoBO())->enviar($datos),
             "Gracias por escribirnos. Te responderemos a la brevedad.",
-            "publico/contacto.php",
-            "publico/contacto.php"
+            "views/publico/contacto.php",
+            "views/publico/contacto.php"
         );
     }
 }

@@ -6,13 +6,13 @@ require_once __DIR__ . "/ayudas.php";
 $pagina = basename($_SERVER["SCRIPT_NAME"]);
 $menu = [
     "index.php" => "Inicio",
-    "publico/habitaciones.php" => "Habitaciones",
-    "publico/restaurante.php" => "Restaurante",
-    "publico/ubicacion.php" => "Ubicación",
-    "publico/recomendaciones.php" => "Recomendaciones",
-    "publico/puntos.php" => "Puntos",
-    "publico/nosotros.php" => "Nosotros",
-    "publico/contacto.php" => "Contacto",
+    "views/publico/habitaciones.php" => "Habitaciones",
+    "views/publico/restaurante.php" => "Restaurante",
+    "views/publico/ubicacion.php" => "Ubicación",
+    "views/publico/recomendaciones.php" => "Recomendaciones",
+    "views/publico/puntos.php" => "Puntos",
+    "views/publico/nosotros.php" => "Nosotros",
+    "views/publico/contacto.php" => "Contacto",
 ];
 // El detalle de una habitacion pertenece a la seccion "Habitaciones"
 $activa = $pagina === "habitacion.php" ? "habitaciones.php" : $pagina;   // se compara solo el nombre del archivo
@@ -37,7 +37,7 @@ $activa = $pagina === "habitacion.php" ? "habitaciones.php" : $pagina;   // se c
             <div class="container">
                 <?php require __DIR__ . "/logo.php" ?>
                 <div class="d-flex align-items-center order-xl-last">
-                    <a class="btn-linea sa-boton-buscar text-decoration-none" href="<?= url("publico/comprobante.php") ?>">
+                    <a class="btn-linea sa-boton-buscar text-decoration-none" href="<?= url("views/publico/comprobante.php") ?>">
                         <i class="bi bi-search"></i> <span class="d-none d-sm-inline">Mi reserva</span>
                     </a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPublico"
@@ -53,7 +53,7 @@ $activa = $pagina === "habitacion.php" ? "habitaciones.php" : $pagina;   // se c
                             </li>
                         <?php endforeach ?>
                         <li class="nav-item ms-xl-3 my-2 my-xl-0">
-                            <a class="btn-sa d-inline-block text-decoration-none" href="<?= url("publico/reservar.php") ?>"><i class="bi bi-calendar-check"></i> Reservar</a>
+                            <a class="btn-sa d-inline-block text-decoration-none" href="<?= url("views/publico/reservar.php") ?>"><i class="bi bi-calendar-check"></i> Reservar</a>
                         </li>
                     </ul>
                 </div>

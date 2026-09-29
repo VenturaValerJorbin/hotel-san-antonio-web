@@ -1,5 +1,5 @@
 <?php
-require __DIR__ . "/../config/Autoload.php";
+require __DIR__ . "/../../config/Autoload.php";
 
 use App\Bo\Habitacion as HabitacionBO;
 use App\Bo\Reserva as ReservaBO;
@@ -10,7 +10,7 @@ $tipos = (new HabitacionBO())->tipos();
 $beneficio = $reservaBo->beneficioFraccionado();
 $planes = $reservaBo->planesPension();
 
-require __DIR__ . "/../views/partes/cabecera.php";
+require __DIR__ . "/../partes/cabecera.php";
 /** @var array $hotel Datos del hotel (los crea views/partes/ayudas.php) */
 /** @var array $errores Errores del formulario (los crea views/partes/ayudas.php) */
 /** @var array $antiguo Datos escritos antes de un error (los crea views/partes/ayudas.php) */
@@ -41,12 +41,12 @@ $planElegido = (int) $valor("plan_pension_id", $planes[0]->id ?? 0);
 hero(
     "Reserva tu habitación",
     "Confirma tu estadía en Bagua y vive una experiencia inolvidable.",
-    [["Inicio", "index.php"], ["Habitaciones", "publico/habitaciones.php"], ["Reserva", null]]
+    [["Inicio", "index.php"], ["Habitaciones", "views/publico/habitaciones.php"], ["Reserva", null]]
 );
 ?>
 <main class="container py-4 py-lg-5">
     <form id="formReserva" action="<?= url("procesar.php") ?>" method="post" novalidate data-porcentaje="<?= $porcentaje ?>"
-        data-consulta-puntos="<?= url("publico/consultar_puntos.php") ?>">
+        data-consulta-puntos="<?= url("views/publico/consultar_puntos.php") ?>">
         <input type="hidden" name="modulo" value="reserva">
         <input type="hidden" name="accion" value="crear">
 
@@ -170,8 +170,8 @@ hero(
                         </div>
                         <div class="form-text">
                             Acumulas puntos en cada estadía.
-                            <a href="<?= url("publico/puntos.php") ?>#consulta" target="_blank" rel="noopener" id="linkVerPuntos" data-base="<?= url("publico/puntos.php") ?>">Consulta tus puntos</a>
-                            o <a href="<?= url("publico/puntos.php") ?>">conoce el programa completo</a>.
+                            <a href="<?= url("views/publico/puntos.php") ?>#consulta" target="_blank" rel="noopener" id="linkVerPuntos" data-base="<?= url("views/publico/puntos.php") ?>">Consulta tus puntos</a>
+                            o <a href="<?= url("views/publico/puntos.php") ?>">conoce el programa completo</a>.
                         </div>
                     </div>
 
@@ -190,8 +190,8 @@ hero(
                     <div class="form-check mt-4">
                         <input class="form-check-input<?= $claseError("acepta") ?>" type="checkbox" id="acepta" name="acepta" required>
                         <label class="form-check-label" for="acepta">
-                            Acepto los <a href="<?= url("publico/terminos.php") ?>" target="_blank" rel="noopener">términos y condiciones</a> y la
-                            <a href="<?= url("publico/privacidad.php") ?>" target="_blank" rel="noopener">política de privacidad</a>: el pago no es reembolsable, salvo que la habitación no corresponda a lo publicado en esta web.
+                            Acepto los <a href="<?= url("views/publico/terminos.php") ?>" target="_blank" rel="noopener">términos y condiciones</a> y la
+                            <a href="<?= url("views/publico/privacidad.php") ?>" target="_blank" rel="noopener">política de privacidad</a>: el pago no es reembolsable, salvo que la habitación no corresponda a lo publicado en esta web.
                         </label>
                         <?= $mensaje("acepta") ?>
                     </div>
@@ -230,4 +230,4 @@ hero(
         </div>
     </form>
 </main>
-<?php require __DIR__ . "/../views/partes/pie.php" ?>
+<?php require __DIR__ . "/../partes/pie.php" ?>

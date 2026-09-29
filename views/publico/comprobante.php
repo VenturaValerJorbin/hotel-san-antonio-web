@@ -1,5 +1,5 @@
 <?php
-require __DIR__ . "/../config/Autoload.php";
+require __DIR__ . "/../../config/Autoload.php";
 
 use App\Bo\LimiteIntento as LimiteIntentoBO;
 use App\Bo\Reserva as ReservaBO;
@@ -24,7 +24,7 @@ $estados = ["pendiente" => "Pendiente", "confirmada" => "Confirmada", "checkin" 
     "checkout" => "Finalizada", "cancelada" => "Cancelada", "no_show" => "No llegó"];
 $metodos = ["yape" => "Yape", "tarjeta" => "Tarjeta Visa", "transferencia" => "Transferencia", "efectivo" => "Efectivo"];
 
-require __DIR__ . "/../views/partes/cabecera.php";
+require __DIR__ . "/../partes/cabecera.php";
 /** @var array $hotel Datos del hotel (los crea views/partes/ayudas.php) */
 
 hero(
@@ -105,12 +105,12 @@ hero(
 
             <div class="sa-caja-crema small mt-4">
                 <i class="bi bi-info-circle"></i> El pago no es reembolsable, salvo que la habitación no corresponda a lo publicado en esta web.
-                Consulta nuestros <a href="<?= url("publico/terminos.php") ?>">términos y condiciones</a>.
+                Consulta nuestros <a href="<?= url("views/publico/terminos.php") ?>">términos y condiciones</a>.
             </div>
 
             <div class="d-flex flex-column flex-sm-row gap-2 mt-4 no-imprimir">
                 <button type="button" class="btn-sa" onclick="window.print()"><i class="bi bi-printer"></i> Imprimir / Guardar como PDF</button>
-                <a class="btn-linea text-decoration-none text-center" href="<?= url("publico/comprobante.php") ?>">Buscar otra reserva</a>
+                <a class="btn-linea text-decoration-none text-center" href="<?= url("views/publico/comprobante.php") ?>">Buscar otra reserva</a>
             </div>
 
             <p class="small text-muted mt-4 mb-0 no-imprimir">
@@ -119,4 +119,4 @@ hero(
         </section>
     <?php endif ?>
 </main>
-<?php require __DIR__ . "/../views/partes/pie.php" ?>
+<?php require __DIR__ . "/../partes/pie.php" ?>
