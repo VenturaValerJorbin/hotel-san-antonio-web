@@ -23,4 +23,15 @@ class Pago extends Dao
         $stmt->execute();
         return (int) $this->conn->lastInsertId();
     }
+
+    // Pagos de una reserva, para mostrarlos en el comprobante
+    public function listarPorReserva(int $reservaId): array
+    {
+        $stmt = $this->conn->prepare(
+            "SELECT tipo, monto, metodo, estado, fecha_pago FROM pago WHERE reserva_id = :id ORDER BY id"
+        );
+        $this->enlazar($stmt, [":id" => $reservaId]);
+        $stmt->execute();
+        return $stmt->fetchAll();
+    }
 }

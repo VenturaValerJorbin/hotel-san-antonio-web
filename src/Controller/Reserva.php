@@ -47,16 +47,15 @@ class Reserva extends Controlador
             return $this->resultado(false, "Revisa los datos marcados en el formulario.", $this->volverAReservar($datos), $errores);
         }
 
+        // Al confirmar, se redirige al comprobante (no a un mensaje que desaparece al recargar):
+        // con el codigo y su documento, el huesped puede volver a verlo o imprimirlo cuando quiera.
         return $this->ejecutar(
-            function () use ($datos) {
-                $r = $this->bo->reservar($datos);
-                return sprintf(
-                    "Reserva %s confirmada. Habitación N.° %s (piso %d). Total S/ %.2f, pagado S/ %.2f, saldo a pagar al llegar S/ %.2f.",
-                    $r["codigo"], $r["habitacion"], $r["piso"], $r["total"], $r["pagado"], $r["saldo"]
-                );
-            },
-            "",
-            "publico/reservar.php",
+            fn() => $this->bo->reservar($datos),
+            "Reserva confirmada. Aquí tienes tu comprobante.",
+            fn($r) => "publico/comprobante.php?" . http_build_query([
+                "codigo" => $r["codigo"],
+                "numero_documento" => $datos["numero_documento"],
+            ]),
             $this->volverAReservar($datos)
         );
     }

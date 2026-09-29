@@ -26,6 +26,7 @@
                 <div class="col-12 col-sm-6 col-lg-3">
                     <h6>Información</h6>
                     <ul>
+                        <li><a href="<?= url("publico/comprobante.php") ?>">Buscar mi reserva</a></li>
                         <li><a href="<?= url("publico/terminos.php") ?>">Términos y condiciones</a></li>
                         <li><a href="<?= url("publico/privacidad.php") ?>">Política de privacidad</a></li>
                     </ul>

@@ -173,6 +173,14 @@ a:hover { color: var(--rojo-osc); }
 .form-check-input:checked { background-color: var(--rojo); border-color: var(--rojo); }
 .requerido::after { content: " *"; color: var(--rojo); }
 
+/* Al imprimir (ej. el comprobante de reserva) se oculta todo lo que no es el contenido:
+   menu, aviso, franja dorada del pie y cualquier boton marcado como .no-imprimir */
+@media print {
+    .sa-header, .sa-hero, .sa-banner, footer, .migas, .no-imprimir { display: none !important; }
+    body { background: #fff; }
+    .sa-comprobante { box-shadow: none !important; border-color: #ccc !important; }
+}
+
 /* Programa de puntos */
 .sa-paso { display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; border-radius: 50%; background: var(--rojo); color: #fff; font-weight: 700; }
 .sa-nivel-puntos { font-family: "Playfair Display", serif; font-weight: 700; font-size: 1.9rem; line-height: 1; color: var(--rojo); }

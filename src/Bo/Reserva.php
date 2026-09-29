@@ -17,6 +17,18 @@ use App\Dto\Reserva as ReservaDTO;
 // y transacciones. Todos los DAO comparten UNA conexion para que el commit/rollBack sea conjunto.
 class Reserva
 {
+    // Comprobante publico de una reserva: el huesped la recupera con su codigo y su documento,
+    // sin necesidad de haber guardado nada mas (ni de crear una cuenta).
+    public function buscarComprobante(string $codigo, string $numeroDocumento): ?array
+    {
+        $reserva = (new ReservaDAO())->porCodigoYDocumento($codigo, $numeroDocumento);
+        if (!$reserva) {
+            return null;
+        }
+        $reserva["pagos"] = (new PagoDAO())->listarPorReserva((int) $reserva["id"]);
+        return $reserva;
+    }
+
     public function listar(array $filtros = []): array
     {
         return array_map(

@@ -157,6 +157,24 @@ class Reserva extends Dao
         return $stmt->fetch() ?: null;
     }
 
+    // Comprobante publico: el huesped se identifica con el codigo Y su documento (dos datos que
+    // solo el deberia tener), asi nadie puede ver una reserva ajena solo adivinando el codigo.
+    public function porCodigoYDocumento(string $codigo, string $numeroDocumento): ?array
+    {
+        $stmt = $this->conn->prepare(
+            "SELECT v.*, hu.nombre_completo, hu.tipo_documento, hu.numero_documento, hu.telefono,
+                    hab.numero AS habitacion, hab.piso, t.nombre AS tipo
+             FROM vista_reserva v
+             JOIN huesped hu ON hu.id = v.huesped_id
+             JOIN habitacion hab ON hab.id = v.habitacion_id
+             JOIN tipo_habitacion t ON t.id = hab.tipo_id
+             WHERE v.codigo = :codigo AND hu.numero_documento = :documento"
+        );
+        $this->enlazar($stmt, [":codigo" => $codigo, ":documento" => $numeroDocumento]);
+        $stmt->execute();
+        return $stmt->fetch() ?: null;
+    }
+
     public function actualizarAsignacion(int $id, int $habitacionId, string $observaciones): bool
     {
         $stmt = $this->conn->prepare(
