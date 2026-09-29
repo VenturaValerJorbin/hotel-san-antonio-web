@@ -27,7 +27,7 @@ require __DIR__ . "/../views/partes/panel_cabecera.php";
         </div>
         <div class="col-7 col-md-5">
             <label class="form-label" for="numero_documento">Número de documento</label>
-            <input class="form-control" id="numero_documento" name="numero_documento" placeholder="Ej. 12345678" value="<?= e($numeroDocumento) ?>">
+            <input class="form-control" id="numero_documento" name="numero_documento" placeholder="Ej. 12345678" value="<?= e($numeroDocumento) ?>" autocomplete="off">
         </div>
         <div class="col-12 col-md-4"><button class="btn-sa w-100" type="submit">Buscar huésped</button></div>
     </div>

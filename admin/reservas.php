@@ -41,7 +41,7 @@ $pago = fn($r) => $r->saldoPendiente > 0
     <div class="row g-3 align-items-end">
         <div class="col-12 col-md-4">
             <label class="form-label" for="buscar">Buscar por huésped o DNI</label>
-            <input class="form-control" id="buscar" name="buscar" placeholder="Nombre, apellido o DNI..." value="<?= e($filtros["buscar"]) ?>">
+            <input class="form-control" id="buscar" name="buscar" placeholder="Nombre, apellido o DNI..." value="<?= e($filtros["buscar"]) ?>" autocomplete="off">
         </div>
         <div class="col-6 col-md-3">
             <label class="form-label" for="ingreso">Fecha de ingreso</label>
