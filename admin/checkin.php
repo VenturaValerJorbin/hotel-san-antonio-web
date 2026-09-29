@@ -5,7 +5,7 @@ require_once __DIR__ . "/../views/partes/ayudas.php";
 use App\Bo\Reserva as ReservaBO;
 
 $titulo = "Registro de check-in";
-$activo = "checkin";
+$activo = "reservas";
 
 $r = (new ReservaBO())->detalleCheckin((int) ($_GET["id"] ?? 0));
 if (!$r) {

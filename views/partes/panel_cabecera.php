@@ -7,7 +7,6 @@ require_once __DIR__ . "/ayudas.php";
 $opciones = [
     "reservas" => ["admin/reservas.php", "bi-journal-text", "Reservas"],
     "disponibilidad" => ["admin/disponibilidad.php", "bi-calendar3", "Disponibilidad"],
-    "checkin" => ["admin/reservas.php?estado=confirmada", "bi-person-check", "Check-in"],
     "habitaciones" => ["admin/gestion_habitaciones.php", "bi-door-open", "Habitaciones"],
 ];
 ?>
