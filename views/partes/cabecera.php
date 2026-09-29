@@ -37,8 +37,8 @@ $activa = $pagina === "habitacion.php" ? "habitaciones.php" : $pagina;   // se c
             <div class="container">
                 <?php require __DIR__ . "/logo.php" ?>
                 <div class="d-flex align-items-center order-xl-last">
-                    <a class="sa-icono-cabecera" href="<?= url("publico/comprobante.php") ?>" title="Buscar mi reserva" aria-label="Buscar mi reserva">
-                        <i class="bi bi-search"></i>
+                    <a class="btn-linea sa-boton-buscar text-decoration-none" href="<?= url("publico/comprobante.php") ?>">
+                        <i class="bi bi-search"></i> <span class="d-none d-sm-inline">Mi reserva</span>
                     </a>
                     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menuPublico"
                         aria-controls="menuPublico" aria-expanded="false" aria-label="Abrir menú">

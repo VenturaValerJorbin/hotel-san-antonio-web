@@ -50,9 +50,9 @@ a:hover { color: var(--rojo-osc); }
 .sa-header .nav-link { color: var(--tinta); font-weight: 700; font-size: .95rem; padding: .6rem 0; }
 .sa-header .nav-link.active { color: var(--rojo); }
 .sa-header .navbar-toggler { border-color: #D3C1AB; }
-/* Icono "Buscar mi reserva": siempre visible junto al logo/boton Reservar, sin depender del menu */
-.sa-icono-cabecera { display: inline-flex; align-items: center; justify-content: center; width: 2.4rem; height: 2.4rem; margin-right: .5rem; border-radius: 50%; border: 1px solid #D3C1AB; color: var(--marron); font-size: 1.1rem; }
-.sa-icono-cabecera:hover { background: var(--dorado); border-color: var(--dorado); color: #fff; }
+/* Boton "Buscar mi reserva": siempre visible junto al logo/boton Reservar, sin depender del menu.
+   Mas chico que un .btn-linea normal para que quepa comodo en la cabecera. */
+.sa-boton-buscar { padding: .5rem .8rem; font-size: .85rem; margin-right: .5rem; white-space: nowrap; }
 /* Como el menu es fijo, si se abre en una pantalla baja debe poder desplazarse en vez de quedar cortado */
 @media (max-width: 1199.98px) {
     .sa-header .navbar-collapse { max-height: calc(100vh - 6rem); overflow-y: auto; }
