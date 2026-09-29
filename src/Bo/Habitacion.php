@@ -3,6 +3,7 @@
 namespace App\Bo;
 
 use App\Dao\Habitacion as HabitacionDAO;
+use App\Dao\Reserva as ReservaDAO;
 use App\Dao\TipoHabitacion as TipoHabitacionDAO;
 use App\Dto\Habitacion as HabitacionDTO;
 use App\Dto\TipoHabitacion as TipoHabitacionDTO;
@@ -32,6 +33,11 @@ class Habitacion
     public function tipos(?string $ingreso = null, ?string $salida = null): array
     {
         $tipoDao = new TipoHabitacionDAO();
+        // Si alguien nunca hizo check-in y ya paso su fecha de salida, se libera antes de contar
+        // (ver Bo\Reserva::liberarNoShow); solo hace falta cuando de verdad se pide disponibilidad.
+        if ($ingreso && $salida) {
+            (new ReservaDAO())->liberarNoShowVencidos();
+        }
         $libres = ($ingreso && $salida) ? $tipoDao->disponibles($ingreso, $salida) : null;
 
         return array_map(

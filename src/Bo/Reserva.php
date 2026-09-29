@@ -17,6 +17,14 @@ use App\Dto\Reserva as ReservaDTO;
 // y transacciones. Todos los DAO comparten UNA conexion para que el commit/rollBack sea conjunto.
 class Reserva
 {
+    // Cierra sola las reservas "confirmada" cuya fecha de salida ya paso sin que el huesped
+    // llegara, y libera esa habitacion. No hay tarea programada en el proyecto: se llama antes
+    // de mostrar el panel o de buscar disponibilidad, para que el estado este siempre al dia.
+    public function liberarNoShow(): int
+    {
+        return (new ReservaDAO())->liberarNoShowVencidos();
+    }
+
     // Comprobante publico de una reserva: el huesped la recupera con su codigo y su documento,
     // sin necesidad de haber guardado nada mas (ni de crear una cuenta).
     public function buscarComprobante(string $codigo, string $numeroDocumento): ?array
@@ -69,6 +77,7 @@ class Reserva
     // Tablero de disponibilidad: para cada habitacion y dia, disponible / reservada / ocupada / mantenimiento
     public function tablero(string $desde, int $dias): array
     {
+        $this->liberarNoShow();
         $fechas = array_map(fn($i) => date("Y-m-d", strtotime("$desde +$i day")), range(0, $dias - 1));
         $reservas = (new ReservaDAO())->enRango($fechas[0], end($fechas));
 
@@ -96,6 +105,7 @@ class Reserva
     // Reserva completa: huesped + reserva + pago. Si algo falla, no se guarda nada (ACID).
     public function reservar(array $d): array
     {
+        $this->liberarNoShow();
         $conn = (new Conexion())->conectar();
         try {
             $conn->beginTransaction();

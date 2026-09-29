@@ -190,4 +190,19 @@ class Reserva extends Dao
         $this->enlazar($stmt, [":estado" => $estado, ":id" => $id]);
         return $stmt->execute();
     }
+
+    // "No llegó": el huesped tenia hasta su propia fecha de salida para presentarse (pudo llegar
+    // tarde dentro de su estadia). Si ese plazo ya paso y nunca hizo check-in, se cierra sola la
+    // reserva y la habitacion queda libre para otras fechas (no vuelve a contar como ocupada,
+    // porque habitacionLibre() solo bloquea por 'pendiente', 'confirmada' o 'checkin').
+    // No hay tarea programada en el proyecto, asi que esto se ejecuta "de paso" justo antes de
+    // consultar disponibilidad o listar reservas, en vez de esperar un proceso aparte.
+    public function liberarNoShowVencidos(): int
+    {
+        $stmt = $this->conn->prepare(
+            "UPDATE reserva SET estado = 'no_show' WHERE estado = 'confirmada' AND fecha_salida < CURDATE()"
+        );
+        $stmt->execute();
+        return $stmt->rowCount();
+    }
 }

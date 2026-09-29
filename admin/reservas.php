@@ -13,10 +13,13 @@ $filtros = [
     "estado" => $_GET["estado"] ?? "",
 ];
 $bo = new ReservaBO();
+$bo->liberarNoShow();   // cierra sola cualquier reserva cuya fecha de salida ya paso sin check-in
 $reservas = $bo->listar($filtros);
 $resumen = $bo->resumen();
 
-$estados = ["pendiente" => "Pendiente", "confirmada" => "Confirmada", "checkin" => "En el hotel", "checkout" => "Finalizada", "cancelada" => "Cancelada", "no_show" => "No llegó"];
+// "pendiente" y "cancelada" no se usan hoy: toda reserva nace "confirmada" (pago instantaneo,
+// aunque simulado) y el pago no es reembolsable, asi que no hay una accion de "cancelar".
+$estados = ["confirmada" => "Confirmada", "checkin" => "En el hotel", "checkout" => "Finalizada", "no_show" => "No llegó"];
 
 require __DIR__ . "/../views/partes/panel_cabecera.php";
 
