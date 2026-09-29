@@ -113,6 +113,12 @@ hero(
                                 placeholder="Ej. 914 137 531" value="<?= e($valor("telefono")) ?>" autocomplete="tel" required>
                             <?= $mensaje("telefono") ?>
                         </div>
+                        <div class="col-12 col-sm-6">
+                            <label class="form-label" for="correo">Correo electrónico (opcional)</label>
+                            <input class="form-control<?= $claseError("correo") ?>" type="email" id="correo" name="correo" maxlength="100"
+                                placeholder="Ej. correo@ejemplo.com" value="<?= e($valor("correo")) ?>" autocomplete="email">
+                            <?= $mensaje("correo") ?>
+                        </div>
                     </div>
 
                     <hr class="my-4">

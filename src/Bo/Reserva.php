@@ -119,7 +119,7 @@ class Reserva
             $huesped = $huespedDao->buscarPorDocumento($d["tipo_documento"], $d["numero_documento"]);
             if ($huesped) {
                 $huespedId = (int) $huesped["id"];
-                $huespedDao->actualizarTelefono($huespedId, $d["telefono"]);
+                $huespedDao->actualizarContacto($huespedId, $d["telefono"], $d["correo"] ?? null);
             } else {
                 $huespedId = $huespedDao->insertar($d);
             }

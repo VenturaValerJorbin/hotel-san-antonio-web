@@ -38,6 +38,7 @@ class Reserva extends Controlador
             "numero_documento" => $documento,
             "nombre_completo" => trim($p["nombre_completo"] ?? ""),
             "telefono" => trim($p["telefono"] ?? ""),
+            "correo" => trim($p["correo"] ?? "") ?: null,   // opcional
             "modalidad_pago" => $p["modalidad_pago"] ?? "",
             "metodo_pago" => $p["metodo_pago"] ?? "",
         ];
@@ -138,6 +139,9 @@ class Reserva extends Controlador
         }
         if (!preg_match('/^\+?\d{7,15}$/', $d["telefono"])) {
             $e["telefono"] = "Celular no valido (solo numeros, 7 a 15 digitos).";
+        }
+        if ($d["correo"] !== null && !filter_var($d["correo"], FILTER_VALIDATE_EMAIL)) {
+            $e["correo"] = "Ingresa un correo valido, o deja el campo vacio.";
         }
         if (!in_array($d["modalidad_pago"], ["completo", "fraccionado"], true)) {
             $e["modalidad_pago"] = "Elige como pagar.";

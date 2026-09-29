@@ -31,11 +31,14 @@ class Huesped extends Dao
         return (int) $this->conn->lastInsertId();
     }
 
-    // Un huesped que vuelve puede haber cambiado su telefono
-    public function actualizarTelefono(int $id, string $telefono): bool
+    // Un huesped que vuelve puede haber cambiado su telefono o su correo. El correo es opcional:
+    // si esta vez no lo escribe, se conserva el que ya tenia guardado (COALESCE no lo borra).
+    public function actualizarContacto(int $id, string $telefono, ?string $correo): bool
     {
-        $stmt = $this->conn->prepare("UPDATE huesped SET telefono = :telefono WHERE id = :id");
-        $this->enlazar($stmt, [":telefono" => $telefono, ":id" => $id]);
+        $stmt = $this->conn->prepare(
+            "UPDATE huesped SET telefono = :telefono, correo = COALESCE(:correo, correo) WHERE id = :id"
+        );
+        $this->enlazar($stmt, [":telefono" => $telefono, ":correo" => $correo, ":id" => $id]);
         return $stmt->execute();
     }
 }

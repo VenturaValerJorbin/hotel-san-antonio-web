@@ -78,6 +78,7 @@
             tipo_documento: $("tipo_documento").value,
             numero_documento: $("numero_documento").value.trim().toUpperCase(),
             telefono: $("telefono").value.trim(),
+            correo: $("correo").value.trim(),
             modalidad_pago: $("modalidad_pago").value,
             metodo_pago: form.querySelector("input[name=metodo_pago]:checked")?.value || "",
             acepta: $("acepta").checked,
@@ -100,6 +101,7 @@
                 return null; // el error de tipo_documento ya avisa
             },
             telefono: (d) => /^\+?\d{7,15}$/.test(d.telefono) ? null : "Celular no válido (solo números, 7 a 15 dígitos).",
+            correo: (d) => (!d.correo || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.correo)) ? null : "Ingresa un correo válido, o deja el campo vacío.",
             modalidad_pago: (d) => d.modalidad_pago ? null : "Elige cómo pagar.",
             metodo_pago: (d) => d.metodo_pago ? null : "Elige un método de pago.",
             acepta: (d) => d.acepta ? null : "Debes aceptar los términos y condiciones.",
@@ -128,7 +130,7 @@
         $("tipo_documento").addEventListener("change", () => { actualizarDocumento(); validarCampo("numero_documento"); });
 
         // Revalida un campo apenas el huesped lo corrige, sin esperar a reenviar el formulario
-        ["tipo_id", "fecha_ingreso", "fecha_salida", "nombre_completo", "numero_documento", "telefono"].forEach((campo) => {
+        ["tipo_id", "fecha_ingreso", "fecha_salida", "nombre_completo", "numero_documento", "telefono", "correo"].forEach((campo) => {
             $(campo).addEventListener("input", () => { if ($(campo).classList.contains("is-invalid")) validarCampo(campo); });
         });
         $("modalidad_pago").addEventListener("change", () => validarCampo("modalidad_pago"));

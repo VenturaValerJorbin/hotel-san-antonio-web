@@ -162,7 +162,7 @@ class Reserva extends Dao
     public function porCodigoYDocumento(string $codigo, string $numeroDocumento): ?array
     {
         $stmt = $this->conn->prepare(
-            "SELECT v.*, hu.nombre_completo, hu.tipo_documento, hu.numero_documento, hu.telefono,
+            "SELECT v.*, hu.nombre_completo, hu.tipo_documento, hu.numero_documento, hu.telefono, hu.correo,
                     hab.numero AS habitacion, hab.piso, t.nombre AS tipo
              FROM vista_reserva v
              JOIN huesped hu ON hu.id = v.huesped_id

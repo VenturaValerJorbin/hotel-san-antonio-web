@@ -60,6 +60,7 @@ hero(
                 <?= e($reserva["nombre_completo"]) ?><br>
                 <?= e($reserva["tipo_documento"]) ?> <?= e($reserva["numero_documento"]) ?>
                 <?php if ($reserva["telefono"]) : ?> · <?= e($reserva["telefono"]) ?><?php endif ?>
+                <?php if ($reserva["correo"]) : ?> · <?= e($reserva["correo"]) ?><?php endif ?>
             </p>
 
             <h3 class="h6 text-muted">Habitación y estadía</h3>
