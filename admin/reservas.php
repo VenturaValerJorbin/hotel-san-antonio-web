@@ -17,9 +17,10 @@ $bo->liberarNoShow();   // cierra sola cualquier reserva cuya fecha de salida ya
 $reservas = $bo->listar($filtros);
 $resumen = $bo->resumen();
 
-// "pendiente" y "cancelada" no se usan hoy: toda reserva nace "confirmada" (pago instantaneo,
-// aunque simulado) y el pago no es reembolsable, asi que no hay una accion de "cancelar".
-$estados = ["confirmada" => "Confirmada", "checkin" => "En el hotel", "checkout" => "Finalizada", "no_show" => "No llegó"];
+// "pendiente" no se usa hoy (el pago es instantaneo, asi que toda reserva nace "confirmada"), pero
+// se deja en el filtro para cuando se integre una pasarela real y el pago ya no sea inmediato.
+// "cancelada" si se quita: el pago no es reembolsable, asi que no hay una accion de "cancelar".
+$estados = ["pendiente" => "Pendiente", "confirmada" => "Confirmada", "checkin" => "En el hotel", "checkout" => "Finalizada", "no_show" => "No llegó"];
 
 require __DIR__ . "/../views/partes/panel_cabecera.php";
 
