@@ -10,7 +10,9 @@ require __DIR__ . "/../views/partes/cabecera.php";
 
 $valor = fn($campo) => $antiguo[$campo] ?? "";
 $claseError = fn($campo) => isset($errores[$campo]) ? " is-invalid" : "";
-$mensaje = fn($campo) => isset($errores[$campo]) ? '<div class="invalid-feedback d-block">' . e($errores[$campo]) . "</div>" : "";
+// Siempre imprime el contenedor del mensaje (vacio si no hay error), con data-error para que
+// assets/js/app.js pueda mostrar y quitar los errores de validacion sin recargar la pagina.
+$mensaje = fn($campo) => '<div class="invalid-feedback' . (isset($errores[$campo]) ? " d-block" : "") . '" data-error="' . $campo . '">' . e($errores[$campo] ?? "") . '</div>';
 
 // El asunto puede llegar preseleccionado por la URL (ej. el enlace del Libro de Reclamaciones usa ?asunto=reclamo)
 $asuntos = ["reserva" => "Reserva", "consulta" => "Consulta", "sugerencia" => "Sugerencia", "reclamo" => "Reclamo"];
@@ -29,7 +31,7 @@ hero(
                 <h2 class="h4">Formulario de contacto</h2>
                 <div class="sa-linea-dorada"></div>
                 <p class="text-muted small">Escríbenos y te responderemos a la brevedad. Estaremos encantados de ayudarte con tu reserva o cualquier consulta.</p>
-                <form action="<?= url("procesar.php") ?>" method="post" novalidate>
+                <form id="formContacto" action="<?= url("procesar.php") ?>" method="post" novalidate>
                     <input type="hidden" name="modulo" value="contacto">
                     <input type="hidden" name="accion" value="enviar">
                     <div class="mb-3">

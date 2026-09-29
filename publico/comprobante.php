@@ -33,11 +33,11 @@ hero(
             <form method="get" class="row g-3">
                 <div class="col-12">
                     <label class="form-label requerido" for="codigo">Código de reserva</label>
-                    <input class="form-control" id="codigo" name="codigo" placeholder="Ej. SAAB12CD34" value="<?= e($codigo) ?>" required>
+                    <input class="form-control" id="codigo" name="codigo" maxlength="10" placeholder="Ej. SAAB12CD34" value="<?= e($codigo) ?>" required>
                 </div>
                 <div class="col-12">
                     <label class="form-label requerido" for="numero_documento">DNI o pasaporte</label>
-                    <input class="form-control" id="numero_documento" name="numero_documento" placeholder="Ej. 12345678" value="<?= e($documento) ?>" required>
+                    <input class="form-control" id="numero_documento" name="numero_documento" maxlength="12" placeholder="Ej. 12345678" value="<?= e($documento) ?>" required>
                 </div>
                 <div class="col-12"><button class="btn-sa w-100" type="submit">Buscar</button></div>
             </form>

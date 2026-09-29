@@ -235,6 +235,18 @@
         const resultado = document.getElementById("resultadoConsultaPuntos");
         const url = formConsulta.dataset.consulta;
 
+        // El DNI es siempre de 8 digitos exactos: no dejar escribir de mas (igual que en Reservar)
+        const actualizarLongitud = () => {
+            const esDni = tipoSel.value === "DNI";
+            numInput.maxLength = esDni ? 8 : 12;
+            numInput.placeholder = esDni ? "Ej. 12345678" : "Ej. AB123456";
+        };
+        // Si el documento cambia despues de consultar, el resultado anterior ya no corresponde
+        const limpiarResultado = () => { resultado.innerHTML = ""; };
+        actualizarLongitud();
+        tipoSel.addEventListener("change", () => { actualizarLongitud(); limpiarResultado(); });
+        numInput.addEventListener("input", limpiarResultado);
+
         const consultar = async () => {
             const tipo = tipoSel.value;
             const numero = numInput.value.trim().toUpperCase();
@@ -263,9 +275,66 @@
         const parametros = new URLSearchParams(location.search);
         if (parametros.get("numero_documento")) {
             if (parametros.get("tipo_documento") === "PASAPORTE") tipoSel.value = "PASAPORTE";
+            actualizarLongitud();
             numInput.value = parametros.get("numero_documento");
             consultar();
         }
+    }
+
+    // ---- Formulario de contacto: validacion en el navegador, mismas reglas que el servidor
+    // (src/Controller/Contacto.php), sin esperar a que la pagina se recargue ----
+    const formContacto = document.getElementById("formContacto");
+    if (formContacto) {
+        const $c = (id) => document.getElementById(id);
+
+        const leerDatosContacto = () => ({
+            nombre: $c("nombre").value.trim(),
+            correo: $c("correo").value.trim(),
+            telefono: $c("telefono").value.trim(),
+            asunto: $c("asunto").value,
+            mensaje: $c("mensaje").value.trim(),
+        });
+
+        const reglasContacto = {
+            nombre: (d) => /^[\p{L}][\p{L} '.-]{2,99}$/u.test(d.nombre) ? null : "Escribe tu nombre (solo letras).",
+            correo: (d) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(d.correo) ? null : "Correo electrónico no válido.",
+            telefono: (d) => /^\+?\d{7,15}$/.test(d.telefono) ? null : "Celular no válido (solo números, 7 a 15 dígitos).",
+            asunto: (d) => d.asunto ? null : "Selecciona un asunto.",
+            mensaje: (d) => (d.mensaje.length >= 10 && d.mensaje.length <= 500) ? null : "El mensaje debe tener entre 10 y 500 caracteres.",
+        };
+
+        const mostrarErrorContacto = (campo, mensaje) => {
+            const contenedor = formContacto.querySelector('[data-error="' + campo + '"]');
+            if (contenedor) {
+                contenedor.textContent = mensaje || "";
+                contenedor.classList.toggle("d-block", Boolean(mensaje));
+            }
+            const control = $c(campo);
+            if (control) control.classList.toggle("is-invalid", Boolean(mensaje));
+            return !mensaje;
+        };
+
+        const validarCampoContacto = (campo) => mostrarErrorContacto(campo, reglasContacto[campo](leerDatosContacto()));
+
+        // Los campos de texto se revalidan al escribir (solo si ya estaban marcados en rojo);
+        // el "asunto" es un select, se revalida apenas cambia (igual que modalidad_pago en Reservar)
+        ["nombre", "correo", "telefono", "mensaje"].forEach((campo) => {
+            $c(campo).addEventListener("input", () => { if ($c(campo).classList.contains("is-invalid")) validarCampoContacto(campo); });
+        });
+        $c("asunto").addEventListener("change", () => validarCampoContacto("asunto"));
+
+        formContacto.addEventListener("submit", (evento) => {
+            const datos = leerDatosContacto();
+            let primerError = null;
+            for (const campo in reglasContacto) {
+                if (!mostrarErrorContacto(campo, reglasContacto[campo](datos)) && !primerError) primerError = campo;
+            }
+            if (primerError) {
+                evento.preventDefault();
+                $c(primerError)?.scrollIntoView({ behavior: "smooth", block: "center" });
+                $c(primerError)?.focus();
+            }
+        });
     }
 
     // ---- Boton "Copiar direccion" ----
