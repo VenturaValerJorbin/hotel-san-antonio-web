@@ -9,13 +9,13 @@ $carta = (new RestauranteBO())->carta();
 
 require __DIR__ . "/../partes/cabecera.php";
 
-//imagen restaurante cabesera
+// "sa-hero-foto-restaurante" pone una foto de fondo en el hero, sin etiqueta encima
 hero(
     "Carta del restaurante",
     "Sabores amazónicos del corazón de Bagua. Disfruta de una experiencia única con lo mejor de nuestra tierra.",
     [["Inicio", "index.php"], ["Restaurante", null]],
-    "",                          // <- NUEVO (sin etiqueta)
-    "sa-hero-foto-restaurante"   // <- NUEVO (clase de la foto)
+    "",
+    "sa-hero-foto-restaurante"
 );
 ?>
 <main class="container py-4 py-lg-5">

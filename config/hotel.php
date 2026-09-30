@@ -9,13 +9,9 @@ return [
     "yape" => "929 179 237",
     "correo" => "hotelturisticosanantonio@gmail.com",
     "recepcion" => "Recepción las 24 horas",
-    // Foto de la pagina "Nosotros": poner aqui la ruta de la imagen (ej. "assets/img/nosotros/hotel.jpg").
-    // Mientras este en null se muestra un marcador.
-
-    //imagen de nosotros
-"foto_nosotros" => "assets/img/hero/recepcion.jpg",
-    // Redes sociales: completar con la direccion real de cada una (https://...).
-    // Las que queden vacias no se muestran en el pie de pagina.
+    // Foto de la pagina "Nosotros"; si es null se muestra un marcador en su lugar
+    "foto_nosotros" => "assets/img/hero/recepcion.jpg",
+    // Las redes sociales vacias no se muestran en el pie de pagina
     "redes" => [
         "facebook" => "",
         "instagram" => "",

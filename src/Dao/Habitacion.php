@@ -22,14 +22,14 @@ class Habitacion extends Dao
     // READ: una habitacion por id (null si no existe)
     public function obtener(int $id): ?array
     {
-        $stmt = $this->conn->prepare(
+        $stmt = $this->conn->prepare(  //   PREPARE esta aqui
             "SELECT h.*, t.nombre AS tipo, t.precio_noche
              FROM habitacion h
              JOIN tipo_habitacion t ON t.id = h.tipo_id
              WHERE h.id = :id"
         );
-        $this->enlazar($stmt, [":id" => $id]);                          // Bind
-        $stmt->execute();
+        $this->enlazar($stmt, [":id" => $id]);          //   BIND esta aqui                 // Bind
+        $stmt->execute();                       //  EXECUTE esta aqui
         return $stmt->fetch() ?: null;
     }
 

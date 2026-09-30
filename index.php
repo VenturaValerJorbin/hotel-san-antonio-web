@@ -5,7 +5,7 @@ use App\Bo\Habitacion as HabitacionBO;
 
 $titulo = "Inicio";
 $tipos = (new HabitacionBO())->tipos();
-// En la portada se destacan tres tipos
+
 $destacadas = array_filter($tipos, fn($t) => in_array($t->nombre, ["Simple", "Matrimonial", "King"], true));
 $servicios = [
     ["bi-car-front", "Cochera gratuita", "Estacionamiento sin costo para nuestros huéspedes."],

@@ -11,8 +11,8 @@ unset($_SESSION["flash"], $_SESSION["errores"], $_SESSION["antiguo"]);
 
 $hotel = require dirname(__DIR__, 2) . "/config/hotel.php";
 
-// Direccion base del proyecto (ej. /hotel_san_antonio_web/). Las paginas viven en la raiz, en publico/ o en admin/,
-// asi que se quita esa subcarpeta para que todos los enlaces partan siempre de la raiz.
+// Direccion base del proyecto (ej. /hotel_san_antonio_web/). Las paginas viven en la raiz o en
+// views/publico/ o views/admin/, asi que se quita esa subcarpeta para que todos los enlaces partan siempre de la raiz.
 $base = rtrim(preg_replace("#/views/(publico|admin)$#", "", str_replace("\\", "/", dirname($_SERVER["SCRIPT_NAME"]))), "/") . "/";
 
 // Arma un enlace desde la raiz del proyecto: url("views/publico/reservar.php"), url("assets/css/estilo.css")
@@ -64,26 +64,17 @@ function fechaLarga(string $fecha): string
     return date("d/m/Y", strtotime($fecha));
 }
 
-// Foto real si existe la ruta; si no, un marcador con el mismo tamano
-// ===================== CAMBIO 4 (corregido) =====================
-// Antes: src="' . e($ruta) . '"  -> fallaba en paginas dentro de publico/
-// o admin/, porque la ruta guardada en la BD (ej. "assets/img/...") es
-// relativa a la RAIZ del proyecto, no a la carpeta de la pagina actual.
-// Ahora se arma igual que todos los demas enlaces del sitio, con url().
+// Foto real si existe la ruta (relativa a la raiz del proyecto, como todos los enlaces del sitio);
+// si no hay foto, un marcador con el mismo tamano
 function foto(?string $ruta, string $alt, string $icono = "bi-image"): void
 {
     echo $ruta
         ? '<img class="sa-foto" src="' . e(url($ruta)) . '" alt="' . e($alt) . '" loading="lazy">'
         : '<div class="sa-foto" role="img" aria-label="' . e($alt) . '"><i class="bi ' . e($icono) . '"></i></div>';
 }
-// ===================== FIN CAMBIO 4 ==============================
 
-// =====================================================================
-// CAMBIO 1 de 3 (agregado) - views/partes/ayudas.php
-// Carrusel de fotos (usa el componente Carousel de Bootstrap, que ya
-// se carga en pie.php). Si no hay fotos o hay solo una, no arma
-// carrusel: cae en foto() de siempre para no romper nada.
-// =====================================================================
+// Carrusel de fotos (usa el componente Carousel de Bootstrap, que ya se carga en pie.php).
+// Si no hay fotos o hay solo una, cae en foto() en vez de armar el carrusel.
 function carrusel(array $fotos, string $alt, string $icono = "bi-image", string $idBase = "carrusel"): void
 {
     if (!$fotos) {
@@ -105,7 +96,6 @@ function carrusel(array $fotos, string $alt, string $icono = "bi-image", string 
     echo '</div><div class="carousel-inner">';
     foreach ($fotos as $i => $f) {
         echo '<div class="carousel-item' . ($i === 0 ? ' active' : '') . '">';
-        // CAMBIO 5 (corregido): src="' . e(url($f)) . '" en vez de e($f) -> mismo motivo que CAMBIO 4
         echo '<img class="sa-foto" src="' . e(url($f)) . '" alt="' . e($alt) . ' - foto ' . ($i + 1) . '" loading="lazy">';
         echo '</div>';
     }
@@ -116,7 +106,6 @@ function carrusel(array $fotos, string $alt, string $icono = "bi-image", string 
         . '<span class="carousel-control-next-icon" aria-hidden="true"></span><span class="visually-hidden">Siguiente</span></button>';
     echo '</div>';
 }
-// ===================== FIN CAMBIO 1 de 3 ==============================
 
 function hero(string $titulo, string $texto = "", array $migas = [], string $etiqueta = "", string $claseExtra = ""): void
 {
@@ -146,10 +135,7 @@ function tarjetaTipo(\App\Dto\TipoHabitacion $t, string $consulta = ""): void
     $sufijo = $consulta ? "&" . $consulta : "";
     echo '<div class="col-12 col-md-6 col-lg-4"><article class="sa-card h-100 d-flex flex-column">';
     echo '<div class="p-2 pb-0">';
-    // ================= CAMBIO 2 de 3 (modificado) =====================
-    // Antes: foto($t->fotos[0] ?? null, "Habitación " . $t->nombre, "bi-house-heart");
     carrusel($t->fotos, "Habitación " . $t->nombre, "bi-house-heart", "tarjeta-" . $t->id);
-    // ===================== FIN CAMBIO 2 de 3 ===========================
     echo '</div><div class="sa-card-cuerpo d-flex flex-column flex-grow-1">';
     echo '<div class="d-flex justify-content-between align-items-start gap-2"><div>';
     echo '<h3 class="h5 mb-1">' . e($t->nombre) . '</h3>';

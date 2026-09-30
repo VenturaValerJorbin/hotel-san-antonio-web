@@ -29,13 +29,7 @@ hero(
     <div class="row g-4">
         <div class="col-12 col-lg-7">
             <div class="sa-card p-2">
-                <?php
-                // ================= CAMBIO 3 de 3 (modificado) =====================
-                // Antes: foto() de la primera imagen + fila de hasta 4 miniaturas debajo.
-                // Ahora: un solo carrusel con TODAS las fotos de la habitacion.
-                carrusel($tipo->fotos, "Habitación " . $tipo->nombre, "bi-house-heart", "detalle-" . $tipo->id);
-                // ===================== FIN CAMBIO 3 de 3 ===========================
-                ?>
+                <?php carrusel($tipo->fotos, "Habitación " . $tipo->nombre, "bi-house-heart", "detalle-" . $tipo->id); ?>
             </div>
 
             <h2 class="h4 mt-4">Descripción</h2>

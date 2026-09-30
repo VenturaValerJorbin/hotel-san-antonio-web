@@ -15,8 +15,9 @@ class Conexion
         try {
             $dsn = "mysql:host=$this->host;dbname=$this->dbname;charset=utf8mb4";
             $conexion = new \PDO($dsn, $this->user, $this->password);
-            // Los errores de SQL se lanzan como excepciones (PDOException)
+            // Los errores de SQL se lanzan como excepciones (PDOException), en vez de fallar en silencio
             $conexion->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            // Los resultados de las consultas vienen como arreglo asociativo: $fila["columna"]
             $conexion->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_ASSOC);
             // Sentencias preparadas reales en el servidor (no simuladas por PHP)
             $conexion->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
